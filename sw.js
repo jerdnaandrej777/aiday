@@ -1,14 +1,18 @@
 // AIDAY Service Worker
-const CACHE_NAME = 'aiday-v1';
-const OFFLINE_URL = '/offline.html';
+const CACHE_NAME = 'aiday-v2';
+const OFFLINE_URL = 'offline.html';
+
+// Base-Pfad ermitteln (funktioniert für GitHub Pages Subdirectory)
+const BASE_PATH = self.location.pathname.replace(/sw\.js$/, '');
 
 // Dateien, die beim Install gecacht werden
 const PRECACHE_ASSETS = [
-  '/',
-  '/app.html',
-  '/start-ui.html',
-  '/offline.html',
-  '/manifest.json'
+  './',
+  './app.html',
+  './start-ui.html',
+  './offline.html',
+  './manifest.json',
+  './index.html'
 ];
 
 // Install Event - Precache wichtige Assets
@@ -163,8 +167,8 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'AIDAY',
     body: 'Du hast eine neue Benachrichtigung',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-72.png'
+    icon: 'icons/icon-192.png',
+    badge: 'icons/icon-72.png'
   };
 
   if (event.data) {
@@ -181,7 +185,7 @@ self.addEventListener('push', (event) => {
     badge: data.badge,
     vibrate: [100, 50, 100],
     data: {
-      url: data.url || '/app.html'
+      url: data.url || 'app.html'
     },
     actions: [
       { action: 'open', title: 'Öffnen' },
@@ -204,7 +208,7 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  const url = event.notification.data?.url || '/app.html';
+  const url = event.notification.data?.url || 'app.html';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })

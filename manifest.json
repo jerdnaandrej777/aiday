@@ -2,12 +2,12 @@
   "name": "AIDAY - KI-gestützter Tagesplaner",
   "short_name": "AIDAY",
   "description": "Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität",
-  "start_url": "/app.html",
+  "start_url": "./app.html",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#6366f1",
   "orientation": "portrait",
-  "scope": "/",
+  "scope": "./",
   "lang": "de-DE",
   "categories": ["productivity", "lifestyle", "health"],
   "icons": [
@@ -65,14 +65,14 @@
       "name": "Check-in starten",
       "short_name": "Check-in",
       "description": "Täglichen Check-in starten",
-      "url": "/app.html?action=checkin",
+      "url": "./app.html?action=checkin",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Neues Ziel",
       "short_name": "Ziel",
       "description": "Neues Ziel erstellen",
-      "url": "/app.html?action=newgoal",
+      "url": "./app.html?action=newgoal",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     }
   ],
