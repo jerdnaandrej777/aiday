@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Aiday – Mobile UI Wireframe (Goal Intelligence)</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --muted: #a0a6b5;
+      --text: #e8ecf3;
+      --accent: #7aa2ff;
+      --accent-2: #5be7a9;
+      --danger: #ff6b6b;
+      --warning: #ffb86c;
+      --border: #212635;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    a { color: inherit; text-decoration: none; }
+    .page { display: flex; justify-content: center; padding: 24px; gap: 24px; flex-wrap: wrap; }
+    .phone { width: 392px; height: 844px; border-radius: 32px; background: #0b0d12; border: 1px solid var(--border); overflow: hidden; position: relative; box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+    .statusbar { height: 20px; }
+    .topbar { height: 52px; display:flex; align-items:center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent); }
+    .topbar .title { font-weight: 600; }
+    .goal-select { font-size: 12px; color: var(--muted); }
+    .content { position: absolute; top: 72px; bottom: 80px; left: 0; right: 0; overflow: auto; padding: 16px; }
+    .navbar { position: absolute; bottom: 0; left:0; right:0; height: 80px; border-top:1px solid var(--border); background: #0c0f15; display:flex; }
+    .nav-item { flex:1; display:flex; flex-direction: column; align-items:center; justify-content:center; gap:4px; color: var(--muted); font-size: 12px; }
+    .nav-item.active { color: var(--accent); }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+    .row { display:flex; gap: 12px; align-items: center; }
+    .row.spread { justify-content: space-between; }
+    .kpi { background: #0e121a; border: 1px solid var(--border); padding: 10px; border-radius: 12px; min-width: 90px; text-align: center; }
+    .kpi .label { color: var(--muted); font-size: 12px; }
+    .kpi .value { font-size: 18px; font-weight: 600; }
+    .badge { font-size: 10px; padding: 4px 8px; border-radius: 999px; background: #0e1525; border: 1px solid var(--border); color: var(--muted); }
+
+    .action-card { border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(180deg, rgba(122,162,255,0.06), rgba(122,162,255,0.02)); padding: 16px; }
+    .action-title { font-weight: 600; }
+    .impact { display:flex; gap:8px; font-size: 12px; color: var(--muted); }
+    .impact .pill { background:#0e1525; border:1px solid var(--border); border-radius:12px; padding:4px 8px; }
+    .btn-row { display:flex; gap:8px; margin-top:10px; }
+    .btn { padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: #0e121a; color: var(--text); font-weight: 600; font-size: 14px; }
+    .btn.primary { background: var(--accent); color: #0a0b0f; border: none; }
+    .btn.success { background: var(--accent-2); color: #07130d; border:none; }
+    .btn.ghost { background: transparent; }
+
+    .list { display:flex; flex-direction: column; gap:8px; }
+    .list-item { display:flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 12px; background: #0d121a; border:1px solid var(--border); }
+    .list-item .title { font-weight: 600; }
+    .list-item .meta { color: var(--muted); font-size: 12px; }
+
+    .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 16px 0 8px; }
+
+    .chart { height: 80px; background: linear-gradient(180deg, rgba(91,231,169,0.12), transparent); border-radius: 12px; border: 1px dashed #28403a; display:flex; align-items:center; justify-content:center; color:#86ffd1; font-size:12px; }
+
+    .toggle-screens { position: absolute; top: 8px; right: 8px; display:flex; gap:6px; }
+    .toggle-screens button { font-size: 11px; padding:6px 8px; border-radius: 10px; border:1px solid var(--border); background:#0f1420; color:var(--muted); }
+    .toggle-screens button.active { color: #0a0b0f; background: var(--accent); border-color: transparent; }
+
+    .explain { font-size: 13px; color: var(--muted); background:#0b0f18; border:1px solid var(--border); border-radius:12px; padding:10px; }
+    .fab { position: absolute; right: 16px; bottom: 96px; background: var(--accent-2); color:#0a0b0f; border:none; padding:14px 16px; border-radius: 16px; font-weight:700; box-shadow: 0 6px 24px rgba(91,231,169,0.2); }
+
+    .divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="phone" id="app">
+      <div class="statusbar"></div>
+      <div class="topbar">
+        <div class="title" id="screenTitle">Nächste Aktion</div>
+        <div class="goal-select">
+          Ziel: <strong>+500 €/Monat</strong> bis 30.06. — <span class="badge">Mehr Einkommen</span>
+        </div>
+      </div>
+
+      <div class="toggle-screens">
+        <button data-nav="home" class="active">Home</button>
+        <button data-nav="plan">Plan</button>
+        <button data-nav="checkin">Check‑in</button>
+        <button data-nav="insights">Insights</button>
+        <button data-nav="profile">Profil</button>
+      </div>
+
+      <div class="content">
+        <!-- HOME: Next best action -->
+        <section data-screen="home">
+          <div class="card row spread">
+            <div>
+              <div class="muted">Primärmetrik</div>
+              <div class="row" style="gap:8px;">
+                <div class="kpi"><div class="label">Netto Δ</div><div class="value">+120 €</div></div>
+                <div class="kpi"><div class="label">Prognose</div><div class="value">+540 €</div></div>
+                <div class="kpi"><div class="label">Woche</div><div class="value">W2/6</div></div>
+              </div>
+            </div>
+            <div class="badge">Bandit: UCB</div>
+          </div>
+
+          <div class="action-card">
+            <div class="action-title">Markt‑Research + Value‑Case für Gehaltsgespräch</div>
+            <div class="impact" style="margin-top:6px;">
+              <span class="pill">Impact: hoch</span>
+              <span class="pill">Aufwand: 2.5h</span>
+              <span class="pill">Fit: 0.9</span>
+              <span class="pill">Exploration +0.12</span>
+            </div>
+            <div class="btn-row">
+              <button class="btn primary">Starten</button>
+              <button class="btn ghost" id="explainBtn">Warum?</button>
+              <button class="btn" style="border-color:#2a2f3e;">Später</button>
+            </div>
+            <div class="divider"></div>
+            <div class="explain" id="explainBox" style="display:none;">
+              Empfohlen, weil: aktuelles Gehalt < 35. Percentil Markt; Performance: hoch; geringe Friktion; erwarteter Uplift 6–12%. Quellen: Glassdoor, interner Impact‑Log.
+            </div>
+          </div>
+
+          <div class="section-title">Heute</div>
+          <div class="list">
+            <div class="list-item"><div>
+              <div class="title">3 Job‑Listings validieren</div>
+              <div class="meta">Score 0.74 • 35 min</div>
+            </div><div class="badge">Job‑Switch</div></div>
+            <div class="list-item"><div>
+              <div class="title">Portfolio: Case #1 Teaser</div>
+              <div class="meta">Score 0.62 • 45 min</div>
+            </div><div class="badge">Freelancing</div></div>
+          </div>
+        </section>
+
+        <!-- PLAN: Weekly plan -->
+        <section data-screen="plan" style="display:none;">
+          <div class="section-title">Wöchentlicher Sprint</div>
+          <div class="card">
+            <div class="row spread"><div><strong>Fokus</strong>: Negotiation + Job‑Switch</div><span class="badge">Kapazität: 6h</span></div>
+            <div class="divider"></div>
+            <div class="list">
+              <div class="list-item"><div><div class="title">Interview‑Drill (Systemdesign)</div><div class="meta">Impact 0.7 • Aufwand 1.5h</div></div><button class="btn">Planen</button></div>
+              <div class="list-item"><div><div class="title">LinkedIn Re‑branding</div><div class="meta">Impact 0.6 • Aufwand 1h</div></div><button class="btn">Planen</button></div>
+              <div class="list-item"><div><div class="title">Headhunter kontaktieren</div><div class="meta">Impact 0.5 • Aufwand 0.5h</div></div><button class="btn">Planen</button></div>
+            </div>
+          </div>
+          <div class="section-title">Tracks</div>
+          <div class="row">
+            <div class="kpi"><div class="label">Negotiation</div><div class="value">w=0.42</div></div>
+            <div class="kpi"><div class="label">Job‑Switch</div><div class="value">w=0.33</div></div>
+            <div class="kpi"><div class="label">Skill</div><div class="value">w=0.18</div></div>
+            <div class="kpi"><div class="label">Freelance</div><div class="value">w=0.07</div></div>
+          </div>
+        </section>
+
+        <!-- CHECK-IN: Proxy metrics logging -->
+        <section data-screen="checkin" style="display:none;">
+          <div class="section-title">Check‑in (Woche)</div>
+          <div class="card">
+            <div class="list">
+              <div class="list-item"><div><div class="title">Bewerbungen</div><div class="meta">Anzahl</div></div><input type="number" min="0" value="3" class="btn" style="width:80px; text-align:center;"></div>
+              <div class="list-item"><div><div class="title">Interviews</div><div class="meta">Anzahl</div></div><input type="number" min="0" value="1" class="btn" style="width:80px; text-align:center;"></div>
+              <div class="list-item"><div><div class="title">Skill‑Practice</div><div class="meta">Stunden</div></div><input type="number" min="0" value="2" class="btn" style="width:80px; text-align:center;"></div>
+              <div class="list-item"><div><div class="title">Einkommen Δ</div><div class="meta">€ / Monat</div></div><input type="number" min="-2000" value="120" class="btn" style="width:100px; text-align:center;"></div>
+            </div>
+            <div class="btn-row" style="margin-top:12px;">
+              <button class="btn success">Check‑in speichern</button>
+              <button class="btn ghost">Später</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- INSIGHTS: Analytics & rationale -->
+        <section data-screen="insights" style="display:none;">
+          <div class="section-title">Outcome‑Trends</div>
+          <div class="card"><div class="chart">Netto‑Einkommen Δ (Placeholder Chart)</div></div>
+          <div class="section-title">Wirksamkeit je Track</div>
+          <div class="list">
+            <div class="list-item"><div><div class="title">Negotiation</div><div class="meta">Uplift/Std: 0.8 | Konfidenz: 72%</div></div><div class="badge">↑ Priorisieren</div></div>
+            <div class="list-item"><div><div class="title">Job‑Switch</div><div class="meta">Uplift/Std: 0.6 | Konfidenz: 64%</div></div><div class="badge">= Halten</div></div>
+            <div class="list-item"><div><div class="title">Skill Upgrade</div><div class="meta">Uplift/Std: 0.3 | Konfidenz: 51%</div></div><div class="badge">↓ Drosseln</div></div>
+          </div>
+          <div class="section-title">Erklärungen</div>
+          <div class="card explain">Ranking begründet durch: jüngste Proxy‑Erfolge, Aufwand/Impact‑Verhältnis, Profil‑Fit, Exploration‑Bonus (UCB). Manuelle Anpassung möglich.</div>
+        </section>
+
+        <!-- PROFILE: Settings & goal definition -->
+        <section data-screen="profile" style="display:none;">
+          <div class="section-title">Ziel</div>
+          <div class="card">
+            <div class="list">
+              <div class="list-item"><div><div class="title">Objective</div><div class="meta">Mehr Einkommen</div></div><button class="btn">Ändern</button></div>
+              <div class="list-item"><div><div class="title">Zielwert</div><div class="meta">+500 €/Monat</div></div><button class="btn">Anpassen</button></div>
+              <div class="list-item"><div><div class="title">Horizont</div><div class="meta">6 Monate</div></div><button class="btn">Anpassen</button></div>
+            </div>
+          </div>
+          <div class="section-title">Präferenzen</div>
+          <div class="card">
+            <div class="list">
+              <div class="list-item"><div><div class="title">Zeitbudget/Woche</div><div class="meta">6 Stunden</div></div><button class="btn">Bearbeiten</button></div>
+              <div class="list-item"><div><div class="title">No‑Go Tracks</div><div class="meta">Freelancing</div></div><button class="btn">Bearbeiten</button></div>
+              <div class="list-item"><div><div class="title">Transparenz</div><div class="meta">Erklärbares Ranking aktiv</div></div><button class="btn">Optionen</button></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <button class="fab">Beobachtung loggen</button>
+
+      <nav class="navbar">
+        <a class="nav-item active" data-nav="home">Home</a>
+        <a class="nav-item" data-nav="plan">Plan</a>
+        <a class="nav-item" data-nav="checkin">Check‑in</a>
+        <a class="nav-item" data-nav="insights">Insights</a>
+        <a class="nav-item" data-nav="profile">Profil</a>
+      </nav>
+    </div>
+  </div>
+
+  <script>
+    const screens = Array.from(document.querySelectorAll('[data-screen]'));
+    const navItems = Array.from(document.querySelectorAll('[data-nav]'));
+    const title = document.getElementById('screenTitle');
+    const titles = { home: 'Nächste Aktion', plan: 'Wöchentlicher Plan', checkin: 'Check‑in', insights: 'Insights', profile: 'Profil' };
+
+    function show(screen) {
+      screens.forEach(s => s.style.display = s.getAttribute('data-screen') === screen ? 'block' : 'none');
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('data-nav') === screen));
+      title.textContent = titles[screen] || '';
+      document.querySelectorAll('.toggle-screens button').forEach(b => b.classList.toggle('active', b.dataset.nav === screen));
+    }
+
+    document.querySelectorAll('[data-nav]').forEach(el => {
+      el.addEventListener('click', (e) => { e.preventDefault(); show(el.getAttribute('data-nav')); });
+    });
+
+    // Inline explain toggle
+    const explainBtn = document.getElementById('explainBtn');
+    const explainBox = document.getElementById('explainBox');
+    if (explainBtn) explainBtn.addEventListener('click', () => {
+      explainBox.style.display = explainBox.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Keyboard shortcuts for quick demo
+    window.addEventListener('keydown', (e) => {
+      const order = ['home','plan','checkin','insights','profile'];
+      const current = order.find(o => document.querySelector('[data-screen="'+o+'"]').style.display !== 'none');
+      let idx = order.indexOf(current);
+      if (e.key === 'ArrowRight') { idx = (idx + 1) % order.length; show(order[idx]); }
+      if (e.key === 'ArrowLeft') { idx = (idx - 1 + order.length) % order.length; show(order[idx]); }
+    });
+
+    // Init
+    show('home');
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "auth-export-data",
+  "entrypoint": "index.ts",
+  "import_map": "../_shared/import_map.json",
+  "verify_jwt": true
+}

@@ -1,0 +1,45 @@
+File: ..\..\..\..\..\Desktop\Apps\aiday\.github\workflows\ci.yml
+
+     1	name: CI
+     2	
+     3	on:
+     4	  push:
+     5	    branches: [ main ]
+     6	  pull_request:
+     7	    branches: [ main ]
+     8	
+     9	jobs:
+    10	  lint_and_typecheck:
+    11	    runs-on: ubuntu-latest
+    12	    steps:
+    13	      - name: Checkout
+    14	        uses: actions/checkout@v4
+    15	      - name: Setup Deno
+    16	        uses: denoland/setup-deno@v1
+    17	        with:
+    18	          deno-version: v1.x
+    19	      - name: Format check
+    20	        run: deno fmt --check
+    21	      - name: Lint
+    22	        run: deno lint
+    23	      - name: Type check Edge Functions
+    24	        run: deno check supabase/functions/**/index.ts
+    25	
+    26	  deploy:
+    27	    if: github.ref == 'refs/heads/main' && false  # set to true when ready to deploy
+    28	    needs: [lint_and_typecheck]
+    29	    runs-on: ubuntu-latest
+    30	    steps:
+    31	      - uses: actions/checkout@v4
+    32	      - name: Setup Supabase CLI
+    33	        uses: supabase/setup-cli@v1
+    34	      - name: Supabase login
+    35	        run: supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    36	      - name: Link project
+    37	        run: supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+    38	      - name: Deploy functions
+    39	        run: |
+    40	          supabase functions deploy coach-plan
+    41	          supabase functions deploy coach-checkin
+    42	          supabase functions deploy reminders-dispatch
+    43	          supabase functions deploy analytics-monthly

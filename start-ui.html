@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="AIDAY - Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität">
+
+  <!-- PWA Meta-Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AIDAY">
+  <meta name="application-name" content="AIDAY">
+  <meta name="msapplication-TileColor" content="#0a0a0f">
+  <meta name="msapplication-config" content="none">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120.png">
+
+  <title>AIDAY - Dein persönlicher Ziel-Coach</title>
+  <style>
+    :root {
+      --bg-dark: #0a0a0f;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-card-hover: rgba(255, 255, 255, 0.06);
+      --text: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.4);
+      --accent-2: #06b6d4;
+      --accent-2-glow: rgba(6, 182, 212, 0.4);
+      --glass-border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== ANIMATED BACKGROUND ========== */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* ========== BOKEH CLOCK LAYER ========== */
+    .clock-layer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: blur(50px);
+      opacity: 0.2;
+    }
+
+    .bokeh-clock {
+      position: absolute;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, transparent 70%);
+      box-shadow:
+        inset 0 0 60px rgba(255,255,255,0.05),
+        0 0 80px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Main Clock - Center */
+    .clock-1 {
+      width: 550px;
+      height: 550px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: clock-breathe-main 45s infinite ease-in-out;
+    }
+
+    /* Secondary Clocks */
+    .clock-2 {
+      width: 380px;
+      height: 380px;
+      top: 10%;
+      left: 5%;
+      opacity: 0.7;
+      animation: clock-drift-1 60s infinite ease-in-out;
+    }
+
+    .clock-3 {
+      width: 300px;
+      height: 300px;
+      bottom: 15%;
+      right: 5%;
+      opacity: 0.6;
+      animation: clock-drift-2 55s infinite ease-in-out;
+    }
+
+    .clock-4 {
+      width: 220px;
+      height: 220px;
+      top: 20%;
+      right: 15%;
+      opacity: 0.5;
+      animation: clock-drift-3 50s infinite ease-in-out;
+    }
+
+    .clock-5 {
+      width: 180px;
+      height: 180px;
+      bottom: 25%;
+      left: 15%;
+      opacity: 0.4;
+      animation: clock-drift-4 65s infinite ease-in-out;
+    }
+
+    @keyframes clock-breathe-main {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.2;
+        filter: blur(50px);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.08);
+        opacity: 0.28;
+        filter: blur(45px);
+      }
+    }
+
+    @keyframes clock-drift-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+      33% { transform: translate(30px, 20px) scale(1.05); opacity: 0.8; }
+      66% { transform: translate(-20px, 40px) scale(0.98); opacity: 0.65; }
+    }
+
+    @keyframes clock-drift-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+      33% { transform: translate(-25px, -15px) scale(1.03); opacity: 0.7; }
+      66% { transform: translate(15px, -30px) scale(0.97); opacity: 0.55; }
+    }
+
+    @keyframes clock-drift-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      50% { transform: translate(-20px, 25px) scale(1.06); opacity: 0.6; }
+    }
+
+    @keyframes clock-drift-4 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+      50% { transform: translate(25px, -20px) scale(1.04); opacity: 0.5; }
+    }
+
+    /* Clock Face Elements */
+    .clock-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 6%;
+      height: 6%;
+      background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 100%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    }
+
+    /* Hour Markers - All 12 */
+    .clock-markers {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .clock-marker {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 2px;
+      left: 50%;
+      top: 4%;
+      width: 2%;
+      height: 8%;
+      transform-origin: center calc(100% + 38%);
+    }
+
+    .clock-marker.major {
+      height: 10%;
+      width: 2.5%;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Clock Hands */
+    .clock-hand {
+      position: absolute;
+      bottom: 50%;
+      left: 50%;
+      transform-origin: bottom center;
+      border-radius: 4px;
+    }
+
+    /* Hour Hand */
+    .hand-hour {
+      width: 2.5%;
+      height: 22%;
+      margin-left: -1.25%;
+      background: linear-gradient(to top, rgba(255,255,255,0.5), rgba(255,255,255,0.15));
+      animation: rotate-hour 216000s linear infinite; /* 60 hours = very slow */
+    }
+
+    /* Minute Hand */
+    .hand-minute {
+      width: 1.8%;
+      height: 32%;
+      margin-left: -0.9%;
+      background: linear-gradient(to top, rgba(255,255,255,0.45), rgba(255,255,255,0.1));
+      animation: rotate-minute 3600s linear infinite; /* 1 hour per rotation */
+    }
+
+    /* Second Hand */
+    .hand-second {
+      width: 0.8%;
+      height: 38%;
+      margin-left: -0.4%;
+      background: linear-gradient(to top, var(--accent), rgba(99, 102, 241, 0.2));
+      animation: rotate-second 60s linear infinite; /* 1 minute per rotation - visible but slow */
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    @keyframes rotate-hour {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes rotate-minute {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes rotate-second {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Different starting positions */
+    .clock-1 .hand-hour { animation-delay: -30000s; }
+    .clock-1 .hand-minute { animation-delay: -900s; }
+    .clock-1 .hand-second { animation-delay: -15s; }
+
+    .clock-2 .hand-hour { animation-delay: -80000s; }
+    .clock-2 .hand-minute { animation-delay: -1800s; }
+    .clock-2 .hand-second { animation-delay: -30s; }
+
+    .clock-3 .hand-hour { animation-delay: -120000s; }
+    .clock-3 .hand-minute { animation-delay: -2700s; }
+    .clock-3 .hand-second { animation-delay: -45s; }
+
+    .clock-4 .hand-hour { animation-delay: -160000s; }
+    .clock-4 .hand-minute { animation-delay: -1200s; }
+    .clock-4 .hand-second { animation-delay: -8s; }
+
+    .clock-5 .hand-hour { animation-delay: -50000s; }
+    .clock-5 .hand-minute { animation-delay: -600s; }
+    .clock-5 .hand-second { animation-delay: -52s; }
+
+    /* ========== BOKEH CIRCLES ========== */
+    .bokeh-circles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .bokeh-circle {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(30px);
+      animation: bokeh-float 50s infinite ease-in-out;
+    }
+
+    .bokeh-circle:nth-child(1) {
+      width: 180px;
+      height: 180px;
+      top: 15%;
+      left: 10%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+      animation-delay: 0s;
+    }
+
+    .bokeh-circle:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: 55%;
+      left: 20%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+      animation-delay: -18s;
+    }
+
+    .bokeh-circle:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      top: 25%;
+      right: 15%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+      animation-delay: -10s;
+    }
+
+    .bokeh-circle:nth-child(4) {
+      width: 100px;
+      height: 100px;
+      bottom: 20%;
+      right: 25%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      animation-delay: -30s;
+    }
+
+    .bokeh-circle:nth-child(5) {
+      width: 150px;
+      height: 150px;
+      bottom: 35%;
+      left: 35%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      animation-delay: -15s;
+    }
+
+    .bokeh-circle:nth-child(6) {
+      width: 220px;
+      height: 220px;
+      top: 65%;
+      right: 8%;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
+      animation-delay: -35s;
+    }
+
+    .bokeh-circle:nth-child(7) {
+      width: 90px;
+      height: 90px;
+      top: 8%;
+      right: 30%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+      animation-delay: -25s;
+    }
+
+    .bokeh-circle:nth-child(8) {
+      width: 130px;
+      height: 130px;
+      bottom: 10%;
+      left: 8%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+      animation-delay: -42s;
+    }
+
+    @keyframes bokeh-float {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+      }
+      20% {
+        transform: translate(25px, -15px) scale(1.08);
+        opacity: 0.55;
+      }
+      40% {
+        transform: translate(-10px, 25px) scale(0.95);
+        opacity: 0.45;
+      }
+      60% {
+        transform: translate(15px, 10px) scale(1.02);
+        opacity: 0.5;
+      }
+      80% {
+        transform: translate(-20px, -10px) scale(0.98);
+        opacity: 0.42;
+      }
+    }
+
+    /* ========== AMBIENT ORBS ========== */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(150px);
+      animation: orb-float 120s infinite ease-in-out;
+    }
+
+    .orb-1 {
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -300px;
+      left: -200px;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--accent-2-glow) 0%, transparent 70%);
+      bottom: -250px;
+      right: -200px;
+      animation-delay: -40s;
+    }
+
+    .orb-3 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -80s;
+    }
+
+    .orb-4 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      top: 20%;
+      right: 10%;
+      animation-delay: -60s;
+    }
+
+    .orb-5 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+      bottom: 30%;
+      left: 5%;
+      animation-delay: -20s;
+    }
+
+    @keyframes orb-float {
+      0%, 100% {
+        opacity: 0.2;
+        transform: translate(0, 0) scale(1);
+      }
+      25% {
+        opacity: 0.3;
+        transform: translate(40px, -30px) scale(1.05);
+      }
+      50% {
+        opacity: 0.25;
+        transform: translate(-30px, 50px) scale(0.95);
+      }
+      75% {
+        opacity: 0.28;
+        transform: translate(25px, 25px) scale(1.02);
+      }
+    }
+
+    /* ========== FLOATING PARTICLES ========== */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: particle-rise linear infinite;
+      filter: blur(0.5px);
+    }
+
+    @keyframes particle-rise {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.8;
+        transform: translateY(95vh) translateX(5px) scale(1);
+      }
+      50% {
+        transform: translateY(50vh) translateX(-10px) scale(1);
+      }
+      95% {
+        opacity: 0.8;
+        transform: translateY(5vh) translateX(8px) scale(1);
+      }
+      100% {
+        transform: translateY(-5vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+    }
+
+    /* ========== PULSE RINGS ========== */
+    .pulse-rings {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 50%;
+      animation: pulse-expand 15s infinite ease-out;
+    }
+
+    .pulse-ring:nth-child(1) { animation-delay: 0s; }
+    .pulse-ring:nth-child(2) { animation-delay: -3.75s; }
+    .pulse-ring:nth-child(3) { animation-delay: -7.5s; }
+    .pulse-ring:nth-child(4) { animation-delay: -11.25s; }
+
+    @keyframes pulse-expand {
+      0% {
+        width: 80px;
+        height: 80px;
+        opacity: 0.25;
+        border-width: 2px;
+      }
+      100% {
+        width: 1000px;
+        height: 1000px;
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    /* ========== LIGHT RAYS ========== */
+    .light-rays {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200%;
+      height: 200%;
+      transform: translate(-50%, -50%);
+      opacity: 0.025;
+      animation: rays-rotate 240s linear infinite;
+    }
+
+    .light-ray {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background: linear-gradient(to top, transparent 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.4) 70%, transparent 100%);
+      transform-origin: center bottom;
+    }
+
+    @keyframes rays-rotate {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ========== WAVE EFFECT ========== */
+    .wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 250px;
+      overflow: hidden;
+      opacity: 0.06;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: -50%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(transparent 0%, var(--accent) 100%);
+      border-radius: 45% 45% 0 0;
+      animation: wave-motion 40s infinite ease-in-out;
+    }
+
+    .wave:nth-child(2) {
+      animation-delay: -12s;
+      opacity: 0.6;
+      border-radius: 42% 42% 0 0;
+    }
+
+    .wave:nth-child(3) {
+      animation-delay: -24s;
+      opacity: 0.35;
+      border-radius: 48% 48% 0 0;
+    }
+
+    @keyframes wave-motion {
+      0%, 100% {
+        transform: translateX(0) scaleY(1);
+      }
+      50% {
+        transform: translateX(20%) scaleY(1.25);
+      }
+    }
+
+    /* ========== VIGNETTE ========== */
+    .vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+    }
+
+    /* ========== MAIN CONTAINER ========== */
+    .container {
+      position: relative;
+      z-index: 10;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ========== SLIDES ========== */
+    .slides-wrapper {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 30px;
+      opacity: 0;
+      transform: translateX(100%) scale(0.9);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .slide.prev {
+      transform: translateX(-100%) scale(0.9);
+      opacity: 0;
+    }
+
+    /* ========== SLIDE CONTENT ========== */
+    .slide-icon {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 50px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-glow {
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: icon-pulse 8s infinite ease-in-out;
+    }
+
+    @keyframes icon-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.35; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+
+    .icon-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      animation: icon-float 10s infinite ease-in-out;
+    }
+
+    @keyframes icon-float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(2deg); }
+      50% { transform: translateY(-12px) rotate(0deg); }
+      75% { transform: translateY(-6px) rotate(-2deg); }
+    }
+
+    .icon-circle svg {
+      width: 50px;
+      height: 50px;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .slide-title {
+      font-size: 32px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .slide.active .slide-title {
+      animation: content-reveal 1s 0.3s forwards ease-out;
+    }
+
+    .slide-subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.7;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .slide.active .slide-subtitle {
+      animation: content-reveal 1s 0.5s forwards ease-out;
+    }
+
+    @keyframes content-reveal {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ========== NAVIGATION ========== */
+    .nav-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+
+    .nav-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-glow);
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    .nav-dot.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+
+    .nav-dot.active::after {
+      opacity: 1;
+      animation: dot-pulse 4s infinite ease-in-out;
+    }
+
+    @keyframes dot-pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+      50% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+    }
+
+    /* ========== BUTTONS ========== */
+    .buttons {
+      padding: 20px 30px 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .btn {
+      padding: 18px 36px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      text-align: center;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      box-shadow: 0 8px 32px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-next {
+      position: absolute;
+      bottom: 160px;
+      right: 30px;
+      padding: 14px 28px;
+      background: transparent;
+      border: 2px solid var(--glass-border);
+      color: var(--text);
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      z-index: 20;
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-next:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-next svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-next:hover svg {
+      transform: translateX(4px);
+    }
+
+    .btn-skip {
+      position: absolute;
+      top: 50px;
+      right: 24px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 20;
+      padding: 10px 16px;
+      transition: color 0.3s ease;
+    }
+
+    .btn-skip:hover {
+      color: var(--text);
+    }
+
+    /* ========== AUTH SCREENS ========== */
+    .auth-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 30px;
+    }
+
+    .auth-screen.active {
+      display: flex;
+    }
+
+    .auth-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 440px;
+      backdrop-filter: blur(20px);
+      animation: auth-fade-in 0.5s ease-out;
+    }
+
+    @keyframes auth-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .auth-logo span {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .auth-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .auth-btn {
+      margin-top: 8px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      box-shadow: 0 8px 32px var(--accent-glow);
+      transition: all 0.3s ease;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px var(--accent-glow);
+    }
+
+    .auth-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+
+    .auth-divider span {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .auth-switch {
+      text-align: center;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .auth-switch a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .auth-switch a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-back {
+      position: absolute;
+      top: 50px;
+      left: 30px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s ease;
+      z-index: 101;
+    }
+
+    .auth-back:hover {
+      color: var(--text);
+    }
+
+    .auth-back svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .auth-error {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #ff6b6b;
+      display: none;
+    }
+
+    .auth-error.show {
+      display: block;
+    }
+
+    .auth-success {
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--accent-2);
+      display: none;
+    }
+
+    .auth-success.show {
+      display: block;
+    }
+
+    /* Remember Me Checkbox */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .remember-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .remember-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-label:hover {
+      color: var(--text);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========== LOGO ========== */
+    .logo {
+      position: absolute;
+      top: 50px;
+      left: 30px;
+      font-size: 24px;
+      font-weight: 700;
+      z-index: 20;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-height: 700px) {
+      .slide-icon {
+        width: 150px;
+        height: 150px;
+        margin-bottom: 30px;
+      }
+      .icon-circle {
+        width: 90px;
+        height: 90px;
+      }
+      .icon-circle svg {
+        width: 36px;
+        height: 36px;
+      }
+      .slide-title {
+        font-size: 26px;
+      }
+      .buttons {
+        padding: 15px 30px 35px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .slide-title {
+        font-size: 24px;
+      }
+      .slide-subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <!-- Bokeh Clock Layer -->
+    <div class="clock-layer">
+      <!-- Main Center Clock -->
+      <div class="bokeh-clock clock-1">
+        <div class="clock-markers" id="clockMarkers1"></div>
+        <div class="clock-hand hand-hour"></div>
+        <div class="clock-hand hand-minute"></div>
+        <div class="clock-hand hand-second"></div>
+        <div class="clock-center"></div>
+      </div>
+
+      <!-- Secondary Clocks -->
+      <div class="bokeh-clock clock-2">
+        <div class="clock-markers" id="clockMarkers2"></div>
+        <div class="clock-hand hand-hour"></div>
+        <div class="clock-hand hand-minute"></div>
+        <div class="clock-hand hand-second"></div>
+        <div class="clock-center"></div>
+      </div>
+
+      <div class="bokeh-clock clock-3">
+        <div class="clock-markers" id="clockMarkers3"></div>
+        <div class="clock-hand hand-hour"></div>
+        <div class="clock-hand hand-minute"></div>
+        <div class="clock-hand hand-second"></div>
+        <div class="clock-center"></div>
+      </div>
+
+      <div class="bokeh-clock clock-4">
+        <div class="clock-hand hand-hour"></div>
+        <div class="clock-hand hand-minute"></div>
+        <div class="clock-hand hand-second"></div>
+        <div class="clock-center"></div>
+      </div>
+
+      <div class="bokeh-clock clock-5">
+        <div class="clock-hand hand-hour"></div>
+        <div class="clock-hand hand-minute"></div>
+        <div class="clock-hand hand-second"></div>
+        <div class="clock-center"></div>
+      </div>
+    </div>
+
+    <!-- Bokeh Circles -->
+    <div class="bokeh-circles">
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+      <div class="bokeh-circle"></div>
+    </div>
+
+    <!-- Pulse Rings -->
+    <div class="pulse-rings">
+      <div class="pulse-ring"></div>
+      <div class="pulse-ring"></div>
+      <div class="pulse-ring"></div>
+      <div class="pulse-ring"></div>
+    </div>
+
+    <!-- Light Rays -->
+    <div class="light-rays" id="lightRays"></div>
+
+    <!-- Ambient Orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="orb orb-5"></div>
+
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Wave Effect -->
+    <div class="wave-container">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+
+    <!-- Vignette -->
+    <div class="vignette"></div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Logo -->
+    <div class="logo"><span>aiday</span></div>
+
+    <!-- Skip Button -->
+    <button class="btn-skip" onclick="goToSlide(2)">Überspringen</button>
+
+    <!-- Slides -->
+    <div class="slides-wrapper">
+      <!-- Slide 1: Gestalte dein Leben -->
+      <div class="slide active" data-slide="0">
+        <div class="slide-icon">
+          <div class="icon-glow"></div>
+          <div class="icon-circle">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="slide-title">Gestalte dein <span class="gradient-text">Leben</span></h1>
+        <p class="slide-subtitle">Du hast die Macht, jeden Tag zu dem zu machen, was du dir wünschst. Nimm dein Schicksal in die Hand.</p>
+      </div>
+
+      <!-- Slide 2: Träume zu Zielen -->
+      <div class="slide" data-slide="1">
+        <div class="slide-icon">
+          <div class="icon-glow" style="background: radial-gradient(circle, var(--accent-2-glow) 0%, transparent 70%);"></div>
+          <div class="icon-circle">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="slide-title">Mache <span class="gradient-text">Träume</span> zu Zielen</h1>
+        <p class="slide-subtitle">Verwandle vage Wünsche in konkrete, erreichbare Ziele. Schritt für Schritt, Tag für Tag.</p>
+      </div>
+
+      <!-- Slide 3: Mit meiner Hilfe -->
+      <div class="slide" data-slide="2">
+        <div class="slide-icon">
+          <div class="icon-glow" style="background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);"></div>
+          <div class="icon-circle">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+              <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+              <line x1="9" y1="9" x2="9.01" y2="9"/>
+              <line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="slide-title">Mit <span class="gradient-text">KI-Power</span> zum Ziel</h1>
+        <p class="slide-subtitle">Dein persönlicher KI-Coach, der dich motiviert, begleitet und zum Erfolg führt.</p>
+      </div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <div class="nav-dots">
+      <div class="nav-dot active" onclick="goToSlide(0)"></div>
+      <div class="nav-dot" onclick="goToSlide(1)"></div>
+      <div class="nav-dot" onclick="goToSlide(2)"></div>
+    </div>
+
+    <!-- Next Button -->
+    <button class="btn-next" id="btnNext" onclick="nextSlide()">
+      Weiter
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <!-- Action Buttons -->
+    <div class="buttons" id="actionButtons" style="display: none;">
+      <button class="btn btn-primary" onclick="showRegister()">Los geht's</button>
+      <button class="btn btn-secondary" onclick="showLogin()">Ich habe bereits ein Konto</button>
+    </div>
+  </div>
+
+  <!-- Register Screen -->
+  <div class="auth-screen" id="registerScreen">
+    <button class="auth-back" onclick="hideAuth()">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Zurück
+    </button>
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo"><span>aiday</span></div>
+        <h2 class="auth-title">Konto erstellen</h2>
+        <p class="auth-subtitle">Starte deine Reise zu deinen Zielen</p>
+      </div>
+      <div class="auth-error" id="registerError"></div>
+      <div class="auth-success" id="registerSuccess"></div>
+      <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">E-Mail</label>
+          <input type="email" class="form-input" id="registerEmail" placeholder="deine@email.de" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passwort</label>
+          <input type="password" class="form-input" id="registerPassword" placeholder="Mindestens 6 Zeichen" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passwort bestätigen</label>
+          <input type="password" class="form-input" id="registerPasswordConfirm" placeholder="Passwort wiederholen" minlength="6" required>
+        </div>
+        <button type="submit" class="auth-btn" id="registerBtn">Konto erstellen</button>
+      </form>
+      <div class="auth-divider"><span>oder</span></div>
+      <p class="auth-switch">Bereits ein Konto? <a onclick="showLogin()">Anmelden</a></p>
+    </div>
+  </div>
+
+  <!-- Login Screen -->
+  <div class="auth-screen" id="loginScreen">
+    <button class="auth-back" onclick="hideAuth()">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Zurück
+    </button>
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo"><span>aiday</span></div>
+        <h2 class="auth-title">Willkommen zurück</h2>
+        <p class="auth-subtitle">Melde dich an, um fortzufahren</p>
+      </div>
+      <div class="auth-error" id="loginError"></div>
+      <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">E-Mail</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="deine@email.de" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passwort</label>
+          <input type="password" class="form-input" id="loginPassword" placeholder="Dein Passwort" required>
+        </div>
+        <div class="remember-row">
+          <input type="checkbox" class="remember-checkbox" id="rememberMe">
+          <label class="remember-label" for="rememberMe">Einlogdaten merken</label>
+        </div>
+        <button type="submit" class="auth-btn" id="loginBtn">Anmelden</button>
+      </form>
+      <div class="auth-divider"><span>oder</span></div>
+      <p class="auth-switch">Noch kein Konto? <a onclick="showRegister()">Registrieren</a></p>
+    </div>
+  </div>
+
+  <script>
+    // Create clock markers (all 12 hour positions)
+    function createClockMarkers(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      for (let i = 0; i < 12; i++) {
+        const marker = document.createElement('div');
+        marker.className = 'clock-marker' + (i % 3 === 0 ? ' major' : '');
+        marker.style.transform = `translateX(-50%) rotate(${i * 30}deg)`;
+        container.appendChild(marker);
+      }
+    }
+
+    createClockMarkers('clockMarkers1');
+    createClockMarkers('clockMarkers2');
+    createClockMarkers('clockMarkers3');
+
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 35;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 60 + 's';
+      particle.style.animationDuration = (40 + Math.random() * 30) + 's';
+      particle.style.opacity = Math.random() * 0.5 + 0.2;
+      particle.style.width = (1.5 + Math.random() * 3) + 'px';
+      particle.style.height = particle.style.width;
+      particlesContainer.appendChild(particle);
+    }
+
+    // Create light rays
+    const lightRays = document.getElementById('lightRays');
+    const rayCount = 16;
+
+    for (let i = 0; i < rayCount; i++) {
+      const ray = document.createElement('div');
+      ray.className = 'light-ray';
+      ray.style.transform = `rotate(${i * (360 / rayCount)}deg)`;
+      ray.style.opacity = (i % 2 === 0) ? 0.8 : 0.4;
+      lightRays.appendChild(ray);
+    }
+
+    // Slide navigation
+    let currentSlide = 0;
+    const totalSlides = 3;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.nav-dot');
+    const btnNext = document.getElementById('btnNext');
+    const actionButtons = document.getElementById('actionButtons');
+
+    function goToSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.remove('active', 'prev');
+        if (i === index) {
+          slide.classList.add('active');
+        } else if (i < index) {
+          slide.classList.add('prev');
+        }
+      });
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+
+      currentSlide = index;
+
+      if (currentSlide === totalSlides - 1) {
+        btnNext.style.display = 'none';
+        actionButtons.style.display = 'flex';
+      } else {
+        btnNext.style.display = 'flex';
+        actionButtons.style.display = 'none';
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    // Touch/Swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0 && currentSlide < totalSlides - 1) {
+          goToSlide(currentSlide + 1);
+        } else if (diff < 0 && currentSlide > 0) {
+          goToSlide(currentSlide - 1);
+        }
+      }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft') {
+        if (currentSlide > 0) goToSlide(currentSlide - 1);
+      }
+    });
+
+    // ========== AUTH FUNCTIONALITY ==========
+
+    // Supabase Configuration (versteckt)
+    const SUPABASE_URL = 'https://boghlkwclgywpiienmtm.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2hsa3djbGd5d3BpaWVubXRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTIyMjUsImV4cCI6MjA4NDIyODIyNX0.IUDYw2IJXc6jKCCjSUIG5yzWkyiW5Id5xgTmhFG36rU';
+
+    // Auth Screen Navigation
+    function showRegister() {
+      document.getElementById('registerScreen').classList.add('active');
+      document.getElementById('loginScreen').classList.remove('active');
+      document.getElementById('actionButtons').style.visibility = 'hidden';
+      clearErrors();
+    }
+
+    function showLogin() {
+      document.getElementById('loginScreen').classList.add('active');
+      document.getElementById('registerScreen').classList.remove('active');
+      document.getElementById('actionButtons').style.visibility = 'hidden';
+      clearErrors();
+      loadRememberedCredentials();
+    }
+
+    function hideAuth() {
+      document.getElementById('registerScreen').classList.remove('active');
+      document.getElementById('loginScreen').classList.remove('active');
+      document.getElementById('actionButtons').style.visibility = 'visible';
+      clearErrors();
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.auth-error, .auth-success').forEach(el => {
+        el.classList.remove('show');
+        el.textContent = '';
+      });
+    }
+
+    function showError(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.classList.add('show');
+    }
+
+    function showSuccess(elementId, message) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.classList.add('show');
+    }
+
+    function setLoading(buttonId, loading) {
+      const btn = document.getElementById(buttonId);
+      if (loading) {
+        btn.disabled = true;
+        btn.dataset.originalText = btn.textContent;
+        btn.innerHTML = '<span class="spinner"></span>Bitte warten...';
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.originalText;
+      }
+    }
+
+    // Register Handler
+    async function handleRegister(event) {
+      event.preventDefault();
+      clearErrors();
+
+      const email = document.getElementById('registerEmail').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+      // Validation
+      if (password !== passwordConfirm) {
+        showError('registerError', 'Die Passwörter stimmen nicht überein.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('registerError', 'Das Passwort muss mindestens 6 Zeichen haben.');
+        return;
+      }
+
+      setLoading('registerBtn', true);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        console.log('Signup response:', response.status, data);
+
+        if (!response.ok) {
+          const errorMsg = data.error_description || data.error || data.msg || data.message || JSON.stringify(data);
+          throw new Error(errorMsg);
+        }
+
+        if (data.access_token) {
+          // Direkt eingeloggt (E-Mail-Bestätigung deaktiviert)
+          localStorage.setItem('aiday_token', data.access_token);
+          localStorage.setItem('aiday_user', JSON.stringify(data.user));
+          showSuccess('registerSuccess', 'Konto erfolgreich erstellt! Weiterleitung...');
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 1500);
+        } else {
+          // E-Mail-Bestätigung erforderlich
+          showSuccess('registerSuccess', 'Konto erstellt! Bitte bestätige deine E-Mail-Adresse.');
+        }
+
+      } catch (error) {
+        console.error('Register error:', error);
+        let errorMessage = error.message;
+        if (errorMessage.includes('already registered')) {
+          errorMessage = 'Diese E-Mail-Adresse ist bereits registriert.';
+        } else if (errorMessage.includes('valid email')) {
+          errorMessage = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+        } else if (errorMessage.includes('password')) {
+          errorMessage = 'Das Passwort muss mindestens 6 Zeichen haben.';
+        } else if (errorMessage.includes('fetch')) {
+          errorMessage = 'Netzwerkfehler. Bitte überprüfe deine Internetverbindung.';
+        }
+        showError('registerError', errorMessage);
+      } finally {
+        setLoading('registerBtn', false);
+      }
+    }
+
+    // Login Handler
+    async function handleLogin(event) {
+      event.preventDefault();
+      clearErrors();
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
+
+      setLoading('loginBtn', true);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error_description || data.msg || 'Anmeldung fehlgeschlagen');
+        }
+
+        // Speichere Token
+        localStorage.setItem('aiday_token', data.access_token);
+        localStorage.setItem('aiday_user', JSON.stringify(data.user));
+
+        // Einlogdaten merken (oder löschen)
+        if (rememberMe) {
+          localStorage.setItem('aiday_remember_email', email);
+          localStorage.setItem('aiday_remember_password', btoa(password)); // Base64 encoded
+        } else {
+          localStorage.removeItem('aiday_remember_email');
+          localStorage.removeItem('aiday_remember_password');
+        }
+
+        // Weiterleitung zur Hauptseite
+        window.location.href = 'app.html';
+
+      } catch (error) {
+        console.error('Login error:', error);
+        let errorMessage = error.message;
+        if (errorMessage.includes('Invalid login credentials')) {
+          errorMessage = 'E-Mail oder Passwort ist falsch.';
+        }
+        showError('loginError', errorMessage);
+      } finally {
+        setLoading('loginBtn', false);
+      }
+    }
+
+    // Gespeicherte Einlogdaten laden
+    function loadRememberedCredentials() {
+      const savedEmail = localStorage.getItem('aiday_remember_email');
+      const savedPassword = localStorage.getItem('aiday_remember_password');
+
+      if (savedEmail && savedPassword) {
+        document.getElementById('loginEmail').value = savedEmail;
+        document.getElementById('loginPassword').value = atob(savedPassword); // Base64 decode
+        document.getElementById('rememberMe').checked = true;
+      }
+    }
+
+    // Auto-Login Check
+    (function checkExistingSession() {
+      const token = localStorage.getItem('aiday_token');
+      if (token) {
+        // Prüfen ob Token noch gültig
+        fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'apikey': SUPABASE_ANON_KEY
+          }
+        }).then(response => {
+          if (response.ok) {
+            // Bereits eingeloggt - zur Hauptseite weiterleiten
+            window.location.href = 'app.html';
+          } else {
+            // Token ungültig - löschen
+            localStorage.removeItem('aiday_token');
+            localStorage.removeItem('aiday_user');
+          }
+        }).catch(() => {
+          // Fehler ignorieren
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

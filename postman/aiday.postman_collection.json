@@ -1,0 +1,217 @@
+{
+  "info": {
+    "name": "Aiday API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Auth - Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/auth/v1/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}"
+            }
+          }
+        },
+        {
+          "name": "Auth - Login (Password)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/auth/v1/token?grant_type=password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}"
+            }
+          }
+        },
+        {
+          "name": "Auth - Recover (Password Reset)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/auth/v1/recover",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{EMAIL}}\"}"
+            }
+          }
+        },
+        {
+          "name": "Auth - Profile (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/auth-profile"
+          }
+        },
+        {
+          "name": "Auth - Onboarding (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/auth-onboarding",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priority_areas\": [\"health\", \"career\"],\n  \"motivations\": \"Achieve my goals\",\n  \"time_budget_weekday\": 60,\n  \"energy_peak\": \"morning\",\n  \"coaching_style\": \"balanced\",\n  \"quiet_hours\": { \"start\": \"22:00\", \"end\": \"07:00\" }\n}"
+            }
+          }
+        },
+        {
+          "name": "Auth - Export Data (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/auth-export-data"
+          }
+        },
+        {
+          "name": "Auth - Delete Account (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/auth-delete-account",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"confirmation\": \"DELETE\" }"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coach",
+      "item": [
+        {
+          "name": "Coach - Plan (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/coach-plan",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-01-15\",\n  \"goals\": [\n    { \"title\": \"30 Minuten Sport\", \"category\": \"health\" },\n    { \"title\": \"Projekt-Proposal fertigstellen\", \"category\": \"career\" }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Coach - Checkin (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/coach-checkin",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-01-15\",\n  \"results\": [\n    { \"goalId\": \"{{GOAL_ID_1}}\", \"status\": \"achieved\" },\n    { \"goalId\": \"{{GOAL_ID_2}}\", \"status\": \"not_achieved\", \"blockers\": [\"Zeit\", \"Motivation\"] }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Analytics - Monthly (GET)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/functions/v1/analytics-monthly?month=2024-01",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["functions", "v1", "analytics-monthly"],
+              "query": [{ "key": "month", "value": "2024-01" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Reminders - Dispatch (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{SUPABASE_SERVICE_ROLE_KEY}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{SUPABASE_URL}}/functions/v1/reminders-dispatch"
+          }
+        }
+      ]
+    },
+    {
+      "name": "REST API",
+      "item": [
+        {
+          "name": "Day Entries - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/day_entries"
+          }
+        },
+        {
+          "name": "Goals - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/goals"
+          }
+        },
+        {
+          "name": "Action Steps - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "apikey", "value": "{{SUPABASE_ANON_KEY}}" },
+              { "key": "Authorization", "value": "Bearer {{ACCESS_TOKEN}}" }
+            ],
+            "url": "{{SUPABASE_URL}}/rest/v1/action_steps"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AIDAY - Dein Tagesplaner</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="AIDAY - Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AIDAY">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    :root {
+      /* Neue Farbpalette basierend auf dem AIDAY Design */
+      --bg-dark: #0f172a;
+      --bg-header: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      --bg-light: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-dark: rgba(255, 255, 255, 0.08);
+      --bg-card-hover: rgba(255, 255, 255, 0.12);
+      --bg-input: #f1f5f9;
+      --text: #1e293b;
+      --text-light: #ffffff;
+      --text-muted: #64748b;
+      /* Neue Akzentfarben: Blau-Cyan Gradient */
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.4);
+      --accent-2: #22d3ee;
+      --accent-2-glow: rgba(34, 211, 238, 0.4);
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%);
+      --gradient-primary-hover: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --glass-border: rgba(148, 163, 184, 0.2);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-light);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Background - subtiler Netz-Effekt */
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.06) 0%, transparent 50%);
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 10;
+      max-width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 100px;
+      background: var(--bg-light);
+    }
+
+    /* Padding für nicht-Dashboard Screens */
+    .container > .screen:not(#dashboardScreen):not(#loadingScreen) {
+      padding: 12px 28px;
+    }
+
+    /* App Layout */
+    .app-header {
+      background: var(--bg-card);
+      padding: 12px 28px;
+      padding-top: max(12px, env(safe-area-inset-top));
+      position: relative;
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .app-header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-header-title {
+      color: var(--accent);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    /* New Header Bar */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-left {
+      flex-shrink: 0;
+    }
+
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-email {
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-logout {
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .header-logout:hover {
+      color: var(--danger);
+    }
+
+    .progress-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 10px var(--accent-glow);
+    }
+
+    .progress-btn:hover {
+      background: var(--gradient-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .progress-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: white;
+    }
+
+    .app-body {
+      padding: 12px 28px;
+      background: var(--bg-light);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      margin-bottom: 24px;
+    }
+
+    .quick-actions-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-left: 16px;
+      color: var(--text);
+    }
+
+    .quick-actions-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .quick-action-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 8px;
+      background: var(--bg-card);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--shadow);
+    }
+
+    .quick-action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .quick-action-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--bg-input);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    .quick-action-icon svg {
+      color: inherit;
+    }
+
+    .quick-action-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Progress Ring */
+    .progress-ring {
+      position: relative;
+      width: 70px;
+      height: 70px;
+    }
+
+    .progress-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring-bg {
+      fill: none;
+      stroke: var(--bg-input);
+      stroke-width: 6;
+    }
+
+    .progress-ring-fill {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 188;
+      stroke-dashoffset: 47;
+      transition: stroke-dashoffset 0.5s;
+    }
+
+    .progress-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .progress-ring-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+    }
+
+    /* Header */
+    .header {
+      display: none; /* Standardmäßig ausgeblendet, via JS gesteuert */
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 16px;
+      gap: 12px;
+      background: var(--bg-card);
+      border-radius: 0 0 20px 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .header-left {
+      flex: 0 0 auto;
+    }
+
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header-right {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .user-email {
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: none;
+    }
+
+    @media (min-width: 400px) {
+      .user-email {
+        display: block;
+      }
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* Screens */
+    .screen {
+      display: none;
+      position: relative;
+    }
+
+    .screen.active {
+      display: block;
+      animation: slideIn 0.3s ease forwards;
+    }
+
+    .screen.slide-out-left {
+      animation: slideOutLeft 0.3s ease forwards;
+    }
+
+    .screen.slide-out-right {
+      animation: slideOutRight 0.3s ease forwards;
+    }
+
+    .screen.slide-in-left {
+      animation: slideInLeft 0.3s ease forwards;
+    }
+
+    .screen.slide-in-right {
+      animation: slideInRight 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(0); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideOutLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(-100%); }
+    }
+
+    @keyframes slideOutRight {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(100%); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: none;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .dashboard-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .dashboard-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tasks-badge {
+      background: var(--accent);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .see-all-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .see-all-btn:hover {
+      opacity: 0.7;
+    }
+
+    /* Streak Badge Header */
+    .streak-badge-header {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      background: var(--bg-card);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Mood Selector */
+    .mood-selector {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .mood-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-input);
+      background: var(--bg-card);
+      font-size: 26px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+
+    .mood-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--accent);
+    }
+
+    .mood-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      transform: scale(1.15);
+    }
+
+    /* Energy Slider */
+    .energy-slider {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .energy-level {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 2px solid var(--bg-input);
+      background: var(--bg-card);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+
+    .energy-level:hover {
+      border-color: var(--accent);
+    }
+
+    .energy-level.selected {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 16px 28px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #fff;
+      border-radius: 30px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary:hover {
+      background: var(--gradient-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid var(--glass-border);
+      color: var(--text);
+      border-radius: 30px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-input);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    /* Progress */
+    .progress-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .progress-step {
+      flex: 1;
+      height: 4px;
+      background: var(--glass-border);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .progress-step.active {
+      background: var(--accent);
+    }
+
+    .progress-step.completed {
+      background: var(--success);
+    }
+
+    /* Goal Card */
+    .goal-number {
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    /* Task List */
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg-input);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .task-item:hover {
+      background: #e5e8ec;
+    }
+
+    .task-item.completed {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .task-item.completed .task-text {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.3s;
+      font-size: 12px;
+      color: white;
+    }
+
+    .task-item.completed .task-checkbox {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .task-delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+      opacity: 0;
+      line-height: 1;
+    }
+
+    .task-item:hover .task-delete-btn,
+    .progress-task-item:hover .task-delete-btn {
+      opacity: 1;
+    }
+
+    .task-delete-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .task-checkbox {
+      cursor: pointer;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon svg {
+      color: inherit;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    /* AI Plan Card */
+    .ai-plan-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(34, 211, 238, 0.08));
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-glow);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .plan-section {
+      margin-bottom: 16px;
+    }
+
+    .plan-section-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .plan-steps {
+      list-style: none;
+    }
+
+    .plan-steps li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+      font-size: 14px;
+    }
+
+    .plan-steps li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 14px;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* Review Buttons */
+    .review-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .review-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid var(--glass-border);
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .review-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .review-btn.selected-yes {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+
+    .review-btn.selected-no {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+
+    /* Streak */
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--warning), #f97316);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      min-height: 60vh;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--bg-input);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* Loading Screen spezifisch */
+    #loadingScreen.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 0 !important;
+    }
+
+    /* Blocker Input */
+    .blocker-input {
+      margin-top: 12px;
+      display: none;
+    }
+
+    .blocker-input.show {
+      display: block;
+    }
+
+    /* Navigation */
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .nav-buttons .btn {
+      flex: 1;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon svg {
+      color: inherit;
+    }
+
+    /* Plan Timeline */
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .plan-duration {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .plan-target-date {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .milestone-timeline {
+      position: relative;
+      padding-left: 24px;
+      margin: 20px 0;
+    }
+
+    .milestone-timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--glass-border);
+    }
+
+    .milestone-item {
+      position: relative;
+      padding: 12px 0;
+    }
+
+    .milestone-item::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 16px;
+      width: 14px;
+      height: 14px;
+      background: var(--bg-dark);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+    }
+
+    .milestone-week {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .milestone-target {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .milestone-metric {
+      font-size: 12px;
+      color: var(--success);
+      margin-top: 2px;
+    }
+
+    /* Daily Tasks in Plan */
+    .daily-task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .daily-task-item .task-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--success);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+    }
+
+    .daily-task-item .task-icon svg {
+      color: inherit;
+    }
+
+    .daily-task-item .task-info {
+      flex: 1;
+    }
+
+    .daily-task-item .task-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .daily-task-item .task-duration {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      margin: 16px 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--glass-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Goal Card with Progress */
+    .goal-progress-card {
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .goal-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .goal-progress-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .goal-progress-badge {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .goal-days-left {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Back Button */
+    .back-btn {
+      display: none;
+    }
+
+    /* Footer Back Button */
+    .footer-back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px 28px;
+      margin-top: 24px;
+      background: transparent !important;
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      border-radius: 30px;
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+      backdrop-filter: none;
+    }
+
+    .footer-back-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+    }
+
+    .footer-back-btn:active {
+      transform: translateY(0);
+    }
+
+    .footer-back-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Goal Detail Screen */
+    .goal-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .goal-detail-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .goal-detail-section-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .goal-info-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .goal-info-item:last-child {
+      border-bottom: none;
+    }
+
+    .goal-info-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 100px;
+    }
+
+    .goal-info-value {
+      font-size: 14px;
+      flex: 1;
+    }
+
+    /* Step Item */
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .step-item.completed {
+      opacity: 0.6;
+    }
+
+    .step-item.completed .step-text {
+      text-decoration: line-through;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background: var(--accent-glow);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .step-item.completed .step-number {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-text {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .step-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Clickable Goal in List */
+    .goal-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 8px;
+    }
+
+    .goal-list-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .goal-list-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-glow);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .goal-list-content {
+      flex: 1;
+    }
+
+    .goal-list-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .goal-list-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .goal-list-arrow {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+
+    /* Progress Screen Animations */
+    .animate-in {
+      animation: slideInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Progress Card */
+    .progress-card {
+      margin-bottom: 16px;
+    }
+
+    .progress-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .progress-card-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .progress-date {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Today Stats - Circles */
+    .today-stats {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+    }
+
+    .stat-circle-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .stat-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .stat-emoji {
+      font-size: 36px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Energy & Tasks Circle Rings */
+    .energy-circle, .tasks-circle {
+      background: transparent;
+    }
+
+    .energy-ring, .tasks-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .energy-ring-bg, .tasks-ring-bg {
+      fill: none;
+      stroke: var(--glass-border);
+      stroke-width: 8;
+    }
+
+    .energy-ring-fill {
+      fill: none;
+      stroke: url(#energyGradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .tasks-ring-fill {
+      fill: none;
+      stroke: var(--success);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .energy-value, .tasks-percent {
+      font-size: 20px;
+      font-weight: 700;
+      z-index: 1;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .stat-box:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-box-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+
+    .stat-box-icon svg {
+      color: inherit;
+    }
+
+    .stat-box-value {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .stat-box-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tasks Count Badge */
+    .tasks-count {
+      background: var(--accent-glow);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Progress Tasks List */
+    .progress-tasks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .progress-task-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--bg-input);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .progress-task-item.completed {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .progress-task-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .progress-task-item.completed .progress-task-checkbox {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+      animation: checkmark 0.3s ease;
+    }
+
+    @keyframes checkmark {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .progress-task-text {
+      flex: 1;
+      font-size: 14px;
+    }
+
+    .progress-task-item.completed .progress-task-text {
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+
+    /* Progress Goals List */
+    .progress-goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .progress-goal-item {
+      background: var(--bg-input);
+      border-radius: 16px;
+      padding: 16px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .progress-goal-item:hover {
+      transform: translateX(4px);
+      border-left: 3px solid var(--accent);
+    }
+
+    .progress-goal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .progress-goal-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .progress-goal-percent {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .progress-goal-bar {
+      height: 8px;
+      background: var(--glass-border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-goal-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-goal-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .progress-goal-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Gradient definitions for SVG */
+    .svg-gradients {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    /* Empty state for progress */
+    .progress-empty {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--text-muted);
+    }
+
+    .progress-empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .progress-empty-icon svg {
+      color: inherit;
+    }
+
+    .progress-empty .btn {
+      width: 100%;
+      background: var(--gradient-primary) !important;
+      border-radius: 30px;
+      padding: 16px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    /* Mood colors */
+    .mood-great { color: #10b981; }
+    .mood-good { color: #6366f1; }
+    .mood-neutral { color: #f59e0b; }
+    .mood-bad { color: #ef4444; }
+    .mood-terrible { color: #dc2626; }
+  </style>
+</head>
+<body>
+  <!-- SVG Gradients for animated circles -->
+  <svg class="svg-gradients">
+    <defs>
+      <linearGradient id="energyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#6366f1"/>
+        <stop offset="100%" style="stop-color:#06b6d4"/>
+      </linearGradient>
+      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#10b981"/>
+        <stop offset="100%" style="stop-color:#06b6d4"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="bg-animation"></div>
+
+  <div class="container">
+    <!-- Global Header -->
+    <div class="app-header" id="globalHeader" style="display: none;">
+      <div class="app-header-content">
+        <div class="header-bar">
+          <div class="header-left">
+            <h1 class="app-header-title">aiday</h1>
+          </div>
+          <div class="header-center">
+            <button class="progress-btn" onclick="showProgressScreen()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="20" x2="12" y2="10"/>
+                <line x1="18" y1="20" x2="18" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="16"/>
+              </svg>
+              Mein Fortschritt
+            </button>
+          </div>
+          <div class="header-right">
+            <span class="header-email" id="headerUserEmail"></span>
+            <span class="header-logout" onclick="logout()">Abmelden</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Overview Screen -->
+    <div class="screen" id="progressScreen">
+      <!-- Today's Status Card -->
+      <div class="card progress-card animate-in">
+        <div class="progress-card-header">
+          <h3>Heute</h3>
+          <span class="progress-date" id="progressDate"></span>
+        </div>
+
+        <div class="today-stats">
+          <div class="stat-circle-container">
+            <div class="stat-circle" id="moodCircle">
+              <span class="stat-emoji" id="moodEmoji">😊</span>
+            </div>
+            <div class="stat-label">Stimmung</div>
+            <div class="stat-value" id="moodValue">Gut</div>
+          </div>
+
+          <div class="stat-circle-container">
+            <div class="stat-circle energy-circle" id="energyCircle">
+              <svg class="energy-ring" viewBox="0 0 100 100">
+                <circle class="energy-ring-bg" cx="50" cy="50" r="45"/>
+                <circle class="energy-ring-fill" cx="50" cy="50" r="45" id="energyRing"/>
+              </svg>
+              <span class="energy-value" id="energyValue">4</span>
+            </div>
+            <div class="stat-label">Energie</div>
+            <div class="stat-value" id="energyText">Hoch</div>
+          </div>
+
+          <div class="stat-circle-container">
+            <div class="stat-circle tasks-circle">
+              <svg class="tasks-ring" viewBox="0 0 100 100">
+                <circle class="tasks-ring-bg" cx="50" cy="50" r="45"/>
+                <circle class="tasks-ring-fill" cx="50" cy="50" r="45" id="tasksRing"/>
+              </svg>
+              <span class="tasks-percent" id="tasksPercent">0%</span>
+            </div>
+            <div class="stat-label">Aufgaben</div>
+            <div class="stat-value" id="tasksValue">0/0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak & Stats Card -->
+      <div class="card progress-card animate-in" style="animation-delay: 0.1s;">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-box-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+              </svg>
+            </div>
+            <div class="stat-box-value" id="streakValue">0</div>
+            <div class="stat-box-label">Tage Streak</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div class="stat-box-value" id="tasksCompletedValue">0</div>
+            <div class="stat-box-label">Aufgaben erledigt</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div class="stat-box-value" id="goalsActiveValue">0</div>
+            <div class="stat-box-label">Aktive Ziele</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="20" x2="12" y2="10"/>
+                <line x1="18" y1="20" x2="18" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="16"/>
+              </svg>
+            </div>
+            <div class="stat-box-value" id="avgProgressValue">0%</div>
+            <div class="stat-box-label">Ø Fortschritt</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Tasks Card -->
+      <div class="card progress-card animate-in" style="animation-delay: 0.2s;">
+        <div class="progress-card-header">
+          <h3>Heutige Aufgaben</h3>
+          <span class="tasks-count" id="todayTasksCount">0 Aufgaben</span>
+        </div>
+        <div id="progressTodayTasks" class="progress-tasks-list"></div>
+      </div>
+
+      <!-- All Goals Progress Card -->
+      <div class="card progress-card animate-in" style="animation-delay: 0.3s;">
+        <div class="progress-card-header">
+          <h3>Alle Ziele</h3>
+        </div>
+        <div id="progressAllGoals" class="progress-goals-list"></div>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="closeProgressScreen()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Screen - startet als aktiv -->
+    <div class="screen active" id="loadingScreen">
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">Lade deine Daten...</div>
+      </div>
+    </div>
+
+    <!-- Profile Screen -->
+    <div class="screen" id="profileScreen">
+      <div class="card">
+        <h2 class="card-title">Mein Profil</h2>
+        <p class="card-subtitle">Persönliche Daten helfen der AI, bessere Empfehlungen zu geben (optional)</p>
+
+        <div class="form-group">
+          <label class="form-label">Alter</label>
+          <input type="number" class="form-input" id="profileAge" placeholder="z.B. 28" min="10" max="120">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Beruf</label>
+          <input type="text" class="form-input" id="profileJob" placeholder="z.B. Software-Entwickler">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bildung</label>
+          <select class="form-input" id="profileEducation">
+            <option value="">Bitte wählen...</option>
+            <option value="hauptschule">Hauptschulabschluss</option>
+            <option value="realschule">Realschulabschluss</option>
+            <option value="abitur">Abitur</option>
+            <option value="ausbildung">Berufsausbildung</option>
+            <option value="bachelor">Bachelor</option>
+            <option value="master">Master</option>
+            <option value="promotion">Promotion</option>
+            <option value="other">Sonstiges</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Familienstand</label>
+          <select class="form-input" id="profileFamily">
+            <option value="">Bitte wählen...</option>
+            <option value="single">Single</option>
+            <option value="relationship">In einer Beziehung</option>
+            <option value="married">Verheiratet</option>
+            <option value="divorced">Geschieden</option>
+            <option value="widowed">Verwitwet</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hobbys & Interessen</label>
+          <textarea class="form-textarea" id="profileHobbies" placeholder="z.B. Sport, Lesen, Musik, Reisen..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Persönliche Stärken</label>
+          <textarea class="form-textarea" id="profileStrengths" placeholder="z.B. Kreativität, Durchhaltevermögen, Teamarbeit..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Größte Herausforderungen</label>
+          <textarea class="form-textarea" id="profileChallenges" placeholder="z.B. Zeitmanagement, Prokrastination, Work-Life-Balance..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lebensmotto / Was dich antreibt</label>
+          <textarea class="form-textarea" id="profileMotivation" placeholder="z.B. Familie, Freiheit, Erfolg, Wissen..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="profileSaveBtn" onclick="saveProfile()">Profil speichern</button>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="closeProfileScreen()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Daily Check-in Screen -->
+    <div class="screen" id="checkinScreen">
+      <div class="card">
+        <h2 class="card-title">Guten Tag!</h2>
+        <p class="card-subtitle">Wie geht es dir heute?</p>
+
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="great" onclick="selectMood('great')">😊</button>
+          <button class="mood-btn" data-mood="good" onclick="selectMood('good')">🙂</button>
+          <button class="mood-btn" data-mood="neutral" onclick="selectMood('neutral')">😐</button>
+          <button class="mood-btn" data-mood="bad" onclick="selectMood('bad')">😔</button>
+          <button class="mood-btn" data-mood="terrible" onclick="selectMood('terrible')">😢</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was beschäftigt dich gerade?</label>
+          <textarea class="form-textarea" id="moodNote" placeholder="Optional: Erzähl mir mehr..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was hast du dir für heute vorgenommen?</label>
+          <textarea class="form-textarea" id="plannedToday" placeholder="Was steht heute an?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Wie ist dein Energielevel? (1-5)</label>
+          <div class="energy-slider">
+            <button class="energy-level" data-level="1" onclick="selectEnergy(1)">1</button>
+            <button class="energy-level" data-level="2" onclick="selectEnergy(2)">2</button>
+            <button class="energy-level" data-level="3" onclick="selectEnergy(3)">3</button>
+            <button class="energy-level" data-level="4" onclick="selectEnergy(4)">4</button>
+            <button class="energy-level" data-level="5" onclick="selectEnergy(5)">5</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="checkinSubmit" onclick="submitCheckin()" disabled>Weiter</button>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="goBackFromCheckin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Goals Setup Screen -->
+    <div class="screen" id="goalsScreen">
+      <div class="card">
+        <div class="goal-number" id="goalNumber">Ziel 1</div>
+        <h2 class="card-title">Definiere dein Ziel</h2>
+        <p class="card-subtitle" id="goalSubtitle">Was möchtest du erreichen?</p>
+
+        <div class="form-group">
+          <label class="form-label">Dein Ziel *</label>
+          <input type="text" class="form-input" id="goalTitle" placeholder="z.B. 100.000€ Umsatz, 10kg abnehmen...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Warum ist dir das wichtig?</label>
+          <textarea class="form-textarea" id="goalWhy" placeholder="Was motiviert dich?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was hast du bisher dafür getan?</label>
+          <textarea class="form-textarea" id="goalPrevious" placeholder="Bisherige Versuche oder Schritte..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was glaubst du, musst du dafür tun?</label>
+          <textarea class="form-textarea" id="goalSteps" placeholder="Deine Ideen..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="goalSubmit" onclick="checkGoalAndProceed()">Weiter</button>
+
+        <button class="btn btn-secondary" id="goalAdd" onclick="addAnotherGoal()" style="margin-top: 12px; display: none;">
+          + Weiteres Ziel hinzufügen
+        </button>
+
+        <div id="savedGoalsList" style="margin-top: 24px;"></div>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="goBackFromGoals()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Goal Clarification Screen -->
+    <div class="screen" id="clarifyScreen">
+      <div class="card">
+        <div class="ai-badge">🤖 AI-Analyse</div>
+        <h2 class="card-title" id="clarifyGoalTitle">Dein Ziel konkretisieren</h2>
+        <p class="card-subtitle" id="clarifyReason">Um dir einen wirklich hilfreichen Plan zu erstellen, brauche ich noch ein paar Details.</p>
+
+        <div id="clarifyQuestions"></div>
+
+        <button class="btn btn-primary" id="clarifySubmit" onclick="submitClarification()">Plan erstellen lassen</button>
+        <button class="btn btn-secondary" onclick="skipClarification()" style="margin-top: 12px;">Ohne Details fortfahren</button>
+
+        <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 16px;">
+          Je mehr Details du angibst, desto besser kann die AI deinen Plan personalisieren.
+        </p>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="goBackFromClarify()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Goal Detail Screen -->
+    <div class="screen" id="goalDetailScreen">
+      <div class="card" id="goalDetailCard">
+        <div class="goal-detail-header">
+          <h2 class="card-title" id="goalDetailTitle">Ziel</h2>
+          <div class="goal-progress-badge" id="goalDetailStatus">Aktiv</div>
+        </div>
+
+        <div id="goalDetailProgress"></div>
+
+        <div id="goalDetailInfo" style="margin-top: 20px;"></div>
+
+        <div id="goalDetailMilestones" style="margin-top: 20px;"></div>
+
+        <div id="goalDetailTasks" style="margin-top: 20px;"></div>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="closeGoalDetail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- AI Plan Screen -->
+    <div class="screen" id="planScreen">
+      <div class="card">
+        <h2 class="card-title">Dein persönlicher Plan</h2>
+        <p class="card-subtitle">Prüfe den Vorschlag und nimm ihn an, um zu starten</p>
+      </div>
+
+      <div id="planCards"></div>
+
+      <div class="card" style="margin-top: 20px;">
+        <button class="btn btn-primary" id="acceptPlanBtn" onclick="acceptPlan()">Plan annehmen</button>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="rejectPlan()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück zum Bearbeiten
+        </button>
+      </div>
+    </div>
+
+    <!-- Daily Review Screen -->
+    <div class="screen" id="reviewScreen">
+      <div class="card">
+        <h2 class="card-title">Wie lief es gestern?</h2>
+        <p class="card-subtitle">Lass uns deinen Fortschritt besprechen</p>
+      </div>
+
+      <div id="reviewTasks"></div>
+
+      <div class="card" style="margin-top: 20px;">
+        <button class="btn btn-primary" id="reviewSubmit" onclick="submitReview()">Weiter</button>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="skipReview()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Überspringen
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div class="screen" id="dashboardScreen">
+      <!-- Body Section -->
+      <div class="app-body">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h2 class="quick-actions-title">Übersicht</h2>
+          <div class="quick-actions-grid">
+            <button class="quick-action-btn" onclick="showCheckinScreen()">
+              <div class="quick-action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </div>
+              <span class="quick-action-label">Check-in</span>
+            </button>
+            <button class="quick-action-btn" onclick="startNewGoal()">
+              <div class="quick-action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="6"/>
+                  <circle cx="12" cy="12" r="2"/>
+                </svg>
+              </div>
+              <span class="quick-action-label">Neues Ziel</span>
+            </button>
+            <button class="quick-action-btn" onclick="showProgressScreen()">
+              <div class="quick-action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="20" x2="12" y2="10"/>
+                  <line x1="18" y1="20" x2="18" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="16"/>
+                </svg>
+              </div>
+              <span class="quick-action-label">Fortschritt</span>
+            </button>
+            <button class="quick-action-btn" onclick="showProfileScreen()">
+              <div class="quick-action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="quick-action-label">Mein Profil</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Today's Tasks Card -->
+        <div class="card dashboard-card">
+          <div class="dashboard-card-header">
+            <h2 class="dashboard-card-title">Heutige Aufgaben</h2>
+            <span class="tasks-badge" id="tasksBadge">0</span>
+          </div>
+          <div class="task-list" id="todayTasks"></div>
+        </div>
+
+        <!-- Goals Progress Card -->
+        <div class="card dashboard-card">
+          <div class="dashboard-card-header">
+            <h2 class="dashboard-card-title">Deine Ziele</h2>
+            <button class="see-all-btn" onclick="showProgressScreen()">Alle →</button>
+          </div>
+          <div id="goalsProgressList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const SUPABASE_URL = 'https://boghlkwclgywpiienmtm.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2hsa3djbGd5d3BpaWVubXRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTIyMjUsImV4cCI6MjA4NDIyODIyNX0.IUDYw2IJXc6jKCCjSUIG5yzWkyiW5Id5xgTmhFG36rU';
+
+    // State
+    let accessToken = '';
+    let currentGoalIndex = 0;
+    let goals = [];
+    let checkinData = { mood: null, energy_level: null };
+    let reviewData = [];
+    let appData = null;
+    let previousScreen = 'dashboardScreen';
+    let currentGoalDetail = null;
+
+    // Auth Check
+    (function init() {
+      const token = localStorage.getItem('aiday_token');
+      const user = localStorage.getItem('aiday_user');
+
+      if (!token) {
+        window.location.href = 'start-ui.html';
+        return;
+      }
+
+      accessToken = token;
+
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          const email = userData.email || '';
+          document.getElementById('userEmail').textContent = email;
+          // Auch im neuen Header
+          const headerEmailEl = document.getElementById('headerUserEmail');
+          if (headerEmailEl) {
+            headerEmailEl.textContent = email;
+          }
+        } catch (e) {}
+      }
+
+      showScreen('loadingScreen');
+      loadDailyStart();
+
+      // Swipe Navigation initialisieren
+      initSwipeNavigation();
+    })();
+
+    function logout() {
+      localStorage.removeItem('aiday_token');
+      localStorage.removeItem('aiday_user');
+      window.location.href = 'start-ui.html';
+    }
+
+    // ===== NAVIGATION / ZURÜCK-BUTTONS =====
+
+    function goBackFromCheckin() {
+      // Vom Check-in zurück zum Dashboard (falls bereits Daten vorhanden)
+      if (appData && appData.data && appData.data.has_goals) {
+        showScreen('dashboardScreen', 'back');
+      } else {
+        // Sonst zur Start-Seite
+        window.location.href = 'start-ui.html';
+      }
+    }
+
+    function goBackFromGoals() {
+      // Vom Goals-Screen zurück zum Check-in oder Dashboard
+      if (appData && appData.data && appData.data.checkin_done) {
+        setupDashboard(appData.data);
+        showScreen('dashboardScreen', 'back');
+      } else {
+        showScreen('checkinScreen', 'back');
+      }
+    }
+
+    function goBackFromClarify() {
+      // Von der Klarifizierung zurück zum Goals-Screen
+      currentGoalData = null;
+      pendingClarification = null;
+      setupGoalsScreen();
+      showScreen('goalsScreen', 'back');
+    }
+
+    function skipReview() {
+      // Review überspringen und zum Check-in oder Dashboard gehen
+      if (appData && appData.data && appData.data.checkin_done) {
+        setupDashboard(appData.data);
+        showScreen('dashboardScreen', 'back');
+      } else {
+        showScreen('checkinScreen', 'forward');
+      }
+    }
+
+    // API Call
+    async function apiCall(endpoint, options = {}) {
+      const url = SUPABASE_URL + endpoint;
+      const headers = {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${accessToken}`,
+        ...options.headers
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: options.method || 'GET',
+          headers,
+          body: options.body ? JSON.stringify(options.body) : undefined
+        });
+
+        if (response.status === 401) {
+          logout();
+          return { success: false, error: 'Session expired' };
+        }
+
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error('JSON Parse Error:', parseError, 'Response:', text);
+          return { success: false, error: `Server-Fehler (${response.status}): ${text.substring(0, 200) || 'Keine Antwort'}` };
+        }
+
+        if (!response.ok) {
+          // Extrahiere Fehlermeldung aus der Antwort
+          const errorMsg = data?.error || data?.message || `HTTP ${response.status}`;
+          console.error('API Error Response:', data);
+          return { success: false, error: errorMsg, data };
+        }
+
+        return { success: true, data };
+      } catch (error) {
+        console.error('API Error:', error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Screen Management
+    let lastActiveScreen = 'dashboardScreen';
+    let screenHistory = ['dashboardScreen'];
+
+    // Screen-Reihenfolge für Navigation
+    const screenOrder = [
+      'dashboardScreen',
+      'checkinScreen',
+      'goalsScreen',
+      'clarifyScreen',
+      'planScreen',
+      'reviewScreen',
+      'progressScreen',
+      'profileScreen'
+    ];
+
+    function showScreen(screenId, direction = null) {
+      const currentActive = document.querySelector('.screen.active');
+      if (currentActive && currentActive.id !== screenId) {
+        lastActiveScreen = currentActive.id;
+
+        // Zur History hinzufügen (wenn vorwärts navigiert wird)
+        if (direction !== 'back' && !screenHistory.includes(screenId)) {
+          screenHistory.push(screenId);
+        }
+      }
+
+      // Animation basierend auf Richtung
+      if (direction && currentActive) {
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+          // Alte Screen ausblenden
+          currentActive.classList.remove('active', 'slide-in-left', 'slide-in-right');
+          currentActive.classList.add(direction === 'back' ? 'slide-out-right' : 'slide-out-left');
+
+          // Neue Screen einblenden
+          setTimeout(() => {
+            currentActive.classList.remove('slide-out-left', 'slide-out-right');
+            currentActive.style.display = 'none';
+
+            document.querySelectorAll('.screen').forEach(s => {
+              s.classList.remove('active', 'slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+              s.style.display = 'none';
+            });
+
+            targetScreen.style.display = 'block';
+            targetScreen.classList.add('active', direction === 'back' ? 'slide-in-left' : 'slide-in-right');
+          }, 250);
+        }
+      } else {
+        document.querySelectorAll('.screen').forEach(s => {
+          s.classList.remove('active', 'slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+        });
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+          targetScreen.classList.add('active');
+        }
+      }
+
+      // Header auf Loading Screen verstecken
+      const globalHeader = document.getElementById('globalHeader');
+      if (globalHeader) {
+        globalHeader.style.display = (screenId === 'loadingScreen') ? 'none' : 'block';
+      }
+    }
+
+    // Swipe Navigation
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    const minSwipeDistance = 80;
+
+    function initSwipeNavigation() {
+      const container = document.querySelector('.container');
+      if (!container) return;
+
+      container.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      container.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipe();
+      }, { passive: true });
+    }
+
+    function handleSwipe() {
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      // Nur horizontale Swipes (ignoriere vertikale)
+      if (Math.abs(diffX) < minSwipeDistance || Math.abs(diffY) > Math.abs(diffX)) {
+        return;
+      }
+
+      const activeScreen = document.querySelector('.screen.active');
+      if (!activeScreen) return;
+
+      const currentScreenId = activeScreen.id;
+
+      if (diffX > 0) {
+        // Nach rechts gewischt = Zurück
+        navigateBack(currentScreenId);
+      } else {
+        // Nach links gewischt = Vorwärts (falls möglich)
+        navigateForward(currentScreenId);
+      }
+    }
+
+    function navigateBack(currentScreenId) {
+      // Spezifische Zurück-Navigation je nach Screen
+      switch (currentScreenId) {
+        case 'checkinScreen':
+          goBackFromCheckin();
+          break;
+        case 'goalsScreen':
+          goBackFromGoals();
+          break;
+        case 'clarifyScreen':
+          goBackFromClarify();
+          break;
+        case 'planScreen':
+          setupGoalsScreen();
+          showScreen('goalsScreen', 'back');
+          break;
+        case 'reviewScreen':
+          showScreen('dashboardScreen', 'back');
+          break;
+        case 'progressScreen':
+          closeProgressScreen();
+          break;
+        case 'profileScreen':
+          closeProfileScreen();
+          break;
+        case 'dashboardScreen':
+          // Auf Dashboard - nichts tun
+          break;
+        default:
+          showScreen('dashboardScreen', 'back');
+      }
+    }
+
+    function navigateForward(currentScreenId) {
+      // Vorwärts-Navigation nur in bestimmten Fällen sinnvoll
+      switch (currentScreenId) {
+        case 'dashboardScreen':
+          // Vom Dashboard zu Check-in wenn nicht erledigt
+          if (appData && appData.data && !appData.data.checkin_done) {
+            showScreen('checkinScreen', 'forward');
+          }
+          break;
+        case 'checkinScreen':
+          // Vom Check-in zu Goals
+          if (checkinData.mood) {
+            submitCheckin();
+          }
+          break;
+        default:
+          // Keine automatische Vorwärts-Navigation
+          break;
+      }
+    }
+
+    // Load Daily Start
+    async function loadDailyStart() {
+      const result = await apiCall('/functions/v1/daily-start', { method: 'POST' });
+
+      console.log('loadDailyStart response:', result);
+
+      if (!result.success) {
+        console.error('Failed to load daily start:', result);
+        // Bei Fehler trotzdem Dashboard mit leeren Daten zeigen
+        setupDashboard({
+          streak: 0,
+          today_tasks: [],
+          longterm_goals: [],
+          checkin_done: false,
+          has_goals: false
+        });
+        showScreen('dashboardScreen');
+        return;
+      }
+
+      appData = result.data;
+      const step = result.data.step;
+
+      console.log('loadDailyStart data:', {
+        step,
+        todayTasksCount: result.data.data?.today_tasks?.length || 0,
+        todayTasks: result.data.data?.today_tasks,
+        longtermGoals: result.data.data?.longterm_goals
+      });
+
+      // Nach dem Einloggen immer zuerst das Dashboard anzeigen
+      setupDashboard(result.data.data);
+      showScreen('dashboardScreen');
+    }
+
+    // Mood Selection
+    function selectMood(mood) {
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelector(`[data-mood="${mood}"]`).classList.add('selected');
+      checkinData.mood = mood;
+      updateCheckinButton();
+    }
+
+    // Energy Selection
+    function selectEnergy(level) {
+      document.querySelectorAll('.energy-level').forEach(b => b.classList.remove('selected'));
+      document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+      checkinData.energy_level = level;
+      updateCheckinButton();
+    }
+
+    function updateCheckinButton() {
+      document.getElementById('checkinSubmit').disabled = !checkinData.mood;
+    }
+
+    // Submit Check-in
+    async function submitCheckin() {
+      const btn = document.getElementById('checkinSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Wird gespeichert...';
+
+      const body = {
+        mood: checkinData.mood,
+        mood_note: document.getElementById('moodNote').value,
+        planned_today: document.getElementById('plannedToday').value,
+        energy_level: checkinData.energy_level
+      };
+
+      const result = await apiCall('/functions/v1/daily-checkin', {
+        method: 'POST',
+        body
+      });
+
+      if (result.success) {
+        // Check if we need to setup goals (at least 1 required)
+        if (appData?.data?.goals_count === 0) {
+          setupGoalsScreen();
+          showScreen('goalsScreen', 'forward');
+        } else {
+          loadDailyStart();
+        }
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Weiter';
+        alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+      }
+    }
+
+    // Goals Setup
+    let currentGoalData = null;
+    let pendingClarification = null;
+
+    function setupGoalsScreen() {
+      goals = [];
+      currentGoalData = null;
+      pendingClarification = null;
+      clearGoalForm();
+      updateGoalUI();
+    }
+
+    function clearGoalForm() {
+      document.getElementById('goalTitle').value = '';
+      document.getElementById('goalWhy').value = '';
+      document.getElementById('goalPrevious').value = '';
+      document.getElementById('goalSteps').value = '';
+    }
+
+    function updateGoalUI() {
+      const goalNum = goals.length + 1;
+      document.getElementById('goalNumber').textContent = `Ziel ${goalNum}`;
+
+      const subtitle = document.getElementById('goalSubtitle');
+      if (goals.length === 0) {
+        subtitle.textContent = 'Was möchtest du erreichen?';
+      } else {
+        subtitle.textContent = 'Definiere ein weiteres Ziel (optional)';
+      }
+
+      // Show add button only after first goal is added
+      document.getElementById('goalAdd').style.display = goals.length > 0 && goals.length < 5 ? 'block' : 'none';
+
+      // Update submit button text
+      const submitBtn = document.getElementById('goalSubmit');
+      if (goals.length === 0) {
+        submitBtn.textContent = 'Weiter';
+      } else {
+        submitBtn.textContent = `Plan für ${goals.length} Ziel${goals.length > 1 ? 'e' : ''} erstellen`;
+      }
+
+      renderSavedGoals();
+    }
+
+    function renderSavedGoals() {
+      const container = document.getElementById('savedGoalsList');
+      if (goals.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Deine Ziele:</div>
+        ${goals.map((goal, idx) => `
+          <div class="goal-list-item" onclick="showGoalPreview(${idx})">
+            <div class="goal-list-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <div class="goal-list-content">
+              <div class="goal-list-title">${goal.title}</div>
+              <div class="goal-list-meta">${goal.why_important ? goal.why_important.substring(0, 50) + (goal.why_important.length > 50 ? '...' : '') : 'Tippen für Details'}</div>
+            </div>
+            <button onclick="event.stopPropagation(); removeGoal(${idx})" style="background: none; border: none; color: var(--danger); cursor: pointer; padding: 8px; font-size: 16px;">✕</button>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    // Show preview of a goal during setup (before plan is created)
+    function showGoalPreview(idx) {
+      const goal = goals[idx];
+      if (!goal) return;
+
+      document.getElementById('goalDetailTitle').textContent = goal.title;
+      document.getElementById('goalDetailStatus').textContent = 'Entwurf';
+      document.getElementById('goalDetailStatus').style.background = 'var(--warning)';
+      document.getElementById('goalDetailStatus').style.color = '#fff';
+
+      // Progress (none yet)
+      document.getElementById('goalDetailProgress').innerHTML = `
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Plan wird erstellt...</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      `;
+
+      // Info
+      document.getElementById('goalDetailInfo').innerHTML = `
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Details</div>
+          ${goal.why_important ? `
+            <div class="goal-info-item">
+              <div class="goal-info-label">Motivation</div>
+              <div class="goal-info-value">${goal.why_important}</div>
+            </div>
+          ` : ''}
+          ${goal.previous_efforts ? `
+            <div class="goal-info-item">
+              <div class="goal-info-label">Bisherige Versuche</div>
+              <div class="goal-info-value">${goal.previous_efforts}</div>
+            </div>
+          ` : ''}
+          ${goal.believed_steps ? `
+            <div class="goal-info-item">
+              <div class="goal-info-label">Eigene Ideen</div>
+              <div class="goal-info-value">${goal.believed_steps}</div>
+            </div>
+          ` : ''}
+          ${!goal.why_important && !goal.previous_efforts && !goal.believed_steps ? `
+            <p style="color: var(--text-muted); font-size: 14px;">Noch keine Details angegeben.</p>
+          ` : ''}
+        </div>
+      `;
+
+      // Milestones (none yet)
+      document.getElementById('goalDetailMilestones').innerHTML = `
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Meilensteine</div>
+          <p style="color: var(--text-muted); font-size: 14px;">Werden nach Plan-Erstellung angezeigt.</p>
+        </div>
+      `;
+
+      // Tasks (none yet)
+      document.getElementById('goalDetailTasks').innerHTML = `
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Tägliche Aufgaben</div>
+          <p style="color: var(--text-muted); font-size: 14px;">Werden nach Plan-Erstellung angezeigt.</p>
+        </div>
+      `;
+
+      previousScreen = 'goalsScreen';
+      showScreen('goalDetailScreen');
+    }
+
+    function removeGoal(idx) {
+      goals.splice(idx, 1);
+      updateGoalUI();
+    }
+
+    function getCurrentGoalFormData() {
+      return {
+        title: document.getElementById('goalTitle').value.trim(),
+        why_important: document.getElementById('goalWhy').value,
+        previous_efforts: document.getElementById('goalPrevious').value,
+        believed_steps: document.getElementById('goalSteps').value,
+        clarification_answers: {}
+      };
+    }
+
+    // Check if goal needs clarification before proceeding
+    async function checkGoalAndProceed() {
+      const goalData = getCurrentGoalFormData();
+
+      if (!goalData.title) {
+        alert('Bitte gib ein Ziel ein.');
+        return;
+      }
+
+      currentGoalData = goalData;
+
+      const btn = document.getElementById('goalSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Analysiere...';
+
+      // Call API to check if clarification is needed
+      const result = await apiCall('/functions/v1/goal-clarify', {
+        method: 'POST',
+        body: {
+          goal_title: goalData.title,
+          why_important: goalData.why_important,
+          previous_efforts: goalData.previous_efforts,
+          believed_steps: goalData.believed_steps
+        }
+      });
+
+      btn.disabled = false;
+      btn.textContent = goals.length === 0 ? 'Weiter' : `Plan für ${goals.length} Ziel${goals.length > 1 ? 'e' : ''} erstellen`;
+
+      if (result.success && result.data.questions?.length > 0) {
+        // Always show clarification screen if we have questions
+        pendingClarification = result.data;
+        showClarificationScreen(goalData.title, result.data);
+      } else if (result.success) {
+        // No questions returned - use generic fallback questions
+        const fallbackData = {
+          needs_clarification: true,
+          reason: 'Um dir den besten Plan zu erstellen, brauche ich noch ein paar Details.',
+          goal_type: 'other',
+          questions: [
+            { id: 'success_definition', question: 'Woran erkennst du, dass du das Ziel erreicht hast?', placeholder: 'z.B. Konkretes Ergebnis, Gefühl, Zahl...' },
+            { id: 'current_state', question: 'Wie ist dein aktueller Stand?', placeholder: 'z.B. Ganz am Anfang, schon angefangen...' },
+            { id: 'available_time', question: 'Wie viel Zeit kannst du täglich investieren?', placeholder: 'z.B. 30 Min, 1 Stunde...' },
+            { id: 'biggest_obstacle', question: 'Was ist dein größtes Hindernis?', placeholder: 'z.B. Zeit, Motivation, Wissen...' }
+          ]
+        };
+        pendingClarification = fallbackData;
+        showClarificationScreen(goalData.title, fallbackData);
+      } else {
+        // API error - just add goal without clarification
+        goals.push(currentGoalData);
+        clearGoalForm();
+        currentGoalData = null;
+        updateGoalUI();
+        showPostGoalOptions();
+      }
+    }
+
+    function showClarificationScreen(goalTitle, clarifyData) {
+      document.getElementById('clarifyGoalTitle').textContent = `"${goalTitle}"`;
+      document.getElementById('clarifyReason').textContent = clarifyData.reason || 'Um dir einen personalisierten Plan zu erstellen, brauche ich noch ein paar Details.';
+
+      // Show goal type badge
+      const goalTypeLabels = {
+        financial: '💰 Finanzielles Ziel',
+        fitness: '🏃 Fitness & Gesundheit',
+        learning: '📚 Lernziel',
+        career: '💼 Karriereziel',
+        personal: '🎯 Persönliches Ziel',
+        other: '🎯 Dein Ziel'
+      };
+      const goalTypeLabel = goalTypeLabels[clarifyData.goal_type] || goalTypeLabels.other;
+
+      const container = document.getElementById('clarifyQuestions');
+      container.innerHTML = `
+        <div style="margin-bottom: 20px; padding: 12px; background: var(--accent-glow); border-radius: 10px; text-align: center;">
+          <span style="font-size: 14px;">${goalTypeLabel}</span>
+        </div>
+        ${clarifyData.questions.map(q => `
+          <div class="form-group">
+            <label class="form-label">${q.question}</label>
+            <input type="text" class="form-input" id="clarify-${q.id}" placeholder="${q.placeholder || ''}">
+          </div>
+        `).join('')}
+      `;
+
+      showScreen('clarifyScreen', 'forward');
+    }
+
+    function submitClarification() {
+      if (!pendingClarification || !currentGoalData) return;
+
+      // Collect answers
+      const answers = {};
+      pendingClarification.questions.forEach(q => {
+        const input = document.getElementById(`clarify-${q.id}`);
+        if (input && input.value.trim()) {
+          answers[q.id] = input.value.trim();
+        }
+      });
+
+      // Add answers to goal data
+      currentGoalData.clarification_answers = answers;
+
+      // Build context string from answers for the goal
+      const contextParts = [];
+      pendingClarification.questions.forEach(q => {
+        if (answers[q.id]) {
+          contextParts.push(`${q.question}: ${answers[q.id]}`);
+        }
+      });
+
+      if (contextParts.length > 0) {
+        // Append clarification context to previous_efforts or believed_steps
+        const clarificationContext = '\n\n--- Zusätzliche Details ---\n' + contextParts.join('\n');
+        currentGoalData.believed_steps = (currentGoalData.believed_steps || '') + clarificationContext;
+      }
+
+      // Add goal and continue
+      goals.push(currentGoalData);
+      clearGoalForm();
+      currentGoalData = null;
+      pendingClarification = null;
+      updateGoalUI();
+      showPostGoalOptions();
+    }
+
+    function skipClarification() {
+      if (currentGoalData) {
+        goals.push(currentGoalData);
+        clearGoalForm();
+        currentGoalData = null;
+      }
+      pendingClarification = null;
+      updateGoalUI();
+      showPostGoalOptions();
+    }
+
+    function showPostGoalOptions() {
+      // Nach Klarifizierung direkt Plan erstellen (kein Dialog mehr)
+      submitGoals();
+    }
+
+    function addAnotherGoal() {
+      // This is called when user wants to add another goal after already having some
+      const goalData = getCurrentGoalFormData();
+
+      if (!goalData.title) {
+        // No new goal entered, just submit existing goals
+        submitGoals();
+        return;
+      }
+
+      // Check clarification for this goal
+      checkGoalAndProceed();
+    }
+
+    async function submitGoals() {
+      // Check if there's a current goal being entered that wasn't added yet
+      const currentFormData = getCurrentGoalFormData();
+      if (currentFormData.title && !goals.find(g => g.title === currentFormData.title)) {
+        // There's a new goal - check clarification first
+        await checkGoalAndProceed();
+        return;
+      }
+
+      if (goals.length === 0) {
+        alert('Bitte gib mindestens ein Ziel ein.');
+        return;
+      }
+
+      const btn = document.getElementById('goalSubmit');
+      btn.disabled = true;
+      btn.textContent = 'KI erstellt Plan...';
+
+      showScreen('loadingScreen');
+      document.querySelector('.loading-text').textContent = 'Dein persönlicher Plan wird erstellt...';
+
+      const result = await apiCall('/functions/v1/goals-setup', {
+        method: 'POST',
+        body: { goals }
+      });
+
+      if (result.success) {
+        displayAIPlan(result.data);
+        showScreen('planScreen', 'forward');
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Plan erstellen';
+        showScreen('goalsScreen', 'back');
+        alert('Fehler: ' + (result.error || 'Unbekannter Fehler'));
+      }
+    }
+
+    // Display AI Plan - New format with timeline
+    let currentPlanData = null;
+
+    function displayAIPlan(data) {
+      currentPlanData = data; // Store for accept/reject
+      const container = document.getElementById('planCards');
+      container.innerHTML = '';
+
+      const plans = data.ai_plan?.plans || [];
+
+      plans.forEach((plan, idx) => {
+        const goal = data.goals?.[idx];
+        const card = document.createElement('div');
+        card.className = 'card ai-plan-card';
+
+        // Format target date
+        const targetDate = plan.target_date ? new Date(plan.target_date) : null;
+        const targetDateStr = targetDate ? targetDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+
+        card.innerHTML = `
+          <div class="plan-header">
+            <div class="plan-duration">${plan.duration_weeks || 12} Wochen</div>
+            <div class="plan-target-date">Ziel: ${targetDateStr}</div>
+          </div>
+
+          <h3 style="margin-bottom: 12px; font-size: 18px;">${goal?.title || 'Ziel ' + (idx + 1)}</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">${plan.analysis || ''}</p>
+
+          ${plan.success_metric ? `
+          <div style="background: var(--accent-glow); padding: 10px 14px; border-radius: 10px; margin-bottom: 16px;">
+            <div style="font-size: 12px; color: var(--text-muted);">Erfolgskriterium:</div>
+            <div style="font-weight: 600; color: var(--accent);">${plan.success_metric}</div>
+          </div>
+          ` : ''}
+
+          ${plan.milestones?.length ? `
+          <div class="plan-section">
+            <div class="plan-section-title">Meilensteine:</div>
+            <div class="milestone-timeline">
+              ${plan.milestones.map(m => `
+                <div class="milestone-item">
+                  <div class="milestone-week">Woche ${m.week}</div>
+                  <div class="milestone-target">${m.target}</div>
+                  ${m.metric ? `<div class="milestone-metric">${m.metric}</div>` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          ${plan.daily_tasks?.length ? `
+          <div class="plan-section">
+            <div class="plan-section-title">Deine täglichen Aufgaben:</div>
+            ${plan.daily_tasks.map(t => `
+              <div class="daily-task-item">
+                <div class="task-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div class="task-info">
+                  <div class="task-name">${t.task}</div>
+                  <div class="task-duration">${t.duration_minutes} Min. | ${t.frequency === 'daily' ? 'Täglich' : t.frequency}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          ` : ''}
+
+          ${plan.weekly_tasks?.length ? `
+          <div class="plan-section">
+            <div class="plan-section-title">Wöchentliche Aufgaben:</div>
+            <ul class="plan-steps">
+              ${plan.weekly_tasks.map(t => `<li>${t}</li>`).join('')}
+            </ul>
+          </div>
+          ` : ''}
+
+          ${plan.motivation ? `
+          <div style="font-style: italic; color: var(--accent); margin-top: 16px; padding: 12px; background: var(--accent-glow); border-radius: 10px;">
+            "${plan.motivation}"
+          </div>
+          ` : ''}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function acceptPlan() {
+      if (!currentPlanData) return;
+
+      const btn = document.getElementById('acceptPlanBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gespeichert...';
+
+      // Accept each plan
+      const plans = currentPlanData.ai_plan?.plans || [];
+      const goalsData = currentPlanData.goals || [];
+
+      console.log('acceptPlan called with:', {
+        plansCount: plans.length,
+        goalsCount: goalsData.length,
+        plans,
+        goalsData
+      });
+
+      for (let i = 0; i < plans.length; i++) {
+        const plan = plans[i];
+        const goal = goalsData[i];
+        if (!goal?.id || !plan) {
+          console.log('Skipping plan', i, '- no goal or plan:', { goal, plan });
+          continue;
+        }
+
+        const requestBody = {
+          goal_id: goal.id,
+          plan: {
+            duration_weeks: plan.duration_weeks || 12,
+            target_date: plan.target_date || new Date(Date.now() + 84*24*60*60*1000).toISOString().split('T')[0],
+            milestones: plan.milestones || [],
+            daily_tasks: plan.daily_tasks || [],
+            weekly_tasks: plan.weekly_tasks || [],
+            success_metric: plan.success_metric || ''
+          }
+        };
+
+        console.log('Sending accept-plan request:', requestBody);
+
+        const result = await apiCall('/functions/v1/accept-plan', {
+          method: 'POST',
+          body: requestBody
+        });
+
+        console.log('accept-plan response:', result);
+      }
+
+      // Go to dashboard
+      currentPlanData = null;
+      loadDailyStart();
+    }
+
+    function rejectPlan() {
+      // Go back to goals screen to adjust
+      currentPlanData = null;
+      setupGoalsScreen();
+      showScreen('goalsScreen');
+    }
+
+    // Dashboard
+    function showDashboard() {
+      loadDailyStart();
+    }
+
+    function setupDashboard(data) {
+      // Today's tasks
+      const tasksEl = document.getElementById('todayTasks');
+      const tasks = data.today_tasks || [];
+
+      // Update Tasks Badge
+      const tasksBadgeEl = document.getElementById('tasksBadge');
+      if (tasksBadgeEl) {
+        const completedTasks = tasks.filter(t => t.completed).length;
+        tasksBadgeEl.textContent = `${completedTasks}/${tasks.length}`;
+      }
+
+      // Goals List
+      const goalsList = data.longterm_goals || [];
+
+      if (tasks.length === 0) {
+        tasksEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><p>Keine Aufgaben für heute</p></div>';
+      } else {
+        tasksEl.innerHTML = tasks.map(task => `
+          <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
+            <div class="task-checkbox" onclick="toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
+            <div class="task-text" onclick="toggleTask('${task.id}', ${!task.completed})">${task.task_text}</div>
+            <button class="task-delete-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">×</button>
+          </div>
+        `).join('');
+      }
+
+      // Goals with Progress
+      const goalsEl = document.getElementById('goalsProgressList');
+      // goalsList wurde bereits oben definiert
+
+      // Store goals for detail view
+      window.dashboardGoals = goalsList;
+
+      if (goalsList.length === 0) {
+        goalsEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><p>Noch keine Ziele definiert</p></div>';
+      } else {
+        goalsEl.innerHTML = goalsList.map((goal, idx) => {
+          const hasProgress = goal.target_date && goal.days_left !== null;
+          const plan = goal.plan;
+          const milestones = plan?.milestones || [];
+
+          // Find current milestone (first one not yet reached based on time)
+          let currentMilestoneIdx = 0;
+          if (milestones.length > 0 && goal.progress_percent !== null) {
+            const progressWeeks = Math.floor((goal.progress_percent / 100) * (plan?.duration_weeks || 12));
+            currentMilestoneIdx = milestones.findIndex(m => m.week > progressWeeks);
+            if (currentMilestoneIdx === -1) currentMilestoneIdx = milestones.length - 1;
+          }
+
+          const targetDateStr = goal.target_date
+            ? new Date(goal.target_date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })
+            : '';
+
+          return `
+            <div class="goal-progress-card" onclick="showGoalDetail(window.dashboardGoals[${idx}])" style="cursor: pointer;">
+              <div class="goal-progress-header">
+                <div class="goal-progress-title">${goal.title}</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="goal-progress-badge">${goal.status === 'in_progress' ? 'Aktiv' : goal.status || 'Offen'}</div>
+                  <span style="color: var(--text-muted);">›</span>
+                </div>
+              </div>
+
+              ${hasProgress ? `
+                <div class="progress-container">
+                  <div class="progress-label">
+                    <span>${goal.progress_percent}% geschafft</span>
+                    <span>Ziel: ${targetDateStr}</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill" style="width: ${goal.progress_percent}%"></div>
+                  </div>
+                </div>
+                <div class="goal-days-left">
+                  ${goal.days_left === 0
+                    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Heute ist der Zieltag!'
+                    : goal.days_left === 1
+                      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Noch 1 Tag übrig'
+                      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Noch ${goal.days_left} Tage übrig`}
+                </div>
+              ` : ''}
+
+              ${milestones.length > 0 ? `
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Nächster Meilenstein:</div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 8px; height: 8px; background: var(--accent); border-radius: 50%;"></div>
+                    <div>
+                      <div style="font-size: 14px; font-weight: 500;">${milestones[currentMilestoneIdx]?.target || ''}</div>
+                      <div style="font-size: 12px; color: var(--text-muted);">Woche ${milestones[currentMilestoneIdx]?.week || ''} ${milestones[currentMilestoneIdx]?.metric ? `• ${milestones[currentMilestoneIdx].metric}` : ''}</div>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <div style="margin-top: 12px; font-size: 12px; color: var(--accent);">
+                Tippen für Details und Aufgaben →
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    async function toggleTask(taskId, completed) {
+      // Optimistic update
+      const taskEl = document.querySelector(`[data-task-id="${taskId}"]`);
+      if (taskEl) {
+        taskEl.classList.toggle('completed', completed);
+        const checkbox = taskEl.querySelector('.task-checkbox');
+        if (checkbox) checkbox.textContent = completed ? '✓' : '';
+      }
+
+      // API call to update
+      const action = completed ? 'complete' : 'uncomplete';
+      const result = await apiCall('/functions/v1/task-update', {
+        method: 'POST',
+        body: { task_id: taskId, action }
+      });
+
+      if (!result.success) {
+        // Revert on error
+        if (taskEl) {
+          taskEl.classList.toggle('completed', !completed);
+          const checkbox = taskEl.querySelector('.task-checkbox');
+          if (checkbox) checkbox.textContent = !completed ? '✓' : '';
+        }
+        console.error('Failed to update task:', result.error);
+      }
+    }
+
+    async function deleteTask(taskId) {
+      if (!confirm('Aufgabe wirklich löschen?')) return;
+
+      // Optimistic update - hide task
+      const taskEl = document.querySelector(`[data-task-id="${taskId}"]`);
+      if (taskEl) {
+        taskEl.style.opacity = '0.5';
+        taskEl.style.pointerEvents = 'none';
+      }
+
+      const result = await apiCall('/functions/v1/task-update', {
+        method: 'POST',
+        body: { task_id: taskId, action: 'delete' }
+      });
+
+      if (result.success) {
+        // Remove from DOM
+        if (taskEl) {
+          taskEl.style.transition = 'all 0.3s';
+          taskEl.style.transform = 'translateX(100%)';
+          taskEl.style.opacity = '0';
+          setTimeout(() => taskEl.remove(), 300);
+        }
+      } else {
+        // Revert on error
+        if (taskEl) {
+          taskEl.style.opacity = '1';
+          taskEl.style.pointerEvents = 'auto';
+        }
+        alert('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'));
+      }
+    }
+
+    function editGoals() {
+      setupGoalsScreen();
+      showScreen('goalsScreen');
+    }
+
+    // Profile Screen
+    let profileData = {};
+
+    function showProfileScreen() {
+      previousScreen = document.querySelector('.screen.active')?.id || 'dashboardScreen';
+      loadProfile();
+      showScreen('profileScreen', 'forward');
+    }
+
+    function closeProfileScreen() {
+      showScreen(previousScreen || 'dashboardScreen', 'back');
+    }
+
+    async function loadProfile() {
+      const result = await apiCall('/functions/v1/auth-profile', { method: 'GET' });
+      if (result.success && result.data?.profile) {
+        const profile = result.data.profile;
+        profileData = profile;
+
+        // Felder füllen
+        document.getElementById('profileAge').value = profile.age || '';
+        document.getElementById('profileJob').value = profile.job || '';
+        document.getElementById('profileEducation').value = profile.education || '';
+        document.getElementById('profileFamily').value = profile.family_status || '';
+        document.getElementById('profileHobbies').value = profile.hobbies || '';
+        document.getElementById('profileStrengths').value = profile.strengths || '';
+        document.getElementById('profileChallenges').value = profile.challenges || '';
+        document.getElementById('profileMotivation').value = profile.motivation || '';
+      }
+    }
+
+    async function saveProfile() {
+      const btn = document.getElementById('profileSaveBtn');
+      btn.disabled = true;
+      btn.textContent = 'Speichern...';
+
+      const profileUpdate = {
+        age: parseInt(document.getElementById('profileAge').value) || null,
+        job: document.getElementById('profileJob').value || null,
+        education: document.getElementById('profileEducation').value || null,
+        family_status: document.getElementById('profileFamily').value || null,
+        hobbies: document.getElementById('profileHobbies').value || null,
+        strengths: document.getElementById('profileStrengths').value || null,
+        challenges: document.getElementById('profileChallenges').value || null,
+        motivation: document.getElementById('profileMotivation').value || null
+      };
+
+      const result = await apiCall('/functions/v1/auth-profile', {
+        method: 'POST',
+        body: profileUpdate
+      });
+
+      btn.disabled = false;
+      btn.textContent = 'Profil speichern';
+
+      if (result.success) {
+        alert('Profil gespeichert!');
+        closeProfileScreen();
+      } else {
+        alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+      }
+    }
+
+    // Review
+    function setupReviewScreen(tasks) {
+      reviewData = tasks.map(t => ({ task_id: t.id, completed: null, blockers: [] }));
+
+      const container = document.getElementById('reviewTasks');
+      container.innerHTML = tasks.map((task, idx) => `
+        <div class="card" data-task-idx="${idx}">
+          <div style="font-weight: 500; margin-bottom: 12px;">${task.task_text}</div>
+          <div class="review-buttons">
+            <button class="review-btn" onclick="setReview(${idx}, true)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Geschafft</button>
+            <button class="review-btn" onclick="setReview(${idx}, false)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Nicht geschafft</button>
+          </div>
+          <div class="blocker-input" id="blocker-${idx}">
+            <input type="text" class="form-input" placeholder="Was hat dich gehindert?"
+                   onchange="setBlocker(${idx}, this.value)" style="margin-top: 12px;">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setReview(idx, completed) {
+      reviewData[idx].completed = completed;
+
+      const card = document.querySelector(`[data-task-idx="${idx}"]`);
+      const buttons = card.querySelectorAll('.review-btn');
+      buttons[0].className = `review-btn ${completed ? 'selected-yes' : ''}`;
+      buttons[1].className = `review-btn ${!completed ? 'selected-no' : ''}`;
+
+      // Show blocker input if not completed
+      document.getElementById(`blocker-${idx}`).classList.toggle('show', !completed);
+
+      updateReviewButton();
+    }
+
+    function setBlocker(idx, value) {
+      reviewData[idx].blockers = value ? [value] : [];
+    }
+
+    function updateReviewButton() {
+      const allReviewed = reviewData.every(r => r.completed !== null);
+      document.getElementById('reviewSubmit').disabled = !allReviewed;
+    }
+
+    async function submitReview() {
+      const btn = document.getElementById('reviewSubmit');
+      btn.disabled = true;
+      btn.textContent = 'Wird verarbeitet...';
+
+      const result = await apiCall('/functions/v1/daily-review', {
+        method: 'POST',
+        body: { reviews: reviewData }
+      });
+
+      if (result.success) {
+        loadDailyStart();
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Weiter';
+        alert('Fehler: ' + (result.error || 'Unbekannter Fehler'));
+      }
+    }
+
+    // Progress Screen Functions
+    let progressScreenPreviousScreen = 'dashboardScreen';
+    let currentActiveScreen = 'dashboardScreen';
+
+    async function showProgressScreen() {
+      // Save current screen before switching
+      const activeScreen = document.querySelector('.screen.active');
+      if (activeScreen && activeScreen.id !== 'progressScreen') {
+        progressScreenPreviousScreen = activeScreen.id;
+      }
+      showScreen('progressScreen', 'forward');
+
+      // Set today's date
+      const today = new Date();
+      document.getElementById('progressDate').textContent = today.toLocaleDateString('de-DE', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+
+      // Load fresh data
+      const result = await apiCall('/functions/v1/daily-start', { method: 'POST' });
+
+      if (result.success) {
+        updateProgressScreen(result.data.data);
+      }
+    }
+
+    function closeProgressScreen() {
+      // Go back to previous screen, default to dashboard
+      const targetScreen = progressScreenPreviousScreen || lastActiveScreen || 'dashboardScreen';
+      // Don't go back to loading or progress screen
+      if (targetScreen === 'loadingScreen' || targetScreen === 'progressScreen') {
+        showScreen('dashboardScreen', 'back');
+      } else {
+        showScreen(targetScreen, 'back');
+      }
+    }
+
+    function startNewGoal() {
+      setupGoalsScreen();
+      showScreen('goalsScreen', 'forward');
+    }
+
+    function showCheckinScreen() {
+      showScreen('checkinScreen', 'forward');
+    }
+
+    function updateProgressScreen(data) {
+      // Mood
+      const moodData = {
+        great: { emoji: '😊', text: 'Super', class: 'mood-great' },
+        good: { emoji: '🙂', text: 'Gut', class: 'mood-good' },
+        neutral: { emoji: '😐', text: 'Okay', class: 'mood-neutral' },
+        bad: { emoji: '😔', text: 'Nicht so gut', class: 'mood-bad' },
+        terrible: { emoji: '😢', text: 'Schlecht', class: 'mood-terrible' }
+      };
+
+      // Get today's checkin mood from appData or use default
+      const todayMood = checkinData.mood || 'neutral';
+      const mood = moodData[todayMood] || moodData.neutral;
+
+      document.getElementById('moodEmoji').textContent = mood.emoji;
+      document.getElementById('moodValue').textContent = mood.text;
+      document.getElementById('moodValue').className = `stat-value ${mood.class}`;
+
+      // Energy
+      const energyLevel = checkinData.energy_level || 3;
+      const energyPercent = (energyLevel / 5) * 100;
+      const energyOffset = 283 - (283 * energyPercent / 100);
+
+      document.getElementById('energyValue').textContent = energyLevel;
+      document.getElementById('energyRing').style.strokeDashoffset = energyOffset;
+
+      const energyTexts = ['', 'Sehr niedrig', 'Niedrig', 'Mittel', 'Hoch', 'Sehr hoch'];
+      document.getElementById('energyText').textContent = energyTexts[energyLevel] || 'Mittel';
+
+      // Tasks Progress
+      const tasks = data.today_tasks || [];
+      const completedTasks = tasks.filter(t => t.completed).length;
+      const totalTasks = tasks.length;
+      const tasksPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      const tasksOffset = 283 - (283 * tasksPercent / 100);
+
+      document.getElementById('tasksPercent').textContent = `${tasksPercent}%`;
+      document.getElementById('tasksRing').style.strokeDashoffset = tasksOffset;
+      document.getElementById('tasksValue').textContent = `${completedTasks}/${totalTasks}`;
+
+      // Stats
+      document.getElementById('streakValue').textContent = data.streak || 0;
+      document.getElementById('tasksCompletedValue').textContent = completedTasks;
+
+      const goalsActive = (data.longterm_goals || []).filter(g => g.status === 'in_progress').length;
+      document.getElementById('goalsActiveValue').textContent = goalsActive || (data.longterm_goals || []).length;
+
+      // Average Progress
+      const goalsWithProgress = (data.longterm_goals || []).filter(g => g.progress_percent !== null);
+      const avgProgress = goalsWithProgress.length > 0
+        ? Math.round(goalsWithProgress.reduce((sum, g) => sum + (g.progress_percent || 0), 0) / goalsWithProgress.length)
+        : 0;
+      document.getElementById('avgProgressValue').textContent = `${avgProgress}%`;
+
+      // Today's Tasks List
+      document.getElementById('todayTasksCount').textContent = `${totalTasks} Aufgaben`;
+      const tasksContainer = document.getElementById('progressTodayTasks');
+
+      if (tasks.length === 0) {
+        tasksContainer.innerHTML = `
+          <div class="progress-empty">
+            <div class="progress-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <p>Keine Aufgaben für heute</p>
+          </div>
+        `;
+      } else {
+        tasksContainer.innerHTML = tasks.map(task => `
+          <div class="progress-task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
+            <div class="progress-task-checkbox" onclick="toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
+            <div class="progress-task-text" onclick="toggleTask('${task.id}', ${!task.completed})">${task.task_text}</div>
+            <button class="task-delete-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">×</button>
+          </div>
+        `).join('');
+      }
+
+      // All Goals List
+      const goalsContainer = document.getElementById('progressAllGoals');
+      const goalsList = data.longterm_goals || [];
+
+      if (goalsList.length === 0) {
+        goalsContainer.innerHTML = `
+          <div class="progress-empty">
+            <div class="progress-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <p>Noch keine Ziele definiert</p>
+            <button class="btn btn-primary" onclick="startNewGoal()">
+              + Neues Ziel erstellen
+            </button>
+          </div>
+        `;
+      } else {
+        // Store goals for click handler
+        window.progressGoals = goalsList;
+
+        goalsContainer.innerHTML = goalsList.map((goal, idx) => {
+          const progress = goal.progress_percent || 0;
+          const daysLeft = goal.days_left;
+          const targetDate = goal.target_date
+            ? new Date(goal.target_date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })
+            : '';
+
+          // Color based on progress
+          let barColor = 'linear-gradient(90deg, #6366f1, #06b6d4)';
+          if (progress >= 75) barColor = 'linear-gradient(90deg, #10b981, #06b6d4)';
+          else if (progress >= 50) barColor = 'linear-gradient(90deg, #6366f1, #10b981)';
+          else if (progress < 25) barColor = 'linear-gradient(90deg, #f59e0b, #6366f1)';
+
+          return `
+            <div class="progress-goal-item" onclick="showGoalDetail(window.progressGoals[${idx}])">
+              <div class="progress-goal-header">
+                <div class="progress-goal-title">${goal.title}</div>
+                <div class="progress-goal-percent">${progress}%</div>
+              </div>
+              <div class="progress-goal-bar">
+                <div class="progress-goal-fill" style="width: ${progress}%; background: ${barColor};"></div>
+              </div>
+              <div class="progress-goal-meta">
+                <span>${daysLeft !== null ? `${daysLeft} Tage übrig` : 'Kein Datum'}</span>
+                <span>${targetDate ? `Ziel: ${targetDate}` : ''}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Trigger animations after a small delay
+      setTimeout(() => {
+        document.querySelectorAll('.progress-goal-fill').forEach(el => {
+          el.style.width = el.style.width; // Trigger reflow
+        });
+      }, 100);
+    }
+
+    // Goal Detail Functions
+    function closeGoalDetail() {
+      showScreen(previousScreen);
+    }
+
+    function showGoalDetail(goalData) {
+      currentGoalDetail = goalData;
+
+      document.getElementById('goalDetailTitle').textContent = goalData.title;
+
+      // Status Badge
+      const statusEl = document.getElementById('goalDetailStatus');
+      const statusLabels = {
+        'in_progress': 'Aktiv',
+        'open': 'Offen',
+        'achieved': 'Erreicht',
+        'not_achieved': 'Nicht erreicht'
+      };
+      statusEl.textContent = statusLabels[goalData.status] || goalData.status || 'Offen';
+      statusEl.style.background = goalData.status === 'in_progress' ? 'var(--accent-glow)' : 'var(--glass-border)';
+      statusEl.style.color = goalData.status === 'in_progress' ? 'var(--accent)' : 'var(--text-muted)';
+
+      // Progress
+      const hasProgress = goalData.target_date && goalData.days_left !== null;
+      const targetDateStr = goalData.target_date
+        ? new Date(goalData.target_date).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })
+        : '';
+
+      document.getElementById('goalDetailProgress').innerHTML = hasProgress ? `
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>${goalData.progress_percent || 0}% geschafft</span>
+            <span>Ziel: ${targetDateStr}</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${goalData.progress_percent || 0}%"></div>
+          </div>
+        </div>
+        <div class="goal-days-left" style="margin-top: 8px;">
+          ${goalData.days_left === 0
+            ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Heute ist der Zieltag!'
+            : goalData.days_left === 1
+              ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Noch 1 Tag übrig'
+              : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Noch ${goalData.days_left} Tage übrig`}
+        </div>
+      ` : `
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Kein Zeitrahmen festgelegt</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      `;
+
+      // Info Section
+      const plan = goalData.plan;
+      document.getElementById('goalDetailInfo').innerHTML = `
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Informationen</div>
+          ${plan?.success_metric ? `
+            <div class="goal-info-item">
+              <div class="goal-info-label">Erfolgskriterium</div>
+              <div class="goal-info-value" style="color: var(--accent); font-weight: 500;">${plan.success_metric}</div>
+            </div>
+          ` : ''}
+          ${plan?.duration_weeks ? `
+            <div class="goal-info-item">
+              <div class="goal-info-label">Zeitrahmen</div>
+              <div class="goal-info-value">${plan.duration_weeks} Wochen</div>
+            </div>
+          ` : ''}
+          <div class="goal-info-item">
+            <div class="goal-info-label">Erstellt am</div>
+            <div class="goal-info-value">${goalData.created_at ? new Date(goalData.created_at).toLocaleDateString('de-DE') : 'Unbekannt'}</div>
+          </div>
+        </div>
+      `;
+
+      // Milestones
+      const milestones = plan?.milestones || [];
+      if (milestones.length > 0) {
+        // Calculate which milestones are completed based on progress
+        const progressWeeks = plan?.duration_weeks
+          ? Math.floor((goalData.progress_percent / 100) * plan.duration_weeks)
+          : 0;
+
+        document.getElementById('goalDetailMilestones').innerHTML = `
+          <div class="goal-detail-section">
+            <div class="goal-detail-section-title">Meilensteine</div>
+            ${milestones.map((m, idx) => {
+              const isCompleted = m.week <= progressWeeks;
+              const isCurrent = !isCompleted && (idx === 0 || milestones[idx - 1].week <= progressWeeks);
+              return `
+                <div class="step-item ${isCompleted ? 'completed' : ''}">
+                  <div class="step-number">${isCompleted ? '✓' : idx + 1}</div>
+                  <div class="step-content">
+                    <div class="step-text">${m.target}</div>
+                    <div class="step-meta">Woche ${m.week} ${m.metric ? `• ${m.metric}` : ''} ${isCurrent ? '← Aktuell' : ''}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        document.getElementById('goalDetailMilestones').innerHTML = `
+          <div class="goal-detail-section">
+            <div class="goal-detail-section-title">Meilensteine</div>
+            <p style="color: var(--text-muted); font-size: 14px;">Keine Meilensteine definiert.</p>
+          </div>
+        `;
+      }
+
+      // Daily Tasks
+      const dailyTasks = plan?.daily_tasks || [];
+      if (dailyTasks.length > 0) {
+        document.getElementById('goalDetailTasks').innerHTML = `
+          <div class="goal-detail-section">
+            <div class="goal-detail-section-title">Tägliche Aufgaben</div>
+            ${dailyTasks.map((t, idx) => `
+              <div class="step-item">
+                <div class="step-number">${idx + 1}</div>
+                <div class="step-content">
+                  <div class="step-text">${t.task}</div>
+                  <div class="step-meta">${t.duration_minutes} Min. | ${t.frequency === 'daily' ? 'Täglich' : t.frequency}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          ${plan?.weekly_tasks?.length ? `
+            <div class="goal-detail-section">
+              <div class="goal-detail-section-title">Wöchentliche Aufgaben</div>
+              ${plan.weekly_tasks.map((t, idx) => `
+                <div class="step-item">
+                  <div class="step-number">W</div>
+                  <div class="step-content">
+                    <div class="step-text">${t}</div>
+                    <div class="step-meta">Wöchentlich</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        `;
+      } else {
+        document.getElementById('goalDetailTasks').innerHTML = `
+          <div class="goal-detail-section">
+            <div class="goal-detail-section-title">Tägliche Aufgaben</div>
+            <p style="color: var(--text-muted); font-size: 14px;">Keine Aufgaben definiert.</p>
+          </div>
+        `;
+      }
+
+      previousScreen = 'dashboardScreen';
+      showScreen('goalDetailScreen');
+    }
+
+    // ===== PWA: Service Worker Registration =====
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('/sw.js');
+          console.log('[PWA] Service Worker registered:', registration.scope);
+
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                showUpdateNotification();
+              }
+            });
+          });
+        } catch (error) {
+          console.error('[PWA] Service Worker registration failed:', error);
+        }
+      });
+    }
+
+    // ===== Offline-Erkennung =====
+    let offlineBanner = null;
+
+    function createOfflineBanner() {
+      if (offlineBanner) return;
+
+      offlineBanner = document.createElement('div');
+      offlineBanner.id = 'offlineBanner';
+      offlineBanner.innerHTML = `
+        <div style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+          color: white;
+          padding: 12px 20px;
+          text-align: center;
+          font-size: 14px;
+          font-weight: 600;
+          z-index: 10000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23"/>
+            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+            <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+            <path d="M10.71 5.05A16 16 0 0 1 22.58 9"/>
+            <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+            <line x1="12" y1="20" x2="12.01" y2="20"/>
+          </svg>
+          Du bist offline - Einige Funktionen sind eingeschränkt
+        </div>
+      `;
+      document.body.prepend(offlineBanner);
+    }
+
+    function removeOfflineBanner() {
+      if (offlineBanner) {
+        offlineBanner.remove();
+        offlineBanner = null;
+      }
+    }
+
+    function updateOnlineStatus() {
+      if (navigator.onLine) {
+        removeOfflineBanner();
+        console.log('[PWA] Online');
+      } else {
+        createOfflineBanner();
+        console.log('[PWA] Offline');
+      }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    // Initial check
+    if (!navigator.onLine) {
+      createOfflineBanner();
+    }
+
+    // ===== Update Notification =====
+    function showUpdateNotification() {
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div style="
+          position: fixed;
+          bottom: 20px;
+          left: 20px;
+          right: 20px;
+          background: var(--bg-card);
+          border: 1px solid var(--glass-border);
+          border-radius: 16px;
+          padding: 16px 20px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+          z-index: 10000;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        ">
+          <span style="font-size: 14px; color: var(--text);">
+            Eine neue Version ist verfügbar!
+          </span>
+          <button onclick="window.location.reload()" style="
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+          ">
+            Aktualisieren
+          </button>
+        </div>
+      `;
+      document.body.appendChild(notification);
+    }
+  </script>
+</body>
+</html>
