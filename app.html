@@ -549,14 +549,19 @@
     /* Mood Selector */
     .mood-selector {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       justify-content: center;
       margin: 24px 0;
+      flex-wrap: wrap;
     }
 
     .mood-btn {
       width: 56px;
       height: 56px;
+      min-width: 56px;
+      min-height: 56px;
+      max-width: 56px;
+      max-height: 56px;
       border-radius: 50%;
       border: 2px solid var(--bg-input);
       background: var(--bg-card);
@@ -567,6 +572,8 @@
       align-items: center;
       justify-content: center;
       box-shadow: var(--shadow);
+      flex-shrink: 0;
+      aspect-ratio: 1 / 1;
     }
 
     .mood-btn:hover {
