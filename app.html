@@ -3167,9 +3167,20 @@
 
         console.log('Plans accepted successfully:', successCount);
 
-        // Go to dashboard
+        // Success! Show confirmation and go to dashboard
         currentPlanData = null;
-        loadDailyStart();
+        btn.textContent = 'Gespeichert!';
+
+        // Short delay to show success, then load dashboard
+        setTimeout(async () => {
+          try {
+            await loadDailyStart();
+          } catch (e) {
+            console.error('loadDailyStart error:', e);
+            // Fallback: just show dashboard
+            showScreen('dashboardScreen');
+          }
+        }, 500);
 
       } catch (error) {
         console.error('acceptPlan error:', error);
