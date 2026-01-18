@@ -3968,11 +3968,13 @@
     }
 
     function showGoalDetail(goalData) {
-      // Remember where we came from
-      goalDetailPreviousScreen = lastActiveScreen || 'dashboardScreen';
-      currentGoalDetail = goalData;
+      console.log('showGoalDetail called with:', goalData);
+      try {
+        // Remember where we came from
+        goalDetailPreviousScreen = lastActiveScreen || 'dashboardScreen';
+        currentGoalDetail = goalData;
 
-      document.getElementById('goalDetailTitle').textContent = goalData.title;
+        document.getElementById('goalDetailTitle').textContent = goalData.title;
 
       // Status Badge
       const statusEl = document.getElementById('goalDetailStatus');
@@ -4121,7 +4123,13 @@
       }
 
       previousScreen = 'dashboardScreen';
+      console.log('About to show goalDetailScreen');
       showScreen('goalDetailScreen');
+      console.log('showGoalDetail complete');
+      } catch (error) {
+        console.error('Error in showGoalDetail:', error);
+        alert('Fehler beim Laden der Zieldetails: ' + error.message);
+      }
     }
 
     // ===== PWA: Service Worker Registration =====
