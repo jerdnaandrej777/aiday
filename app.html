@@ -3875,6 +3875,8 @@
 
     function renderGoalsOverview() {
       const container = document.getElementById('goalsOverviewList');
+      // Store in window for onclick access
+      window.goalsOverviewData = goalsOverviewData;
 
       if (goalsOverviewData.length === 0) {
         container.innerHTML = `
@@ -3941,9 +3943,15 @@
     }
 
     function showGoalDetailFromOverview(idx) {
-      const goal = goalsOverviewData[idx];
+      console.log('showGoalDetailFromOverview called with idx:', idx);
+      const data = window.goalsOverviewData || goalsOverviewData;
+      console.log('goalsOverviewData length:', data?.length);
+      const goal = data[idx];
+      console.log('Selected goal:', goal);
       if (goal) {
         showGoalDetail(goal);
+      } else {
+        console.error('Goal not found at index:', idx);
       }
     }
 
