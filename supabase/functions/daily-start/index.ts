@@ -25,11 +25,11 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString().split('T')[0]
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-    // 1. Prüfe ob Check-in für heute existiert
+    // 1. Prüfe ob Check-in für heute existiert und hole Daten
     const { data: todayCheckin } = await supabase
       .schema('core')
       .from('daily_checkins')
-      .select('id')
+      .select('id, mood, mood_note, energy_level, planned_today')
       .eq('user_id', userId)
       .eq('date', today)
       .maybeSingle()
@@ -165,6 +165,7 @@ Deno.serve(async (req) => {
       step,
       data: {
         checkin_done: checkinDone,
+        today_checkin: todayCheckin || null,
         goals_count: goalsCount || 0,
         has_goals: hasGoals,
         pending_review: pendingReview,

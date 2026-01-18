@@ -257,7 +257,8 @@ aiday/
 ├── db/                           # SQL Migrations
 │   ├── 001_init.sql              # Hauptschema
 │   ├── 002_auth.sql              # Auth Trigger
-│   └── 003_daily_coaching.sql    # Daily Coaching Tabellen
+│   ├── 003_daily_coaching.sql    # Daily Coaching Tabellen
+│   └── fix_goals_schema.sql      # FIX: Fehlende Spalten
 │
 ├── docs/                         # Dokumentation
 ├── icons/                        # PWA App-Icons (alle Größen)
@@ -445,3 +446,43 @@ supabase functions deploy auth-onboarding --no-verify-jwt
 | Frontend | Single HTML Files (PWA) |
 | Hosting | GitHub Pages |
 | PWA | Service Worker + Manifest |
+
+---
+
+## Troubleshooting
+
+### "Deine Ziele" zeigt keine Ziele an
+**Problem:** Fehlende Spalten in der `core.goals` Tabelle.
+
+**Lösung:** `db/fix_goals_schema.sql` im Supabase SQL Editor ausführen:
+```sql
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS target_date DATE;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS is_longterm BOOLEAN DEFAULT false;
+
+ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT USING status::TEXT;
+```
+
+### "estimated_minutes" Fehler
+**Problem:** `Could not find the 'estimated_minutes' column of 'daily_tasks'`
+
+**Lösung:**
+```sql
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
+```
+
+### Button bleibt auf "Wird gespeichert..."
+**Problem:** API-Timeout oder Fehler ohne Feedback.
+
+**Lösung:** Browser-Console (F12) prüfen. Die App hat 30s Timeout und zeigt Fehler an.
+
+### Lokale Tests (file://) - Erwartete Fehler
+Beim Öffnen direkt von der Festplatte erscheinen normale Fehler:
+- `Service Worker registration failed` - SW funktioniert nur über HTTP/HTTPS
+- `AbortError` - API-Timeout (normal wenn offline)
+- `CORS policy` - manifest.json kann nicht von file:// geladen werden
+
+**Lösung:** GitHub Pages nutzen oder lokalen Server starten: `npx serve .`

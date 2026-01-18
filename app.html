@@ -1530,6 +1530,20 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
 
+    .stat-box-clickable {
+      border: 2px solid var(--accent);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+    }
+
+    .stat-box-clickable:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .stat-box-clickable:active {
+      transform: translateY(0);
+    }
+
     .stat-box-icon {
       font-size: 24px;
       margin-bottom: 8px;
@@ -1861,7 +1875,7 @@
             <div class="stat-box-value" id="tasksCompletedValue">0</div>
             <div class="stat-box-label">Aufgaben erledigt</div>
           </div>
-          <div class="stat-box">
+          <div class="stat-box stat-box-clickable" onclick="showProgressScreen()" style="cursor: pointer;">
             <div class="stat-box-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
@@ -3563,7 +3577,7 @@
     }
 
     function updateProgressScreen(data) {
-      // Mood
+      // Mood - Verwende Daten aus API (today_checkin) oder lokale checkinData
       const moodData = {
         great: { emoji: '😊', text: 'Super', class: 'mood-great' },
         good: { emoji: '🙂', text: 'Gut', class: 'mood-good' },
@@ -3572,16 +3586,17 @@
         terrible: { emoji: '😢', text: 'Schlecht', class: 'mood-terrible' }
       };
 
-      // Get today's checkin mood from appData or use default
-      const todayMood = checkinData.mood || 'neutral';
+      // Get today's checkin mood from API data, fallback to local checkinData
+      const todayCheckin = data.today_checkin || {};
+      const todayMood = todayCheckin.mood || checkinData.mood || 'neutral';
       const mood = moodData[todayMood] || moodData.neutral;
 
       document.getElementById('moodEmoji').textContent = mood.emoji;
       document.getElementById('moodValue').textContent = mood.text;
       document.getElementById('moodValue').className = `stat-value ${mood.class}`;
 
-      // Energy
-      const energyLevel = checkinData.energy_level || 3;
+      // Energy - Verwende Daten aus API oder lokale checkinData
+      const energyLevel = todayCheckin.energy_level || checkinData.energy_level || 3;
       const energyPercent = (energyLevel / 5) * 100;
       const energyOffset = 283 - (283 * energyPercent / 100);
 
@@ -3590,6 +3605,10 @@
 
       const energyTexts = ['', 'Sehr niedrig', 'Niedrig', 'Mittel', 'Hoch', 'Sehr hoch'];
       document.getElementById('energyText').textContent = energyTexts[energyLevel] || 'Mittel';
+
+      // Aktualisiere auch die lokale checkinData für Konsistenz
+      if (todayCheckin.mood) checkinData.mood = todayCheckin.mood;
+      if (todayCheckin.energy_level) checkinData.energy_level = todayCheckin.energy_level;
 
       // Tasks Progress
       const tasks = data.today_tasks || [];

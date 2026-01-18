@@ -111,9 +111,10 @@ aiday/
 │       └── 20240103000000_profile_personal.sql
 │
 ├── db/                           # SQL Migrations
-│   ├── 001_init.sql
-│   ├── 002_auth.sql
-│   └── 003_daily_coaching.sql
+│   ├── 001_init.sql              # Basis-Schema
+│   ├── 002_auth.sql              # Auth Trigger
+│   ├── 003_daily_coaching.sql    # Daily Coaching Tabellen
+│   └── fix_goals_schema.sql      # FIX: Fehlende Spalten
 │
 ├── docs/                         # Dokumentation
 ├── postman/                      # API Collection
@@ -270,11 +271,20 @@ core.user_profile
   - age, job, education, family_status
   - hobbies, strengths, challenges, motivation
 
--- Ziele
+-- Ziele (vollständig)
 core.goals
-  - title, category, status
-  - why_important, previous_efforts, believed_steps
-  - is_longterm, target_date
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - day_entry_id UUID (FK core.day_entries)
+  - title TEXT NOT NULL
+  - category TEXT
+  - status TEXT DEFAULT 'open'  -- 'open', 'in_progress', 'achieved', 'not_achieved'
+  - why_important TEXT          -- Warum wichtig?
+  - previous_efforts TEXT       -- Bisherige Versuche
+  - believed_steps TEXT         -- Eigene Ideen
+  - is_longterm BOOLEAN         -- Langzeit-Ziel Flag
+  - target_date DATE            -- Zieldatum
+  - created_at TIMESTAMPTZ
 
 -- Daily Coaching
 core.daily_checkins   -- mood, energy_level, mood_note
@@ -515,6 +525,54 @@ html, body, .container, .screen {
   border-radius: 50%;
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
+}
+```
+
+### 6. "Deine Ziele" zeigt keine Ziele an
+**Problem:** Fehlende Spalten in der `goals` Tabelle:
+- `target_date` fehlt
+- `is_longterm` fehlt
+- `in_progress` Status nicht unterstützt
+
+**Lösung:** SQL im Supabase Dashboard ausführen (`db/fix_goals_schema.sql`):
+```sql
+-- Fehlende Spalten hinzufügen
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS target_date DATE;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS is_longterm BOOLEAN DEFAULT false;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS why_important TEXT;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS previous_efforts TEXT;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS believed_steps TEXT;
+
+-- Status zu TEXT konvertieren (für in_progress Support)
+DO $$
+BEGIN
+  ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT USING status::TEXT;
+  ALTER TABLE core.goals ALTER COLUMN status SET DEFAULT 'open';
+EXCEPTION
+  WHEN others THEN NULL;
+END $$;
+```
+
+### 7. Quick Actions Buttons nicht zentriert
+**Problem:** Buttons Check-in, Neues Ziel, etc. waren nicht mit anderen UI-Elementen ausgerichtet
+
+**Lösung:**
+```css
+.quick-actions-title {
+  /* padding-left entfernt */
+}
+.quick-actions-grid {
+  width: 100%;
+  gap: 8px; /* von 12px reduziert */
 }
 ```
 

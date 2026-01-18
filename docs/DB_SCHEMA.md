@@ -199,8 +199,27 @@ CREATE TABLE audit.event_log (
 |-------|--------------|
 | `db/001_init.sql` | Hauptschema (Schemas, Tabellen, RLS) |
 | `db/002_auth.sql` | Auth Trigger (auto-create profile) |
-| `db/003_daily_coaching.sql` | Daily Coaching Tabellen |
+| `db/003_daily_coaching.sql` | Daily Coaching Tabellen + Goals-Erweiterungen |
+| `db/fix_goals_schema.sql` | **FIX:** Fehlende Spalten (target_date, is_longterm, etc.) |
 | `supabase/migrations/20240103000000_profile_personal.sql` | Persönliche Profildaten |
+
+### Bekannte Schema-Probleme & Fixes
+
+**Problem:** Die `core.goals` Tabelle hat möglicherweise fehlende Spalten, die für den Daily Coaching Flow benötigt werden.
+
+**Symptom:** "Deine Ziele" auf dem Dashboard zeigt keine Ziele an.
+
+**Lösung:** `db/fix_goals_schema.sql` im Supabase SQL Editor ausführen:
+```sql
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS target_date DATE;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS is_longterm BOOLEAN DEFAULT false;
+
+-- Status zu TEXT für in_progress Support
+ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT USING status::TEXT;
+```
 
 ---
 

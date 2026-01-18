@@ -269,3 +269,58 @@ Die AI nutzt diese Informationen für:
 - Passende Aufgaben (basierend auf Hobbys, Stärken)
 - Motivierende Nachrichten (basierend auf persönlichem Antrieb)
 - Berücksichtigung von Herausforderungen
+
+---
+
+## Datenbank-Anforderungen
+
+### Benötigte Spalten für Edge Functions
+
+Die Edge Functions benötigen bestimmte Spalten in der Datenbank:
+
+**core.goals** (für `daily-start`, `goals-setup`, `accept-plan`):
+```sql
+-- Falls diese Spalten fehlen, DB-Fix ausführen:
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS target_date DATE;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS is_longterm BOOLEAN DEFAULT false;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS why_important TEXT;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS previous_efforts TEXT;
+
+ALTER TABLE core.goals
+ADD COLUMN IF NOT EXISTS believed_steps TEXT;
+
+-- Status muss TEXT sein (nicht ENUM) für 'in_progress' Support
+ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT USING status::TEXT;
+```
+
+**core.daily_tasks** (für `accept-plan`):
+```sql
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
+```
+
+### Vollständiger Fix
+Siehe `db/fix_goals_schema.sql` für das komplette Fix-Script.
+
+---
+
+## Troubleshooting
+
+### "Deine Ziele" zeigt keine Ziele
+- **Ursache:** `is_longterm` oder `target_date` Spalte fehlt
+- **Lösung:** `db/fix_goals_schema.sql` ausführen
+
+### accept-plan gibt "estimated_minutes" Fehler
+- **Ursache:** `estimated_minutes` Spalte fehlt in `daily_tasks`
+- **Lösung:** `ALTER TABLE core.daily_tasks ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;`
+
+### Status 'in_progress' nicht möglich
+- **Ursache:** `status` ist ein ENUM ohne 'in_progress' Wert
+- **Lösung:** Status zu TEXT konvertieren: `ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT;`

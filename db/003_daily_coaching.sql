@@ -64,12 +64,32 @@ ALTER TABLE core.personality_insights ENABLE ROW LEVEL SECURITY;
 -- ============================================
 -- 3. Erweitere core.goals Tabelle
 -- ============================================
+
+-- Füge in_progress zum goal_status ENUM hinzu (falls nicht existiert)
+DO $$
+BEGIN
+  ALTER TYPE core.goal_status ADD VALUE IF NOT EXISTS 'in_progress';
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
 ALTER TABLE core.goals
 ADD COLUMN IF NOT EXISTS why_important TEXT,
 ADD COLUMN IF NOT EXISTS previous_efforts TEXT,
 ADD COLUMN IF NOT EXISTS believed_steps TEXT,
 ADD COLUMN IF NOT EXISTS is_longterm BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS target_date DATE,
 ADD COLUMN IF NOT EXISTS parent_goal_id UUID REFERENCES core.goals(id) ON DELETE SET NULL;
+
+-- Falls status Spalte TEXT ist (nicht ENUM), aktualisiere sie
+-- Ansonsten ignorieren wir diesen Befehl
+DO $$
+BEGIN
+  -- Versuche status auf TEXT zu ändern wenn es ein ENUM ist (für mehr Flexibilität)
+  ALTER TABLE core.goals ALTER COLUMN status TYPE TEXT;
+EXCEPTION
+  WHEN others THEN NULL;
+END $$;
 
 -- Index für Langzeit-Ziele
 CREATE INDEX IF NOT EXISTS idx_goals_longterm
