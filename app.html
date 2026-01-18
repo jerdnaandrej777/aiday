@@ -2901,11 +2901,25 @@
         `).join('')}
       `;
 
+      // Reset clarify button
+      const clarifyBtn = document.getElementById('clarifySubmit');
+      if (clarifyBtn) {
+        clarifyBtn.disabled = false;
+        clarifyBtn.textContent = 'Plan erstellen lassen';
+      }
+
       showScreen('clarifyScreen', 'forward');
     }
 
     function submitClarification() {
       if (!pendingClarification || !currentGoalData) return;
+
+      // Show loading state on button
+      const btn = document.getElementById('clarifySubmit');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Plan wird erstellt...';
+      }
 
       // Collect answers
       const answers = {};
