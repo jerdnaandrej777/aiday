@@ -276,10 +276,28 @@ core.goals
 
 -- Daily Coaching
 core.daily_checkins   -- mood, energy_level, mood_note
-core.daily_tasks      -- task_text, completed, goal_id
+core.daily_tasks      -- task_text, completed, goal_id, estimated_minutes
 
 -- AI
 coach.ai_suggestions  -- kind, payload_json
+```
+
+### daily_tasks Tabelle (vollständig)
+```sql
+core.daily_tasks
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - goal_id UUID (FK core.goals)
+  - date DATE
+  - task_text TEXT
+  - task_order INT
+  - completed BOOLEAN
+  - completed_at TIMESTAMPTZ
+  - skipped BOOLEAN
+  - skip_reason TEXT
+  - ai_generated BOOLEAN
+  - estimated_minutes INTEGER DEFAULT 15  -- NEU: Geschätzte Dauer
+  - created_at TIMESTAMPTZ
 ```
 
 ---
@@ -394,3 +412,128 @@ CRON_SECRET=...
 **Demo-Account:** `admin@aiday.test` / `admin1`
 
 Zum Testen: `test-api.html` öffnen → "Demo Login (admin)" klicken
+
+---
+
+## Frontend-Architektur (app.html)
+
+### API-Call System
+```javascript
+// Alle API-Calls haben 30s Timeout
+async function apiCall(endpoint, options = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    // ...
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return { error: 'Zeitüberschreitung' };
+    }
+  }
+}
+```
+
+### acceptPlan Flow
+```javascript
+// Plan annehmen mit Fehlerbehandlung
+async function acceptPlan() {
+  // 1. Button disabled + "Wird gespeichert..."
+  // 2. Für jeden Plan: API-Call zu accept-plan
+  // 3. Bei Erfolg: Button → "Gespeichert!"
+  // 4. Nach 500ms: loadDailyStart() → Dashboard
+  // 5. Bei Fehler: Alert + Button zurücksetzen
+}
+```
+
+### Fehlerbehandlung
+- **try/catch** um alle async Funktionen
+- **Alert** bei Benutzer-relevanten Fehlern
+- **Console.error** für Debug-Informationen
+- **Button-Reset** bei Fehlern (nicht disabled bleiben)
+
+---
+
+## Bekannte Fixes & Lösungen
+
+### 1. "estimated_minutes" Spalte fehlt
+**Problem:** `Could not find the 'estimated_minutes' column of 'daily_tasks'`
+
+**Lösung:** SQL im Supabase Dashboard ausführen:
+```sql
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
+```
+
+### 2. Button bleibt auf "Wird gespeichert..."
+**Problem:** acceptPlan hatte keine Fehlerbehandlung
+
+**Lösung:**
+- try/catch Block hinzugefügt
+- Bei Fehler: Alert anzeigen + Button zurücksetzen
+- Bei Erfolg: "Gespeichert!" → Dashboard
+
+### 3. API-Calls hängen ohne Timeout
+**Problem:** fetch() wartet ewig wenn Server nicht antwortet
+
+**Lösung:** AbortController mit 30s Timeout:
+```javascript
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 30000);
+fetch(url, { signal: controller.signal });
+```
+
+### 4. Horizontales Scrollen auf Mobile
+**Problem:** Seiten scrollen horizontal über UI hinaus
+
+**Lösung:**
+```css
+html, body, .container, .screen {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+```
+
+### 5. Emoji-Buttons nicht rund
+**Problem:** Mood-Buttons werden oval statt rund
+
+**Lösung:**
+```css
+.mood-btn {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+}
+```
+
+---
+
+## Troubleshooting
+
+### Edge Function Fehler debuggen
+1. Supabase Dashboard → Edge Functions → Logs
+2. Browser Console (F12) → Network Tab
+3. `console.log()` in Edge Functions verwenden
+
+### Datenbank-Schema prüfen
+```sql
+-- Spalten einer Tabelle anzeigen
+SELECT column_name, data_type, column_default
+FROM information_schema.columns
+WHERE table_schema = 'core' AND table_name = 'daily_tasks';
+```
+
+### Cache leeren
+- Browser: Ctrl+Shift+R (Hard Refresh)
+- Service Worker: DevTools → Application → Service Workers → Unregister
+- Supabase Schema Cache: Edge Function neu deployen

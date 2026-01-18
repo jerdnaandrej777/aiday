@@ -111,7 +111,7 @@ CREATE TABLE core.daily_checkins (
 ```
 
 ### core.daily_tasks
-Tägliche Aufgaben.
+Tägliche Aufgaben (von AI generiert oder manuell erstellt).
 
 ```sql
 CREATE TABLE core.daily_tasks (
@@ -126,12 +126,19 @@ CREATE TABLE core.daily_tasks (
   completed BOOLEAN DEFAULT false,
   completed_at TIMESTAMPTZ,
   skipped BOOLEAN DEFAULT false,  -- Für Review übersprungen
+  skip_reason TEXT,               -- Grund für Überspringen
 
-  ai_generated BOOLEAN DEFAULT false,  -- Von AI erstellt
-  estimated_minutes INTEGER,           -- Geschätzte Dauer
+  ai_generated BOOLEAN DEFAULT true,   -- Von AI erstellt
+  estimated_minutes INTEGER DEFAULT 15, -- Geschätzte Dauer in Minuten
 
   created_at TIMESTAMPTZ DEFAULT now()
 );
+```
+
+**Hinweis:** Die `estimated_minutes` Spalte muss existieren, da die `accept-plan` Edge Function diese Spalte verwendet. Falls sie fehlt:
+```sql
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
 ```
 
 ### coach.ai_suggestions
