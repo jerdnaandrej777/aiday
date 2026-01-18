@@ -3,10 +3,12 @@
 ## Überblick
 
 - **Plattform**: Supabase (Postgres, Auth, Edge Functions)
-- **Frontend**: Single HTML Files (app.html)
+- **Frontend**: Progressive Web App (PWA) - Single HTML Files
+- **Hosting**: GitHub Pages (https://jerdnaandrej777.github.io/aiday/)
 - **Sprachen**: SQL (DB), TypeScript (Deno Edge Functions), JavaScript (Frontend)
 - **Auth**: Supabase Auth (E-Mail/Passwort, optional OAuth/Apple/Google)
 - **AI**: OpenAI GPT-4o-mini (nur Backend)
+- **PWA**: Service Worker + Manifest (installierbar, offline-fähig)
 - **Sicherheit**: RLS für alle sensiblen Tabellen, Least Privilege
 - **Observability**: Audit-Event-Log (Server)
 
@@ -212,10 +214,64 @@ npx supabase db push
 npx supabase functions deploy --no-verify-jwt
 ```
 
-### Frontend
-- Statische HTML-Dateien
-- Kein Build-Prozess nötig
-- Direkt im Browser öffnen
+### Frontend (GitHub Pages)
+```bash
+# Repository: https://github.com/jerdnaandrej777/aiday
+git add -A
+git commit -m "Update"
+git push
+# GitHub Pages baut automatisch
+```
+
+---
+
+## PWA-Architektur
+
+### Komponenten
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    PWA FRONTEND                              │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐ │
+│  │   app.html     │  │  start-ui.html │  │  offline.html  │ │
+│  │  (Haupt-App)   │  │  (Login/Reg)   │  │  (Fallback)    │ │
+│  └────────────────┘  └────────────────┘  └────────────────┘ │
+│                              │                               │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                   SERVICE WORKER (sw.js)                ││
+│  │  • Cache-First: Statische Assets                        ││
+│  │  • Network-First: API-Calls                             ││
+│  │  • Offline-Fallback: offline.html                       ││
+│  └─────────────────────────────────────────────────────────┘│
+│                              │                               │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                   MANIFEST (manifest.json)              ││
+│  │  • App-Name, Icons, Theme-Farben                        ││
+│  │  • Standalone-Modus, Start-URL                          ││
+│  │  • Shortcuts für Quick-Actions                          ││
+│  └─────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Service Worker Strategien
+| Ressource | Strategie | Beschreibung |
+|-----------|-----------|--------------|
+| HTML, CSS, JS | Cache-First | Schnelles Laden aus Cache |
+| Icons, Bilder | Cache-First | Offline verfügbar |
+| API-Calls | Network-First | Frische Daten, Fallback zu Cache |
+| Unbekannte URLs | Network-Only | Offline → offline.html |
+
+### PWA-Dateien
+| Datei | Funktion |
+|-------|----------|
+| `manifest.json` | App-Metadaten, Icons, Theme |
+| `sw.js` | Service Worker (Caching, Offline) |
+| `offline.html` | Offline-Fallback-Seite |
+| `icons/` | App-Icons (72px - 512px) |
+
+### Installation
+- **Android**: Chrome Menü → "App installieren"
+- **iOS**: Safari Teilen → "Zum Home-Bildschirm"
+- **Desktop**: Chrome/Edge Install-Icon in Adressleiste
 
 ---
 

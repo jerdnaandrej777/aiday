@@ -17,6 +17,8 @@ Dokumentation des einheitlichen Design-Systems für alle AIDAY-Oberflächen.
 9. [Hintergrund-Effekte](#hintergrund-effekte)
 10. [Screens](#screens)
 11. [Responsive Design](#responsive-design)
+12. [Mobile-Optimierung](#mobile-optimierung)
+13. [PWA-Features](#pwa-features)
 
 ---
 
@@ -959,3 +961,202 @@ Alle Dateien verwenden:
 - Responsive Grid-Layout
 - SVG-Icons
 - Zurück-Buttons auf allen Screens
+
+---
+
+## Mobile-Optimierung
+
+### Horizontales Scrollen verhindern
+
+Kritische CSS-Regeln für volle Bildschirmbreite ohne Overflow:
+
+```css
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding-bottom: 20px;
+}
+
+.screen {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-bottom: 16px;
+}
+
+.card, .dashboard-card {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+```
+
+### Runde Emoji-Buttons (Check-in)
+
+Die Mood-Selector-Buttons müssen immer perfekt rund sein:
+
+```css
+.mood-btn {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  max-width: 56px;
+  max-height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+}
+
+.mood-btn.active {
+  background: var(--gradient-primary);
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+.mood-selector {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;  /* Wichtig: Verhindert Überlauf */
+}
+```
+
+### Touch-Target-Mindestgröße
+
+Alle interaktiven Elemente müssen mindestens 44x44px groß sein (Apple HIG):
+
+```css
+button, .btn, .slider-card, .mood-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.mood-btn {
+  min-width: 56px;
+  min-height: 56px;
+}
+```
+
+---
+
+## PWA-Features
+
+### Offline-Seite (offline.html)
+
+Zeigt sich bei Verbindungsverlust:
+
+```css
+body {
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offline-container {
+  text-align: center;
+  max-width: 400px;
+}
+
+.offline-icon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.retry-btn {
+  background: var(--gradient-primary);
+  border-radius: 30px;
+}
+```
+
+**Automatische Weiterleitung bei Verbindungswiederherstellung:**
+
+```javascript
+window.addEventListener('online', () => {
+  setTimeout(() => {
+    window.location.href = 'app.html';
+  }, 1000);
+});
+```
+
+### PWA Meta-Tags
+
+Erforderliche Tags in `<head>`:
+
+```html
+<!-- PWA Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AIDAY">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#6366f1">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- iOS Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+```
+
+### Installierbarkeit
+
+Die App ist installierbar auf:
+- **Android Chrome**: Menü → "App installieren"
+- **iPhone Safari**: Teilen → "Zum Home-Bildschirm"
+- **Desktop Chrome/Edge**: Install-Icon in Adressleiste
+
+### Service Worker Integration
+
+Registration im Frontend:
+
+```javascript
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(registration => {
+      console.log('SW registered:', registration.scope);
+    });
+}
+```
+
+### Offline-Banner
+
+Zeigt sich bei Verbindungsverlust innerhalb der App:
+
+```css
+.offline-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  animation: slideUp 0.3s ease;
+}
+```

@@ -1,10 +1,14 @@
 # AIDAY
 
-KI-gestützter Tagesplaner - Web-App mit vollständigem täglichen Coaching-Flow auf Basis von Supabase und OpenAI GPT-4o-mini.
+KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem täglichen Coaching-Flow auf Basis von Supabase und OpenAI GPT-4o-mini.
+
+**Installierbar auf Homescreen (Android, iOS, Desktop) mit Offline-Funktionalität.**
 
 ## Inhaltsverzeichnis
 
+- [Live-Demo & Installation](#live-demo--installation)
 - [Features](#features)
+- [PWA-Features](#pwa-features)
 - [Schnellstart](#schnellstart)
 - [Projektstruktur](#projektstruktur)
 - [Datenbank](#datenbank)
@@ -13,6 +17,26 @@ KI-gestützter Tagesplaner - Web-App mit vollständigem täglichen Coaching-Flow
 - [AI-Integration](#ai-integration)
 - [Dokumentation](#dokumentation)
 - [Tech Stack](#tech-stack)
+
+---
+
+## Live-Demo & Installation
+
+### URLs
+| Was | URL |
+|-----|-----|
+| **App (Hauptseite)** | https://jerdnaandrej777.github.io/aiday/app.html |
+| **Start/Login** | https://jerdnaandrej777.github.io/aiday/start-ui.html |
+| **Repository** | https://github.com/jerdnaandrej777/aiday |
+| **Supabase Dashboard** | https://supabase.com/dashboard/project/boghlkwclgywpiienmtm |
+
+### PWA Installation
+- **Android Chrome:** Menü (⋮) → "App installieren"
+- **iPhone Safari:** Teilen (□↑) → "Zum Home-Bildschirm"
+- **Desktop Chrome/Edge:** Install-Icon (⊕) in Adressleiste
+
+### Test-Credentials
+**Demo-Account:** `admin@aiday.test` / `admin1`
 
 ---
 
@@ -36,7 +60,36 @@ KI-gestützter Tagesplaner - Web-App mit vollständigem täglichen Coaching-Flow
 - **GDPR-Konformität**: Datenexport und Account-Löschung
 - **Push Notifications**: Firebase Cloud Messaging Integration
 
-### Edge Functions
+---
+
+## PWA-Features
+
+### Installierbar
+- **Homescreen-Installation** auf Android, iOS und Desktop
+- **App-Icons** in allen Größen (72px - 512px)
+- **Standalone-Modus** ohne Browser-UI
+
+### Offline-Funktionalität
+- **Service Worker** mit Cache-First Strategie
+- **Offline-Fallback** zu offline.html bei Verbindungsverlust
+- **Automatische Update-Erkennung** bei neuen Versionen
+
+### Mobile-Optimierung
+- **Kein horizontales Scrollen** - volle Bildschirmbreite
+- **Touch-optimierte Buttons** (56px Mindestgröße)
+- **Swipe-Navigation** zwischen Screens
+
+### Technische Details
+```javascript
+// Service Worker Strategien
+- Cache-First: Statische Assets (HTML, CSS, JS, Icons)
+- Network-First: API-Calls
+- Offline-Fallback: offline.html
+```
+
+---
+
+## Edge Functions (LIVE DEPLOYED)
 
 #### Daily Coaching (Hauptfeatures)
 | Function | Methode | Beschreibung |
@@ -207,9 +260,16 @@ aiday/
 │   └── 003_daily_coaching.sql    # Daily Coaching Tabellen
 │
 ├── docs/                         # Dokumentation
+├── icons/                        # PWA App-Icons (alle Größen)
+│   ├── icon.svg                  # Basis-SVG
+│   └── icon-72.png ... icon-512.png
 │
 ├── app.html                      # HAUPT-APP (Täglicher Coaching-Flow)
 ├── start-ui.html                 # Onboarding UI
+├── offline.html                  # PWA Offline-Fallback
+├── index.html                    # Redirect zu start-ui.html
+├── manifest.json                 # PWA Manifest
+├── sw.js                         # Service Worker
 ├── test-api.html                 # API Test Konsole
 ├── claude.md                     # Projektkontext für Claude Code
 └── .env.example                  # Umgebungsvariablen Template
@@ -333,11 +393,54 @@ Die `goals-setup` Function lädt automatisch das Benutzerprofil und fügt es dem
 
 ---
 
+## Deployment
+
+### GitHub Pages (Frontend)
+```bash
+# Repository: https://github.com/jerdnaandrej777/aiday
+git add -A
+git commit -m "Update"
+git push
+# GitHub Pages baut automatisch
+```
+
+### Supabase Edge Functions
+```bash
+# CLI installieren (via Scoop auf Windows)
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+
+# Projekt verknüpfen
+cd aiday
+supabase link --project-ref boghlkwclgywpiienmtm
+
+# Secrets setzen
+supabase secrets set OPENAI_API_KEY=sk-...
+
+# Functions deployen
+supabase functions deploy goals-setup --no-verify-jwt
+supabase functions deploy goal-clarify --no-verify-jwt
+supabase functions deploy accept-plan --no-verify-jwt
+supabase functions deploy daily-start --no-verify-jwt
+supabase functions deploy daily-checkin --no-verify-jwt
+supabase functions deploy daily-review --no-verify-jwt
+supabase functions deploy task-update --no-verify-jwt
+supabase functions deploy auth-profile --no-verify-jwt
+supabase functions deploy auth-onboarding --no-verify-jwt
+```
+
+---
+
 ## Tech Stack
 
-- **Backend**: Supabase (Deno Edge Functions)
-- **Datenbank**: PostgreSQL
-- **AI**: OpenAI GPT-4o-mini
-- **Push**: Firebase Cloud Messaging
-- **Validation**: Zod
-- **CI/CD**: GitHub Actions
+| Komponente | Technologie |
+|------------|-------------|
+| Backend | Supabase (Deno Edge Functions) |
+| Datenbank | PostgreSQL mit Row Level Security |
+| AI | OpenAI GPT-4o-mini |
+| Push | Firebase Cloud Messaging (FCM) |
+| Validation | Zod Schemas |
+| Auth | Supabase Auth (JWT) |
+| Frontend | Single HTML Files (PWA) |
+| Hosting | GitHub Pages |
+| PWA | Service Worker + Manifest |
