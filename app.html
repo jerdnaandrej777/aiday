@@ -2162,7 +2162,7 @@
             <line x1="19" y1="12" x2="5" y2="12"/>
             <polyline points="12 19 5 12 12 5"/>
           </svg>
-          Zurück zum Bearbeiten
+          Zurück zum Hauptmenü
         </button>
       </div>
     </div>
@@ -3207,10 +3207,10 @@
     }
 
     function rejectPlan() {
-      // Go back to goals screen to adjust
+      // Go back to dashboard
       currentPlanData = null;
-      setupGoalsScreen();
-      showScreen('goalsScreen');
+      goals = [];
+      loadDailyStart();
     }
 
     // Dashboard
