@@ -1227,6 +1227,41 @@
       height: 18px;
     }
 
+    /* Delete Goal Button */
+    .btn-delete-goal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 24px;
+      margin-top: 32px;
+      background: transparent;
+      border: 2px solid rgba(239, 68, 68, 0.3);
+      border-radius: 30px;
+      color: #ef4444;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-delete-goal:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #ef4444;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete-goal:active {
+      transform: translateY(0);
+    }
+
+    .btn-delete-goal svg {
+      width: 18px;
+      height: 18px;
+    }
+
     /* Goal Detail Screen */
     .goal-detail-header {
       display: flex;
@@ -2265,6 +2300,17 @@
         <div id="goalDetailMilestones" style="margin-top: 20px;"></div>
 
         <div id="goalDetailTasks" style="margin-top: 20px;"></div>
+
+        <!-- Delete Goal Button -->
+        <button class="btn-delete-goal" onclick="confirmDeleteGoal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          Ziel löschen
+        </button>
 
         <!-- Footer Back Button -->
         <button class="footer-back-btn" onclick="closeGoalDetail()">
@@ -3798,7 +3844,9 @@
     let goalsOverviewPreviousScreen = 'dashboardScreen';
 
     async function showGoalsOverview() {
-      goalsOverviewPreviousScreen = lastActiveScreen || 'dashboardScreen';
+      // Get CURRENT active screen, not lastActiveScreen
+      const currentActive = document.querySelector('.screen.active');
+      goalsOverviewPreviousScreen = currentActive?.id || 'dashboardScreen';
       showScreen('goalsOverviewScreen', 'forward');
 
       // Load goals data
@@ -3907,11 +3955,65 @@
       showScreen(goalDetailPreviousScreen, 'back');
     }
 
+    function confirmDeleteGoal() {
+      if (!currentGoalDetail) return;
+
+      const goalTitle = currentGoalDetail.title;
+      const confirmed = confirm(
+        `Bist du sicher, dass du das Ziel "${goalTitle}" löschen möchtest?\n\n` +
+        `Alle zugehörigen Aufgaben und Pläne werden ebenfalls gelöscht.\n\n` +
+        `Diese Aktion kann nicht rückgängig gemacht werden.`
+      );
+
+      if (confirmed) {
+        deleteGoal(currentGoalDetail.id);
+      }
+    }
+
+    async function deleteGoal(goalId) {
+      const btn = document.querySelector('.btn-delete-goal');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Wird gelöscht...';
+
+      try {
+        const result = await apiCall('/functions/v1/goal-delete', {
+          method: 'POST',
+          body: JSON.stringify({ goal_id: goalId })
+        });
+
+        if (result.success) {
+          btn.innerHTML = 'Gelöscht!';
+          btn.style.borderColor = 'var(--success)';
+          btn.style.color = 'var(--success)';
+
+          // Nach kurzer Verzögerung zur Übersicht zurückkehren
+          setTimeout(() => {
+            // Clear current goal data
+            currentGoalDetail = null;
+            // Go back to dashboard and reload
+            showScreen('dashboardScreen', 'back');
+            loadDailyStart();
+          }, 800);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+          alert('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'));
+        }
+      } catch (error) {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        alert('Fehler beim Löschen: ' + error.message);
+      }
+    }
+
     function showGoalDetail(goalData) {
       console.log('showGoalDetail called with:', goalData);
       try {
-        // Remember where we came from
-        goalDetailPreviousScreen = lastActiveScreen || 'dashboardScreen';
+        // Remember where we came from - get CURRENT active screen, not lastActiveScreen
+        const currentActive = document.querySelector('.screen.active');
+        goalDetailPreviousScreen = currentActive?.id || 'dashboardScreen';
+        console.log('goalDetailPreviousScreen set to:', goalDetailPreviousScreen);
         currentGoalDetail = goalData;
 
         document.getElementById('goalDetailTitle').textContent = goalData.title;
