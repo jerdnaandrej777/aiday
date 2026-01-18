@@ -3942,7 +3942,8 @@
       }).join('');
     }
 
-    function showGoalDetailFromOverview(idx) {
+    // Make function globally available for onclick
+    window.showGoalDetailFromOverview = function(idx) {
       console.log('showGoalDetailFromOverview called with idx:', idx);
       const data = window.goalsOverviewData || goalsOverviewData;
       console.log('goalsOverviewData length:', data?.length);
@@ -3953,7 +3954,7 @@
       } else {
         console.error('Goal not found at index:', idx);
       }
-    }
+    };
 
     function closeGoalsOverview() {
       showScreen(goalsOverviewPreviousScreen, 'back');
