@@ -2364,12 +2364,19 @@
         ...options.headers
       };
 
+      // Timeout nach 30 Sekunden
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       try {
         const response = await fetch(url, {
           method: options.method || 'GET',
           headers,
-          body: options.body ? JSON.stringify(options.body) : undefined
+          body: options.body ? JSON.stringify(options.body) : undefined,
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (response.status === 401) {
           logout();
@@ -2394,8 +2401,12 @@
 
         return { success: true, data };
       } catch (error) {
+        clearTimeout(timeoutId);
         console.error('API Error:', error);
-        return { success: false, error: error.message };
+        if (error.name === 'AbortError') {
+          return { success: false, error: 'Zeitüberschreitung - Server antwortet nicht. Bitte versuche es erneut.' };
+        }
+        return { success: false, error: error.message || 'Netzwerkfehler' };
       }
     }
 
@@ -3083,56 +3094,91 @@
     }
 
     async function acceptPlan() {
-      if (!currentPlanData) return;
+      if (!currentPlanData) {
+        console.error('acceptPlan: No currentPlanData available');
+        alert('Fehler: Keine Plandaten vorhanden. Bitte versuche es erneut.');
+        return;
+      }
 
       const btn = document.getElementById('acceptPlanBtn');
+      const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Wird gespeichert...';
 
-      // Accept each plan
-      const plans = currentPlanData.ai_plan?.plans || [];
-      const goalsData = currentPlanData.goals || [];
+      try {
+        // Accept each plan
+        const plans = currentPlanData.ai_plan?.plans || [];
+        const goalsData = currentPlanData.goals || [];
 
-      console.log('acceptPlan called with:', {
-        plansCount: plans.length,
-        goalsCount: goalsData.length,
-        plans,
-        goalsData
-      });
-
-      for (let i = 0; i < plans.length; i++) {
-        const plan = plans[i];
-        const goal = goalsData[i];
-        if (!goal?.id || !plan) {
-          console.log('Skipping plan', i, '- no goal or plan:', { goal, plan });
-          continue;
-        }
-
-        const requestBody = {
-          goal_id: goal.id,
-          plan: {
-            duration_weeks: plan.duration_weeks || 12,
-            target_date: plan.target_date || new Date(Date.now() + 84*24*60*60*1000).toISOString().split('T')[0],
-            milestones: plan.milestones || [],
-            daily_tasks: plan.daily_tasks || [],
-            weekly_tasks: plan.weekly_tasks || [],
-            success_metric: plan.success_metric || ''
-          }
-        };
-
-        console.log('Sending accept-plan request:', requestBody);
-
-        const result = await apiCall('/functions/v1/accept-plan', {
-          method: 'POST',
-          body: requestBody
+        console.log('acceptPlan called with:', {
+          plansCount: plans.length,
+          goalsCount: goalsData.length,
+          plans,
+          goalsData
         });
 
-        console.log('accept-plan response:', result);
-      }
+        if (plans.length === 0) {
+          throw new Error('Keine Pläne zum Speichern vorhanden');
+        }
 
-      // Go to dashboard
-      currentPlanData = null;
-      loadDailyStart();
+        let successCount = 0;
+        let lastError = null;
+
+        for (let i = 0; i < plans.length; i++) {
+          const plan = plans[i];
+          const goal = goalsData[i];
+          if (!goal?.id || !plan) {
+            console.log('Skipping plan', i, '- no goal or plan:', { goal, plan });
+            continue;
+          }
+
+          const requestBody = {
+            goal_id: goal.id,
+            plan: {
+              duration_weeks: plan.duration_weeks || 12,
+              target_date: plan.target_date || new Date(Date.now() + 84*24*60*60*1000).toISOString().split('T')[0],
+              milestones: plan.milestones || [],
+              daily_tasks: plan.daily_tasks || [],
+              weekly_tasks: plan.weekly_tasks || [],
+              success_metric: plan.success_metric || ''
+            }
+          };
+
+          console.log('Sending accept-plan request:', requestBody);
+
+          const result = await apiCall('/functions/v1/accept-plan', {
+            method: 'POST',
+            body: requestBody
+          });
+
+          console.log('accept-plan response:', result);
+
+          if (result.error) {
+            console.error('accept-plan error for goal', goal.id, ':', result.error);
+            lastError = result.error;
+          } else {
+            successCount++;
+          }
+        }
+
+        if (successCount === 0 && lastError) {
+          throw new Error(lastError);
+        }
+
+        console.log('Plans accepted successfully:', successCount);
+
+        // Go to dashboard
+        currentPlanData = null;
+        loadDailyStart();
+
+      } catch (error) {
+        console.error('acceptPlan error:', error);
+        alert('Fehler beim Speichern des Plans: ' + (error.message || 'Unbekannter Fehler. Bitte versuche es erneut.'));
+
+        // Reset button
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
     }
 
     function rejectPlan() {
