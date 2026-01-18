@@ -332,8 +332,8 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziel mit Details eingeben |
 | Clarify | AI-Klarifizierungsfragen beantworten |
-| Plan | AI-Plan mit Meilensteinen prüfen |
-| Progress | Statistiken, alle Ziele |
+| Plan | AI-Plan mit Meilensteinen prüfen, "Zurück zum Hauptmenü" |
+| **Progress ("Mein Fortschritt")** | Statistiken, nur aktive Ziele (mit Plan) |
 | Goal Detail | Ziel-Details mit Plan und Tasks |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten |
 
@@ -356,6 +356,7 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 - **Unified "Zurück"-Button**: Transparent, 30px border-radius, innerhalb Cards
 - **Einheitliche Abstände**: 28px links/rechts für bündige Ausrichtung
 - **"Übersicht"**: Quick Actions Bereich im Dashboard
+- **Loading-States**: Buttons zeigen Status ("Plan wird erstellt...", "Wird gespeichert...")
 
 ---
 

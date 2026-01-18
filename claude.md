@@ -176,7 +176,7 @@ aiday/
 - [x] Goals Screen
 - [x] Clarify Screen (AI-Fragen)
 - [x] Plan Screen (AI-Plan anzeigen)
-- [x] Progress Screen (Statistiken)
+- [x] **Progress Screen (nur aktive Ziele mit Plan)**
 - [x] Goal Detail Screen
 - [x] **Profile Screen (persönliche Daten)**
 - [x] **SVG-Icons statt Emojis**
@@ -187,6 +187,8 @@ aiday/
 - [x] **Streak-Tracking-Anzeige**
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
+- [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
+- [x] **Plan-Screen: "Zurück zum Hauptmenü"** führt zum Dashboard
 
 ---
 
@@ -537,3 +539,23 @@ WHERE table_schema = 'core' AND table_name = 'daily_tasks';
 - Browser: Ctrl+Shift+R (Hard Refresh)
 - Service Worker: DevTools → Application → Service Workers → Unregister
 - Supabase Schema Cache: Edge Function neu deployen
+
+### Lokale Tests (file://) - Erwartete Fehler
+Beim Öffnen der App direkt von der Festplatte (file://) erscheinen diese Fehler:
+
+```
+[PWA] Service Worker registration failed: TypeError
+→ Service Worker funktioniert nur über HTTP/HTTPS
+
+AbortError: signal is aborted without reason
+→ API-Timeout (normal wenn offline)
+
+CORS policy: Cross origin requests are only supported...
+→ manifest.json kann nicht von file:// geladen werden
+```
+
+**Diese Fehler sind NORMAL bei lokalem Testen!**
+
+Für korrektes Testen:
+1. **GitHub Pages nutzen:** https://jerdnaandrej777.github.io/aiday/app.html
+2. **Oder lokalen Server starten:** `npx serve .` oder `python -m http.server 8000`
