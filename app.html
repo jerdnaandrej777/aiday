@@ -1894,10 +1894,10 @@
         <div id="progressTodayTasks" class="progress-tasks-list"></div>
       </div>
 
-      <!-- All Goals Progress Card -->
+      <!-- Active Goals Progress Card -->
       <div class="card progress-card animate-in" style="animation-delay: 0.3s;">
         <div class="progress-card-header">
-          <h3>Alle Ziele</h3>
+          <h3>Aktive Ziele</h3>
         </div>
         <div id="progressAllGoals" class="progress-goals-list"></div>
 
@@ -3636,15 +3636,15 @@
         `).join('');
       }
 
-      // All Goals List
+      // Active Goals List (nur Ziele mit akzeptiertem Plan)
       const goalsContainer = document.getElementById('progressAllGoals');
-      const goalsList = data.longterm_goals || [];
+      const goalsList = (data.longterm_goals || []).filter(g => g.status === 'in_progress');
 
       if (goalsList.length === 0) {
         goalsContainer.innerHTML = `
           <div class="progress-empty">
             <div class="progress-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-            <p>Noch keine Ziele definiert</p>
+            <p>Noch keine aktiven Ziele</p>
             <button class="btn btn-primary" onclick="startNewGoal()">
               + Neues Ziel erstellen
             </button>
