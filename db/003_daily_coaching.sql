@@ -90,8 +90,13 @@ CREATE TABLE IF NOT EXISTS core.daily_tasks (
   skipped BOOLEAN DEFAULT false,
   skip_reason TEXT,
   ai_generated BOOLEAN DEFAULT true,
+  estimated_minutes INTEGER DEFAULT 15,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Falls Tabelle bereits existiert, Spalte hinzufügen
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_daily_tasks_user_date
