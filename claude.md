@@ -177,8 +177,9 @@ aiday/
 - [x] Goals Screen
 - [x] Clarify Screen (AI-Fragen)
 - [x] Plan Screen (AI-Plan anzeigen)
-- [x] **Progress Screen (nur aktive Ziele mit Plan)**
-- [x] Goal Detail Screen
+- [x] **Progress Screen (Heutige Aufgaben)**
+- [x] **Goals Overview Screen (Alle Ziele mit Klick auf Details)** ← NEU
+- [x] Goal Detail Screen (Beschreibung, Plan, Meilensteine, Fortschritt)
 - [x] **Profile Screen (persönliche Daten)**
 - [x] **SVG-Icons statt Emojis**
 - [x] **Gradient-Buttons (Blau-Cyan, 30px border-radius)**
@@ -186,6 +187,7 @@ aiday/
 - [x] **Unified "Zurück"-Button**
 - [x] **Swipe-Navigation (links/rechts wischen)**
 - [x] **Streak-Tracking-Anzeige**
+- [x] **Klickbare "Aktive Ziele" Stat-Box → Goals Overview** ← NEU
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
 - [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
@@ -575,6 +577,46 @@ END $$;
   gap: 8px; /* von 12px reduziert */
 }
 ```
+
+### 8. showScreen zeigt Screen nicht an (Goals Overview → Detail)
+**Problem:** `showScreen()` hatte zwei Code-Pfade:
+- Mit Animation: Setzt `style.display = 'none/block'`
+- Ohne Animation: Setzte nur CSS-Klassen, NICHT `display`
+
+Wenn von der Goals-Übersicht zum Detail navigiert wurde, blieb der Detail-Screen unsichtbar.
+
+**Lösung:**
+```javascript
+} else {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active', ...);
+    s.style.display = 'none';  // NEU
+  });
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) {
+    targetScreen.style.display = 'block';  // NEU
+    targetScreen.classList.add('active');
+  }
+}
+```
+
+### 9. showGoalDetail try-catch nicht geschlossen
+**Problem:** Ein `try`-Block wurde geöffnet aber nie mit `catch` geschlossen → JavaScript Syntax-Fehler
+
+**Lösung:** Korrektes Schließen mit catch-Block:
+```javascript
+      showScreen('goalDetailScreen');
+    } catch (error) {
+      console.error('Error in showGoalDetail:', error);
+      alert('Fehler beim Laden der Zieldetails: ' + error.message);
+    }
+}
+```
+
+### 10. Blink-Effekte in Login-Animationen
+**Problem:** GPU-Optimierungen (`will-change`, `backface-visibility: hidden`, `translateZ(0)`) verursachten Blink-Effekte
+
+**Lösung:** Diese Eigenschaften von `.bokeh-circle`, `.particle`, `.clock-layer` entfernt
 
 ---
 

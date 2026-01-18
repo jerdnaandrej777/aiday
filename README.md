@@ -47,7 +47,8 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Ziel-Definition**: Intelligente AI-Klarifizierung (z.B. "Bist du angestellt oder selbstständig?")
 - **Personalisierte Pläne**: Meilensteine und tägliche Tasks basierend auf Kontext und Profil
 - **Task-Management**: Aufgaben abhaken, löschen, Fortschritt verfolgen
-- **Progress Dashboard**: Statistiken, Streak, alle Ziele im Überblick
+- **Goals Overview**: Übersicht aller Ziele mit Klick auf Details
+- **Goal Detail**: Beschreibung, Plan, Meilensteine, Fortschritt
 
 ### Profil-System (NEU)
 - **Persönliche Daten**: Alter, Beruf, Bildung, Familienstand
@@ -325,17 +326,18 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 
 ## UI-Design
 
-### Screens in app.html
+### Screens in app.html (10 Screens)
 | Screen | Beschreibung |
 |--------|--------------|
-| **Dashboard ("aiday")** | Tägliche Tasks, Fortschritt |
+| **Dashboard ("aiday")** | Tägliche Tasks, klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie, Notizen |
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziel mit Details eingeben |
 | Clarify | AI-Klarifizierungsfragen beantworten |
-| Plan | AI-Plan mit Meilensteinen prüfen, "Zurück zum Hauptmenü" |
-| **Progress ("Mein Fortschritt")** | Statistiken, nur aktive Ziele (mit Plan) |
-| Goal Detail | Ziel-Details mit Plan und Tasks |
+| Plan | AI-Plan mit Meilensteinen prüfen |
+| Progress | Heutige Aufgaben anzeigen |
+| **Goals Overview (NEU)** | Übersicht aller Ziele, klickbar → Goal Detail |
+| Goal Detail | Ziel-Details mit Plan, Meilensteinen und Tasks |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten |
 
 ### start-ui.html Features
@@ -478,6 +480,11 @@ ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
 **Problem:** API-Timeout oder Fehler ohne Feedback.
 
 **Lösung:** Browser-Console (F12) prüfen. Die App hat 30s Timeout und zeigt Fehler an.
+
+### Screen wird aufgerufen aber nicht angezeigt
+**Problem:** `showScreen()` setzt `display` nicht konsistent in allen Code-Pfaden.
+
+**Lösung:** Sicherstellen dass beide Code-Pfade (mit und ohne Animation) `style.display` setzen.
 
 ### Lokale Tests (file://) - Erwartete Fehler
 Beim Öffnen direkt von der Festplatte erscheinen normale Fehler:

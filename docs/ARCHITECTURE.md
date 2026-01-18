@@ -73,17 +73,18 @@
 - **Networking**: Fetch API mit JWT im Authorization-Header
 - **Styling**: CSS-Variablen, Glassmorphism, SVG-Icons
 
-### Screens
+### Screens (10 Screens)
 | Screen | Funktion |
 |--------|----------|
-| Dashboard ("aiday") | Übersicht, Quick Actions, Tasks, Ziele |
+| Dashboard ("aiday") | Übersicht, Quick Actions, Tasks, klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie erfassen |
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziele definieren |
 | Clarify | AI-Klarifizierungsfragen |
 | Plan | AI-Plan anzeigen |
-| Progress | Statistiken |
-| Goal Detail | Ziel-Details |
+| Progress | Heutige Aufgaben |
+| **Goals Overview** | Übersicht aller Ziele (klickbar → Goal Detail) |
+| Goal Detail | Ziel-Details, Meilensteine, Fortschritt |
 | Profile | Persönliche Daten |
 
 ### Globaler Header (NEU)
@@ -95,6 +96,7 @@
 - **Swipe-Navigation**: Nach rechts wischen = zurück, nach links wischen = vorwärts
 - **Zurück-Buttons**: Innerhalb der Cards am unteren Rand
 - **Header**: Global sichtbar mit Gradient-Button für "Mein Fortschritt"
+- **Klickbare Stat-Boxes**: "Aktive Ziele" → Goals Overview Screen
 
 ### Design-System
 - **Farbpalette**: Blau (#6366f1) + Cyan (#22d3ee) Gradient

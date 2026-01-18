@@ -631,13 +631,14 @@ Fünf langsam schwebende Orbs im Hintergrund (start-ui.html):
 
 | Screen | Beschreibung | Besondere Features |
 |--------|--------------|-------------------|
-| **Dashboard ("aiday")** | Tägliche Tasks, Goals-Übersicht (Startseite) | Task-Checkboxes, Slider-Cards |
+| **Dashboard ("aiday")** | Tägliche Tasks, Goals-Übersicht (Startseite) | Task-Checkboxes, Klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie, Notizen | Emoji-Mood-Selector, Energy-Slider |
-| **Review (NEU)** | Aufgaben vom Vortag bewerten | Task-Bewertung, Blocker-Erfassung |
+| **Review** | Aufgaben vom Vortag bewerten | Task-Bewertung, Blocker-Erfassung |
 | Goals | Ziel mit Details eingeben | Form-Validation |
 | Clarify | AI-Klarifizierungsfragen | Dynamic Questions, AI-Badge |
 | Plan | AI-Plan mit Meilensteinen | Timeline-Darstellung, Accept/Reject |
-| Progress | Statistiken, alle Ziele | SVG Circle Rings, Animierte Bars |
+| Progress | Heutige Aufgaben anzeigen | Task-Liste mit Checkboxen |
+| **Goals Overview (NEU)** | Übersicht aller Ziele | Klickbare Goal-Cards, Fortschrittsanzeige |
 | **Goal Detail** | Einzelnes Ziel mit Plan | Milestones, Tasks-Liste, Fortschritt |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten | Form mit 8 Feldern |
 
@@ -686,7 +687,75 @@ Bewertung der Aufgaben vom Vortag:
 </div>
 ```
 
-### Goal Detail Screen (NEU)
+### Goals Overview Screen (NEU)
+
+Übersicht aller definierten Ziele, erreichbar über Klick auf "Aktive Ziele" Stat-Box:
+
+```html
+<div id="goalsOverviewScreen" class="screen">
+  <div class="card">
+    <h2 class="card-title">Deine Ziele</h2>
+    <p class="card-subtitle">Übersicht aller aktiven Ziele</p>
+  </div>
+
+  <div id="goalsOverviewList" class="goals-overview-list">
+    <!-- Dynamisch generierte Goal-Cards -->
+    <div class="goal-overview-card" onclick="showGoalDetailFromOverview(idx)">
+      <div class="goal-overview-header">
+        <div class="goal-overview-title">Ziel-Titel</div>
+        <div class="goal-overview-status">Aktiv</div>
+      </div>
+      <div class="goal-overview-progress">
+        <div class="goal-overview-progress-bar">
+          <div class="goal-overview-progress-fill" style="width: 45%"></div>
+        </div>
+        <span class="goal-overview-percent">45%</span>
+      </div>
+      <div class="goal-overview-meta">
+        <span>Noch 30 Tage</span>
+        <span>Ziel: 15. Apr</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="footer-back-btn" onclick="closeGoalsOverview()">
+      <svg>←</svg> Zurück
+    </button>
+  </div>
+</div>
+```
+
+**CSS für Goal Overview Cards:**
+
+```css
+.goals-overview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goal-overview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.goal-overview-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+}
+
+.goal-overview-card:active {
+  transform: translateY(0);
+}
+```
+
+### Goal Detail Screen
 
 Detailansicht eines einzelnen Ziels:
 
