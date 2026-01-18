@@ -2601,9 +2601,11 @@
       } else {
         document.querySelectorAll('.screen').forEach(s => {
           s.classList.remove('active', 'slide-in-left', 'slide-in-right', 'slide-out-left', 'slide-out-right');
+          s.style.display = 'none';
         });
         const targetScreen = document.getElementById(screenId);
         if (targetScreen) {
+          targetScreen.style.display = 'block';
           targetScreen.classList.add('active');
         }
       }
