@@ -70,6 +70,8 @@
       height: 100%;
       z-index: 0;
       overflow: hidden;
+      contain: layout paint;
+      transform: translateZ(0);
     }
 
     /* ========== BOKEH CLOCK LAYER ========== */
@@ -82,6 +84,8 @@
       justify-content: center;
       filter: blur(50px);
       opacity: 0.2;
+      will-change: transform;
+      transform: translateZ(0);
     }
 
     .bokeh-clock {
@@ -92,6 +96,8 @@
       box-shadow:
         inset 0 0 60px rgba(255,255,255,0.05),
         0 0 80px rgba(99, 102, 241, 0.1);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
 
     /* Main Clock - Center */
@@ -143,14 +149,12 @@
 
     @keyframes clock-breathe-main {
       0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
+        transform: translate(-50%, -50%) scale(1) translateZ(0);
         opacity: 0.2;
-        filter: blur(50px);
       }
       50% {
-        transform: translate(-50%, -50%) scale(1.08);
+        transform: translate(-50%, -50%) scale(1.08) translateZ(0);
         opacity: 0.28;
-        filter: blur(45px);
       }
     }
 
@@ -299,6 +303,9 @@
       border-radius: 50%;
       filter: blur(30px);
       animation: bokeh-float 50s infinite ease-in-out;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      transform: translateZ(0);
     }
 
     .bokeh-circle:nth-child(1) {
@@ -481,7 +488,8 @@
       background: rgba(255, 255, 255, 0.6);
       border-radius: 50%;
       animation: particle-rise linear infinite;
-      filter: blur(0.5px);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
 
     @keyframes particle-rise {

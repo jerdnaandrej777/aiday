@@ -2649,33 +2649,49 @@
     // Submit Check-in
     async function submitCheckin() {
       const btn = document.getElementById('checkinSubmit');
+      const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = 'Wird gespeichert...';
 
-      const body = {
-        mood: checkinData.mood,
-        mood_note: document.getElementById('moodNote').value,
-        planned_today: document.getElementById('plannedToday').value,
-        energy_level: checkinData.energy_level
-      };
+      try {
+        const body = {
+          mood: checkinData.mood,
+          mood_note: document.getElementById('moodNote').value,
+          planned_today: document.getElementById('plannedToday').value,
+          energy_level: checkinData.energy_level
+        };
 
-      const result = await apiCall('/functions/v1/daily-checkin', {
-        method: 'POST',
-        body
-      });
+        const result = await apiCall('/functions/v1/daily-checkin', {
+          method: 'POST',
+          body
+        });
 
-      if (result.success) {
-        // Check if we need to setup goals (at least 1 required)
-        if (appData?.data?.goals_count === 0) {
-          setupGoalsScreen();
-          showScreen('goalsScreen', 'forward');
+        if (result.success) {
+          btn.textContent = 'Gespeichert!';
+
+          // Short delay to show success
+          setTimeout(() => {
+            // Check if we need to setup goals (at least 1 required)
+            if (appData?.data?.goals_count === 0) {
+              setupGoalsScreen();
+              showScreen('goalsScreen', 'forward');
+            } else {
+              loadDailyStart();
+            }
+            // Reset button for next time
+            btn.disabled = false;
+            btn.textContent = originalText;
+          }, 500);
         } else {
-          loadDailyStart();
+          btn.disabled = false;
+          btn.textContent = originalText;
+          alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
         }
-      } else {
+      } catch (error) {
+        console.error('submitCheckin error:', error);
         btn.disabled = false;
-        btn.textContent = 'Weiter';
-        alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+        btn.textContent = originalText;
+        alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
       }
     }
 
