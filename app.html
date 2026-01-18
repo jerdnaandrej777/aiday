@@ -1693,6 +1693,109 @@
       overflow: hidden;
     }
 
+    /* Goals Overview Screen */
+    .goals-overview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .goal-overview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .goal-overview-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .goal-overview-card:active {
+      transform: translateY(0);
+    }
+
+    .goal-overview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .goal-overview-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .goal-overview-status {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 500;
+    }
+
+    .goal-overview-status.open {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .goal-overview-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .goal-overview-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .goal-overview-meta-item svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .goal-overview-progress {
+      height: 6px;
+      background: var(--glass-border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .goal-overview-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .goal-overview-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .goal-overview-empty-icon {
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .goal-overview-empty-icon svg {
+      width: 48px;
+      height: 48px;
+    }
+
     .progress-goal-fill::after {
       content: '';
       position: absolute;
@@ -1875,7 +1978,7 @@
             <div class="stat-box-value" id="tasksCompletedValue">0</div>
             <div class="stat-box-label">Aufgaben erledigt</div>
           </div>
-          <div class="stat-box stat-box-clickable" onclick="showProgressScreen()" style="cursor: pointer;">
+          <div class="stat-box stat-box-clickable" onclick="showGoalsOverview()" style="cursor: pointer;">
             <div class="stat-box-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
@@ -2123,6 +2226,27 @@
 
         <!-- Footer Back Button -->
         <button class="footer-back-btn" onclick="goBackFromClarify()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
+    <!-- Goals Overview Screen -->
+    <div class="screen" id="goalsOverviewScreen">
+      <div class="card">
+        <h2 class="card-title">Deine Ziele</h2>
+        <p class="card-subtitle">Übersicht aller aktiven Ziele</p>
+      </div>
+
+      <div id="goalsOverviewList" class="goals-overview-list"></div>
+
+      <div class="card" style="margin-top: 20px;">
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="closeGoalsOverview()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"/>
             <polyline points="12 19 5 12 12 5"/>
@@ -3729,12 +3853,114 @@
       }, 100);
     }
 
+    // Goals Overview Functions
+    let goalsOverviewData = [];
+    let goalsOverviewPreviousScreen = 'dashboardScreen';
+
+    async function showGoalsOverview() {
+      goalsOverviewPreviousScreen = lastActiveScreen || 'dashboardScreen';
+      showScreen('goalsOverviewScreen', 'forward');
+
+      // Load goals data
+      const result = await apiCall('/functions/v1/daily-start', { method: 'POST' });
+
+      if (result.success) {
+        goalsOverviewData = result.data.data?.longterm_goals || [];
+        renderGoalsOverview();
+      } else {
+        goalsOverviewData = [];
+        renderGoalsOverview();
+      }
+    }
+
+    function renderGoalsOverview() {
+      const container = document.getElementById('goalsOverviewList');
+
+      if (goalsOverviewData.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="goal-overview-empty">
+              <div class="goal-overview-empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="6"/>
+                  <circle cx="12" cy="12" r="2"/>
+                </svg>
+              </div>
+              <p>Noch keine Ziele definiert</p>
+              <button class="btn btn-primary" style="margin-top: 16px;" onclick="startNewGoal()">Neues Ziel erstellen</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = goalsOverviewData.map((goal, idx) => {
+        const progress = goal.progress_percent || 0;
+        const daysLeft = goal.days_left;
+        const targetDate = goal.target_date
+          ? new Date(goal.target_date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })
+          : '';
+        const statusClass = goal.status === 'in_progress' ? '' : 'open';
+        const statusText = goal.status === 'in_progress' ? 'Aktiv' : (goal.status === 'achieved' ? 'Erreicht' : 'Offen');
+
+        return `
+          <div class="goal-overview-card" onclick="showGoalDetailFromOverview(${idx})">
+            <div class="goal-overview-header">
+              <div class="goal-overview-title">${goal.title}</div>
+              <div class="goal-overview-status ${statusClass}">${statusText}</div>
+            </div>
+            <div class="goal-overview-meta">
+              ${daysLeft !== null ? `
+                <div class="goal-overview-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  ${daysLeft} Tage übrig
+                </div>
+              ` : ''}
+              ${targetDate ? `
+                <div class="goal-overview-meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                  Ziel: ${targetDate}
+                </div>
+              ` : ''}
+            </div>
+            <div class="goal-overview-progress">
+              <div class="goal-overview-progress-fill" style="width: ${progress}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showGoalDetailFromOverview(idx) {
+      const goal = goalsOverviewData[idx];
+      if (goal) {
+        showGoalDetail(goal);
+      }
+    }
+
+    function closeGoalsOverview() {
+      showScreen(goalsOverviewPreviousScreen, 'back');
+    }
+
     // Goal Detail Functions
+    let goalDetailPreviousScreen = 'dashboardScreen';
+
     function closeGoalDetail() {
-      showScreen(previousScreen);
+      showScreen(goalDetailPreviousScreen, 'back');
     }
 
     function showGoalDetail(goalData) {
+      // Remember where we came from
+      goalDetailPreviousScreen = lastActiveScreen || 'dashboardScreen';
       currentGoalDetail = goalData;
 
       document.getElementById('goalDetailTitle').textContent = goalData.title;
