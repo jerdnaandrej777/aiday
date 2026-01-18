@@ -2012,14 +2012,8 @@
         <div id="progressTodayTasks" class="progress-tasks-list"></div>
       </div>
 
-      <!-- Active Goals Progress Card -->
-      <div class="card progress-card animate-in" style="animation-delay: 0.3s;">
-        <div class="progress-card-header">
-          <h3>Aktive Ziele</h3>
-        </div>
-        <div id="progressAllGoals" class="progress-goals-list"></div>
-
-        <!-- Footer Back Button -->
+      <!-- Footer Back Button -->
+      <div class="card" style="margin-top: 20px;">
         <button class="footer-back-btn" onclick="closeProgressScreen()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"/>
@@ -3797,62 +3791,6 @@
           </div>
         `).join('');
       }
-
-      // Active Goals List (nur Ziele mit akzeptiertem Plan)
-      const goalsContainer = document.getElementById('progressAllGoals');
-      const goalsList = (data.longterm_goals || []).filter(g => g.status === 'in_progress');
-
-      if (goalsList.length === 0) {
-        goalsContainer.innerHTML = `
-          <div class="progress-empty">
-            <div class="progress-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-            <p>Noch keine aktiven Ziele</p>
-            <button class="btn btn-primary" onclick="startNewGoal()">
-              + Neues Ziel erstellen
-            </button>
-          </div>
-        `;
-      } else {
-        // Store goals for click handler
-        window.progressGoals = goalsList;
-
-        goalsContainer.innerHTML = goalsList.map((goal, idx) => {
-          const progress = goal.progress_percent || 0;
-          const daysLeft = goal.days_left;
-          const targetDate = goal.target_date
-            ? new Date(goal.target_date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })
-            : '';
-
-          // Color based on progress
-          let barColor = 'linear-gradient(90deg, #6366f1, #06b6d4)';
-          if (progress >= 75) barColor = 'linear-gradient(90deg, #10b981, #06b6d4)';
-          else if (progress >= 50) barColor = 'linear-gradient(90deg, #6366f1, #10b981)';
-          else if (progress < 25) barColor = 'linear-gradient(90deg, #f59e0b, #6366f1)';
-
-          return `
-            <div class="progress-goal-item" onclick="showGoalDetail(window.progressGoals[${idx}])">
-              <div class="progress-goal-header">
-                <div class="progress-goal-title">${goal.title}</div>
-                <div class="progress-goal-percent">${progress}%</div>
-              </div>
-              <div class="progress-goal-bar">
-                <div class="progress-goal-fill" style="width: ${progress}%; background: ${barColor};"></div>
-              </div>
-              <div class="progress-goal-meta">
-                <span>${daysLeft !== null ? `${daysLeft} Tage übrig` : 'Kein Datum'}</span>
-                <span>${targetDate ? `Ziel: ${targetDate}` : ''}</span>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      // Trigger animations after a small delay
-      setTimeout(() => {
-        document.querySelectorAll('.progress-goal-fill').forEach(el => {
-          el.style.width = el.style.width; // Trigger reflow
-        });
-      }, 100);
     }
 
     // Goals Overview Functions
