@@ -5998,6 +5998,14 @@
     const SUPABASE_URL = 'https://boghlkwclgywpiienmtm.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvZ2hsa3djbGd5d3BpaWVubXRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTIyMjUsImV4cCI6MjA4NDIyODIyNX0.IUDYw2IJXc6jKCCjSUIG5yzWkyiW5Id5xgTmhFG36rU';
 
+    // Utility: Escape HTML to prevent XSS
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
     // State
     let accessToken = '';
     let currentGoalIndex = 0;
