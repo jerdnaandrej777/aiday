@@ -251,13 +251,16 @@
 
     .quick-actions-grid {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 8px;
       width: 100%;
     }
 
     .quick-action-btn {
-      flex: 1;
+      flex: 1 1 calc(33% - 8px);
+      min-width: 80px;
+      max-width: calc(33% - 8px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -5958,6 +5961,15 @@
                 </svg>
               </div>
               <span class="quick-action-label">Habits</span>
+            </button>
+            <button class="quick-action-btn" onclick="showProfileScreen()">
+              <div class="quick-action-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span class="quick-action-label">Mein Profil</span>
             </button>
           </div>
         </div>
