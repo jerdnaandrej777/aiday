@@ -6637,9 +6637,9 @@
       try {
         // User-Profil mit XP und Level laden
         const profileResult = await apiCall('/functions/v1/auth-profile', { method: 'GET' });
-        if (profileResult.success && profileResult.data) {
-          gamificationData.total_xp = profileResult.data.total_xp || 0;
-          gamificationData.level = profileResult.data.level || 1;
+        if (profileResult.success && profileResult.data?.profile) {
+          gamificationData.total_xp = profileResult.data.profile.total_xp || 0;
+          gamificationData.level = profileResult.data.profile.level || 1;
         }
 
         // Achievements laden (alle und verdiente)
@@ -10910,6 +10910,32 @@
 
     function handleGamificationFeedback(gamification) {
       if (!gamification) return;
+
+      // XP-Anzeige aktualisieren
+      if (gamification.total_xp !== undefined) {
+        const currentXpEl = document.getElementById('currentXp');
+        const userLevelEl = document.getElementById('userLevel');
+        const nextLevelXpEl = document.getElementById('nextLevelXp');
+        const xpProgressEl = document.getElementById('xpProgress');
+
+        if (currentXpEl) {
+          const level = gamification.level || 1;
+          const totalXp = gamification.total_xp || 0;
+          // XP für aktuelles Level berechnen
+          const xpForCurrentLevel = (level - 1) * (level - 1) * 100;
+          const xpForNextLevel = level * level * 100;
+          const xpInCurrentLevel = totalXp - xpForCurrentLevel;
+          const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
+
+          currentXpEl.textContent = xpInCurrentLevel;
+          if (nextLevelXpEl) nextLevelXpEl.textContent = xpNeededForLevel;
+          if (userLevelEl) userLevelEl.textContent = level;
+          if (xpProgressEl) {
+            const progress = (xpInCurrentLevel / xpNeededForLevel) * 100;
+            xpProgressEl.style.width = `${Math.min(progress, 100)}%`;
+          }
+        }
+      }
 
       // Level-Up anzeigen
       if (gamification.level_up) {
