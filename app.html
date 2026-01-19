@@ -3584,6 +3584,10 @@
     let currentTaskDetail = null;
     let taskDetailPreviousScreen = 'dashboardScreen';
 
+    // Motivation System Variables (must be declared before init)
+    let lastMotivationTime = 0;
+    const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden in Millisekunden
+
     // Auth Check
     (function init() {
       const token = localStorage.getItem('aiday_token');
@@ -3777,9 +3781,6 @@
       { text: "Nicht die Stärke des Körpers zählt, sondern die Stärke des Geistes.", author: "Unbekannt" },
       { text: "Was vor uns liegt und was hinter uns liegt, ist nichts im Vergleich zu dem, was in uns liegt.", author: "Ralph Waldo Emerson" }
     ];
-
-    let lastMotivationTime = 0;
-    const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden in Millisekunden
 
     function initMotivationSystem() {
       const savedTime = localStorage.getItem('aiday_last_motivation');
