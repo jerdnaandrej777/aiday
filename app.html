@@ -3586,6 +3586,7 @@
     // Motivation System Variables (must be declared before init)
     let lastMotivationTime = 0;
     const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden in Millisekunden
+    let pendingMotivationMood = null; // Mood from check-in, shown on progress screen
 
     // Auth Check
     (function init() {
@@ -4410,8 +4411,8 @@
           btn.textContent = 'Gespeichert!';
           showToast('Check-in erfolgreich!', 'success', 2000);
 
-          // Check if motivation quote should be shown
-          checkMoodForMotivation(checkinData.mood, true); // fromCheckin = true
+          // Save mood for motivation quote (will be shown on progress screen)
+          pendingMotivationMood = checkinData.mood;
 
           // Short delay to show success
           setTimeout(() => {
@@ -5146,12 +5147,6 @@
 
       // Check for motivation quote (evening reminder for incomplete tasks)
       checkTasksForMotivation(tasks);
-
-      // Check for motivation quote based on mood
-      const todayCheckin = data.today_checkin || {};
-      if (todayCheckin.mood) {
-        checkMoodForMotivation(todayCheckin.mood);
-      }
     }
 
     // Debug function to reset cooldown and test motivation quotes
@@ -5516,6 +5511,14 @@
         progressScreenPreviousScreen = activeScreen.id;
       }
       showScreen('progressScreen', 'forward');
+
+      // Show motivation quote if pending from check-in
+      if (pendingMotivationMood) {
+        setTimeout(() => {
+          showMotivationQuote(pendingMotivationMood, true);
+          pendingMotivationMood = null; // Reset after showing
+        }, 800);
+      }
 
       // Set today's date
       const today = new Date();
