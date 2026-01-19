@@ -689,6 +689,61 @@
       80% { transform: translateX(3px); }
     }
 
+    /* Mood Selection Attention Animation */
+    .mood-form-group {
+      position: relative;
+    }
+
+    .mood-buttons.needs-attention .mood-btn {
+      animation: moodPulse 0.6s ease-in-out;
+    }
+
+    .mood-buttons.needs-attention .mood-btn:nth-child(1) { animation-delay: 0s; }
+    .mood-buttons.needs-attention .mood-btn:nth-child(2) { animation-delay: 0.08s; }
+    .mood-buttons.needs-attention .mood-btn:nth-child(3) { animation-delay: 0.16s; }
+    .mood-buttons.needs-attention .mood-btn:nth-child(4) { animation-delay: 0.24s; }
+    .mood-buttons.needs-attention .mood-btn:nth-child(5) { animation-delay: 0.32s; }
+
+    @keyframes moodPulse {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.2); box-shadow: 0 0 20px var(--accent-glow); }
+      50% { transform: scale(0.9); }
+      75% { transform: scale(1.15); }
+    }
+
+    .mood-speech-bubble {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .mood-speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #ef4444;
+    }
+
+    .mood-speech-bubble.show {
+      opacity: 1;
+      animation: bubbleShake 0.5s ease-in-out, bubbleFadeOut 0.3s ease 2.2s forwards;
+    }
+
     /* Buttons */
     .btn {
       width: 100%;
@@ -3223,14 +3278,18 @@
     <div class="screen" id="checkinScreen">
       <div class="card">
         <h2 class="card-title">Guten Tag!</h2>
-        <p class="card-subtitle">Wie geht es dir heute?</p>
 
-        <div class="mood-selector">
-          <button class="mood-btn" data-mood="great" onclick="selectMood('great')">😊</button>
-          <button class="mood-btn" data-mood="good" onclick="selectMood('good')">🙂</button>
-          <button class="mood-btn" data-mood="neutral" onclick="selectMood('neutral')">😐</button>
-          <button class="mood-btn" data-mood="bad" onclick="selectMood('bad')">😔</button>
-          <button class="mood-btn" data-mood="terrible" onclick="selectMood('terrible')">😢</button>
+        <div class="form-group mood-form-group" id="moodFormGroup">
+          <!-- Speech Bubble -->
+          <div class="mood-speech-bubble" id="moodSpeechBubbleCheckin">Wie fühlst du dich heute? 🤔</div>
+          <p class="card-subtitle" style="margin-bottom: 12px;">Wie geht es dir heute?</p>
+          <div class="mood-selector mood-buttons" id="moodButtons">
+            <button class="mood-btn" data-mood="great" onclick="selectMood('great')">😊</button>
+            <button class="mood-btn" data-mood="good" onclick="selectMood('good')">🙂</button>
+            <button class="mood-btn" data-mood="neutral" onclick="selectMood('neutral')">😐</button>
+            <button class="mood-btn" data-mood="bad" onclick="selectMood('bad')">😔</button>
+            <button class="mood-btn" data-mood="terrible" onclick="selectMood('terrible')">😢</button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -3256,7 +3315,7 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" id="checkinSubmit" onclick="submitCheckin()" disabled>Weiter</button>
+        <button class="btn btn-primary" id="checkinSubmit" onclick="submitCheckin()">Weiter</button>
 
         <!-- Footer Back Button -->
         <button class="footer-back-btn" onclick="goBackFromCheckin()">
@@ -4331,6 +4390,38 @@
       if (bubble) bubble.classList.remove('show');
     }
 
+    // Show attention animation for mood selection
+    function showMoodAttention() {
+      const formGroup = document.getElementById('moodFormGroup');
+      const buttons = document.getElementById('moodButtons');
+      const bubble = document.getElementById('moodSpeechBubbleCheckin');
+
+      if (buttons && bubble && formGroup) {
+        // Remove and re-add class to restart animation
+        buttons.classList.remove('needs-attention');
+        bubble.classList.remove('show');
+
+        // Scroll to mood form group
+        formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Trigger animation after short delay
+        setTimeout(() => {
+          buttons.classList.add('needs-attention');
+          bubble.classList.add('show');
+
+          // Remove animation class after completion
+          setTimeout(() => {
+            buttons.classList.remove('needs-attention');
+          }, 1000);
+
+          // Remove bubble after display time
+          setTimeout(() => {
+            bubble.classList.remove('show');
+          }, 2500);
+        }, 100);
+      }
+    }
+
     // Show attention animation for energy selection
     function showEnergyAttention() {
       const formGroup = document.getElementById('energyFormGroup');
@@ -4364,11 +4455,19 @@
     }
 
     function updateCheckinButton() {
-      document.getElementById('checkinSubmit').disabled = !checkinData.mood;
+      // Button ist nicht mehr disabled, aber wir prüfen beim Submit
+      const btn = document.getElementById('checkinSubmit');
+      if (btn) btn.disabled = false;
     }
 
     // Submit Check-in
     async function submitCheckin() {
+      // Check if mood is selected
+      if (!checkinData.mood) {
+        showMoodAttention();
+        return;
+      }
+
       // Check if energy level is selected
       if (!checkinData.energy_level) {
         showEnergyAttention();
