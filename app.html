@@ -2115,37 +2115,41 @@
     .heart-2 { animation-delay: 0.2s; }
     .heart-3 { animation-delay: 0.4s; }
 
-    /* Speech Bubble for Mood Face */
-    .mood-speech-bubble {
+    /* Speech Bubble for Mood Face (Dashboard) */
+    .stat-circle .mood-speech-bubble {
       position: absolute;
       bottom: 100%;
-      left: 0;
-      transform: translateX(0);
+      left: 50%;
+      transform: translateX(-50%);
       background: var(--bg-card);
       color: var(--text);
-      padding: 8px 14px;
+      padding: 12px 18px;
       border-radius: 16px;
       font-size: 13px;
       font-weight: 600;
       white-space: nowrap;
+      width: max-content;
+      max-width: 280px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       opacity: 0;
       pointer-events: none;
       z-index: 100;
       margin-bottom: 12px;
+      display: block;
+      text-align: center;
     }
 
-    .mood-speech-bubble::after {
+    .stat-circle .mood-speech-bubble::after {
       content: '';
       position: absolute;
       top: 100%;
-      left: 30px;
+      left: 50%;
       transform: translateX(-50%);
       border: 8px solid transparent;
       border-top-color: var(--bg-card);
     }
 
-    .mood-speech-bubble.show {
+    .stat-circle .mood-speech-bubble.show {
       animation: bubblePopIn 0.3s ease forwards, bubbleFadeOut 0.3s ease 1.7s forwards;
     }
 
@@ -2160,36 +2164,36 @@
       100% { opacity: 0; transform: translateY(-10px) scale(0.8); }
     }
 
-    /* Mood-specific bubble colors */
-    .mood-speech-bubble.great {
+    /* Mood-specific bubble colors (Dashboard) */
+    .stat-circle .mood-speech-bubble.great {
       background: linear-gradient(135deg, #fbbf24, #f59e0b);
       color: #1f2937;
     }
-    .mood-speech-bubble.great::after { border-top-color: #f59e0b; }
+    .stat-circle .mood-speech-bubble.great::after { border-top-color: #f59e0b; }
 
-    .mood-speech-bubble.good {
+    .stat-circle .mood-speech-bubble.good {
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: white;
     }
-    .mood-speech-bubble.good::after { border-top-color: #8b5cf6; }
+    .stat-circle .mood-speech-bubble.good::after { border-top-color: #8b5cf6; }
 
-    .mood-speech-bubble.neutral {
+    .stat-circle .mood-speech-bubble.neutral {
       background: linear-gradient(135deg, #22d3ee, #06b6d4);
       color: #1f2937;
     }
-    .mood-speech-bubble.neutral::after { border-top-color: #06b6d4; }
+    .stat-circle .mood-speech-bubble.neutral::after { border-top-color: #06b6d4; }
 
-    .mood-speech-bubble.bad {
+    .stat-circle .mood-speech-bubble.bad {
       background: linear-gradient(135deg, #f87171, #ef4444);
       color: white;
     }
-    .mood-speech-bubble.bad::after { border-top-color: #ef4444; }
+    .stat-circle .mood-speech-bubble.bad::after { border-top-color: #ef4444; }
 
-    .mood-speech-bubble.terrible {
+    .stat-circle .mood-speech-bubble.terrible {
       background: linear-gradient(135deg, #ec4899, #db2777);
       color: white;
     }
-    .mood-speech-bubble.terrible::after { border-top-color: #db2777; }
+    .stat-circle .mood-speech-bubble.terrible::after { border-top-color: #db2777; }
 
     /* Motivation Speech Bubble */
     .motivation-speech-bubble {
