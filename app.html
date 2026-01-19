@@ -1948,6 +1948,82 @@
     .heart-2 { animation-delay: 0.2s; }
     .heart-3 { animation-delay: 0.4s; }
 
+    /* Speech Bubble for Mood Face */
+    .mood-speech-bubble {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      margin-bottom: 12px;
+    }
+
+    .mood-speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: var(--bg-card);
+    }
+
+    .mood-speech-bubble.show {
+      animation: bubblePopIn 0.3s ease forwards, bubbleFadeOut 0.3s ease 1.7s forwards;
+    }
+
+    @keyframes bubblePopIn {
+      0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.8); }
+      50% { transform: translateX(-50%) translateY(-5px) scale(1.05); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    @keyframes bubbleFadeOut {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.8); }
+    }
+
+    /* Mood-specific bubble colors */
+    .mood-speech-bubble.great {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #1f2937;
+    }
+    .mood-speech-bubble.great::after { border-top-color: #f59e0b; }
+
+    .mood-speech-bubble.good {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+    .mood-speech-bubble.good::after { border-top-color: #8b5cf6; }
+
+    .mood-speech-bubble.neutral {
+      background: linear-gradient(135deg, #22d3ee, #06b6d4);
+      color: #1f2937;
+    }
+    .mood-speech-bubble.neutral::after { border-top-color: #06b6d4; }
+
+    .mood-speech-bubble.bad {
+      background: linear-gradient(135deg, #f87171, #ef4444);
+      color: white;
+    }
+    .mood-speech-bubble.bad::after { border-top-color: #ef4444; }
+
+    .mood-speech-bubble.terrible {
+      background: linear-gradient(135deg, #ec4899, #db2777);
+      color: white;
+    }
+    .mood-speech-bubble.terrible::after { border-top-color: #db2777; }
+
     .stat-label {
       font-size: 12px;
       color: var(--text-muted);
@@ -2653,6 +2729,8 @@
         <div class="today-stats">
           <div class="stat-circle-container">
             <div class="stat-circle" id="moodCircle">
+              <!-- Speech Bubble -->
+              <div class="mood-speech-bubble" id="moodSpeechBubble"></div>
               <span class="stat-emoji" id="moodEmoji">😊</span>
               <!-- Animated Mood Face -->
               <div class="mood-face good" id="moodFace" onclick="onMoodFaceClick()">
@@ -3392,18 +3470,27 @@
       // Add clicking class to trigger animation
       moodFace.classList.add('clicking');
 
-      // Show toast message based on mood
+      // Show speech bubble message above smiley
       const messages = {
-        great: ['Yeaah! Party time!', 'Du rockst!', 'Weiter so!'],
-        good: ['Hehe! Blechi!', 'Hihi!', 'Lass uns Spaß haben!'],
-        neutral: ['Hey, alles wird gut!', 'Kopf hoch!', 'Du schaffst das!'],
-        bad: ['Ich bin für dich da!', 'Das wird besser!', 'Nicht aufgeben!'],
-        terrible: ['Virtuelle Umarmung!', 'Du bist nicht allein!', 'Ich hab dich lieb!']
+        great: ['Yeaah! Party time! 🎉', 'Du rockst! 🤘', 'Weiter so! ⭐'],
+        good: ['Hehe! Blechi! 😜', 'Hihi! 😄', 'Lass uns Spaß haben! 🎈'],
+        neutral: ['Hey, alles wird gut! 💪', 'Kopf hoch! ☀️', 'Du schaffst das! 🌟'],
+        bad: ['Ich bin für dich da! 💙', 'Das wird besser! 🌈', 'Nicht aufgeben! 💪'],
+        terrible: ['Virtuelle Umarmung! 🤗', 'Du bist nicht allein! 💜', 'Ich hab dich lieb! ❤️']
       };
 
       const moodMessages = messages[currentMood] || messages.neutral;
       const randomMessage = moodMessages[Math.floor(Math.random() * moodMessages.length)];
-      showToast(randomMessage, currentMood === 'great' || currentMood === 'good' ? 'success' : 'info', 2000);
+
+      // Show speech bubble above the mood face
+      const bubble = document.getElementById('moodSpeechBubble');
+      if (bubble) {
+        bubble.textContent = randomMessage;
+        bubble.className = 'mood-speech-bubble ' + currentMood + ' show';
+        setTimeout(() => {
+          bubble.classList.remove('show');
+        }, 2000);
+      }
 
       // Remove clicking class after animation completes
       setTimeout(() => {
