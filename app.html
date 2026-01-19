@@ -9680,12 +9680,11 @@
       try {
         const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             action: 'get',
             include_logs: true,
-            days_back: 7,
-            timezone_offset: userTimezoneOffset
-          })
+            days_back: 7
+          }
         });
 
         if (result.error) {
@@ -9859,11 +9858,10 @@
       try {
         const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             action: complete ? 'complete' : 'uncomplete',
-            habit_id: habitId,
-            timezone_offset: userTimezoneOffset
-          })
+            habit_id: habitId
+          }
         });
 
         if (result.error) {
@@ -9926,14 +9924,13 @@
       try {
         const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             action: 'create',
             title,
             description,
             icon,
-            frequency,
-            timezone_offset: userTimezoneOffset
-          })
+            frequency
+          }
         });
 
         if (result.error) {
@@ -10120,10 +10117,7 @@
       try {
         const result = await apiCall('/functions/v1/streak-recovery', {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'check',
-            timezone_offset: userTimezoneOffset
-          })
+          body: { action: 'check' }
         });
 
         if (result.error) return;
@@ -10161,10 +10155,7 @@
       try {
         const result = await apiCall('/functions/v1/streak-recovery', {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'start',
-            timezone_offset: userTimezoneOffset
-          })
+          body: { action: 'start' }
         });
 
         if (result.error) {
@@ -10208,10 +10199,7 @@
       try {
         const result = await apiCall('/functions/v1/burnout-assessment', {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'check',
-            timezone_offset: userTimezoneOffset
-          })
+          body: { action: 'check' }
         });
 
         if (result.error) return;
@@ -10255,10 +10243,7 @@
       try {
         const result = await apiCall('/functions/v1/burnout-assessment', {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'activate_recovery',
-            timezone_offset: userTimezoneOffset
-          })
+          body: { action: 'activate_recovery' }
         });
 
         if (result.error) {
@@ -10288,10 +10273,7 @@
       try {
         const result = await apiCall('/functions/v1/weekly-reflection', {
           method: 'POST',
-          body: JSON.stringify({
-            action: 'get_data',
-            timezone_offset: userTimezoneOffset
-          })
+          body: { action: 'get_data' }
         });
 
         if (result.error) return;
@@ -10325,12 +10307,12 @@
       try {
         const result = await apiCall('/functions/v1/weekly-reflection', {
           method: 'POST',
-          body: JSON.stringify({
+          body: {
             action: 'submit_reflection',
             what_went_well: whatWentWell,
             what_didnt_work: whatDidntWork,
             timezone_offset: userTimezoneOffset
-          }),
+          },
           timeout: 60000
         });
 
