@@ -116,6 +116,7 @@ Pfad: `functions/v1/goals-setup`
 - **Lädt automatisch Profildaten für AI-Personalisierung**
 - AI generiert Plan mit Meilensteinen und **detaillierten** täglichen Tasks
 - **NEU: Speichert Plan direkt in `goals.plan_json`**
+- **WICHTIG: Neue Ziele werden HINZUGEFÜGT, nicht überschrieben!** (seit 2026-01-19)
 - Response enthält `requires_acceptance: true`
 - **Detaillierte Tasks** beinhalten:
   - `best_time`: Beste Tageszeit (morgens/mittags/abends/flexibel)

@@ -1192,3 +1192,48 @@ const timeoutMs = options.timeout || 60000;
   text-align: center;
 }
 ```
+
+### 35. Ziele werden nicht mehr überschrieben
+**Problem:** Beim Erstellen neuer Ziele wurden alle vorhandenen Tagesziele gelöscht
+
+**Ursache:**
+- `goals-setup` Edge Function löschte alle Ziele vom gleichen Tag vor dem Einfügen
+- Auch Langzeit-Ziele wurden gelöscht
+
+**Lösung:**
+1. DELETE-Logik aus `goals-setup/index.ts` entfernt
+2. DB-Limit von 10 auf 10.000 Ziele pro Tag erhöht
+3. Frontend-Limit (max 5 Ziele auf einmal) entfernt
+
+**Vorher (goals-setup):**
+```typescript
+// GELÖSCHT - Diese Logik überschrieb alle Ziele!
+const { error: deleteError } = await supabase
+  .schema('core')
+  .from('goals')
+  .delete()
+  .eq('day_entry_id', dayEntry.id)
+```
+
+**Nachher:**
+- Neue Ziele werden einfach hinzugefügt
+- Keine automatische Löschung mehr
+- Max 10.000 Ziele pro Tag (DB-Trigger)
+
+**Migration:** `db/20260119_increase_goals_limit.sql`
+```sql
+CREATE OR REPLACE FUNCTION core.enforce_max_10_goals_per_day()
+RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE cnt int;
+BEGIN
+  SELECT count(*) INTO cnt FROM core.goals g
+  JOIN core.day_entries de ON de.id = g.day_entry_id
+  WHERE de.user_id = new.user_id
+    AND de.date = (SELECT date FROM core.day_entries WHERE id = new.day_entry_id);
+  IF cnt >= 10000 THEN
+    RAISE EXCEPTION 'Max 10000 goals per day exceeded';
+  END IF;
+  RETURN new;
+END;
+$$;
+```

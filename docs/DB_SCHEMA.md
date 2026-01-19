@@ -253,6 +253,7 @@ CREATE TABLE audit.event_log (
 | `supabase/migrations/20260118234500_add_plan_json_to_goals.sql` | **NEU:** plan_json Spalte für goals |
 | `supabase/migrations/20260118235600_migrate_plans_to_goals.sql` | **NEU:** Bestehende Pläne migrieren |
 | `supabase/migrations/20260119001000_fix_ai_suggestions_kind.sql` | **NEU:** CHECK Constraint erweitern |
+| `db/20260119_increase_goals_limit.sql` | **NEU:** Ziel-Limit von 10 auf 10.000 erhöht |
 
 ### Bekannte Schema-Probleme & Fixes
 
@@ -299,7 +300,7 @@ CREATE POLICY "Users can manage own tasks" ON core.daily_tasks
 
 ## Trigger/Constraints
 
-- **Ziel-Limit pro Tag**: Max. 10 Ziele pro Tag (Trigger)
+- **Ziel-Limit pro Tag**: Max. 10.000 Ziele pro Tag (Trigger `enforce_max_10_goals_per_day`)
 - **Timestamps**: `updated_at` via Trigger
 - **Auto-Profile**: Bei User-Registration wird automatisch Profil erstellt
 
