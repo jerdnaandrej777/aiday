@@ -10123,8 +10123,7 @@
           card.style.display = 'none';
         } else {
           card.style.display = 'block';
-          const previewHabits = activeHabits.slice(0, 3);
-          list.innerHTML = previewHabits.map(habit => {
+          list.innerHTML = activeHabits.map(habit => {
             const log = todayLogs.get(habit.id);
             const isCompleted = log?.completed || false;
 
