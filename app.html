@@ -5210,7 +5210,7 @@
 
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="closeAddHabitModal()">Abbrechen</button>
-          <button class="btn btn-primary" onclick="createHabit()">Erstellen</button>
+          <button class="btn btn-primary" onclick="createHabit()" id="createHabitBtn">Erstellen</button>
         </div>
       </div>
     </div>
@@ -10245,6 +10245,12 @@
         return;
       }
 
+      // Loading-State für Button
+      const btn = document.getElementById('createHabitBtn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Wird erstellt...';
+
       try {
         const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
@@ -10254,15 +10260,20 @@
             description,
             icon,
             frequency
-          }
+          },
+          timeout: 30000 // 30s für AI-Benefits-Generierung
         });
 
         if (result.error) {
           showToast(result.error, 'error');
+          btn.disabled = false;
+          btn.innerHTML = originalText;
           return;
         }
 
         closeAddHabitModal();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
         showToast('Habit erstellt! ✨', 'success');
         await loadHabits();
 
@@ -10272,6 +10283,8 @@
       } catch (e) {
         console.error('Failed to create habit:', e);
         showToast('Fehler beim Erstellen', 'error');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }
     }
 
@@ -10299,7 +10312,12 @@
       const benefits = habit.benefits || [];
 
       if (benefits.length > 0) {
-        benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+        benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('') +
+          `<li style="display: block; text-align: center; border: none; padding: 8px 0 0 0;">
+            <button class="btn btn-secondary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 12px; padding: 8px 16px;">
+              🔄 Neu generieren
+            </button>
+          </li>`;
       } else {
         // Falls keine Vorteile vorhanden, zeige Button zum Generieren
         benefitsList.innerHTML = `
