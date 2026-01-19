@@ -868,6 +868,82 @@
       cursor: pointer;
     }
 
+    /* Task Arrow for Detail View */
+    .task-arrow {
+      font-size: 20px;
+      color: var(--text-muted);
+      padding: 0 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Task Detail Screen */
+    .task-detail-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .task-detail-time, .task-detail-duration {
+      background: var(--bg-input);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .task-detail-title {
+      font-size: 20px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    .task-detail-why {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .task-detail-why strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .task-detail-why p {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .task-detail-steps {
+      margin-bottom: 24px;
+    }
+
+    .task-detail-steps strong {
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .task-detail-steps ol {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .task-detail-steps li {
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .task-detail-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .task-detail-actions .btn {
+      flex: 1;
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -2943,6 +3019,49 @@
       </div>
     </div>
 
+    <!-- Task Detail Screen -->
+    <div class="screen" id="taskDetailScreen">
+      <div class="card">
+        <div class="task-detail-header">
+          <span class="task-detail-time" id="taskDetailTime">⏰ Flexibel</span>
+          <span class="task-detail-duration" id="taskDetailDuration">~15 Min</span>
+        </div>
+
+        <h2 class="task-detail-title" id="taskDetailTitle">Aufgabentitel</h2>
+
+        <div class="task-detail-why" id="taskDetailWhy">
+          <strong>Warum diese Aufgabe?</strong>
+          <p>Erklärung...</p>
+        </div>
+
+        <div class="task-detail-steps" id="taskDetailSteps">
+          <strong>So gehst du vor:</strong>
+          <ol>
+            <li>Schritt 1</li>
+            <li>Schritt 2</li>
+            <li>Schritt 3</li>
+          </ol>
+        </div>
+
+        <div class="task-detail-actions">
+          <button class="btn btn-secondary" id="taskStartBtn" onclick="startTask()">
+            ▶️ Starten
+          </button>
+          <button class="btn btn-primary" id="taskCompleteBtn" onclick="completeTaskFromDetail()">
+            ✓ Erledigt
+          </button>
+        </div>
+
+        <button class="footer-back-btn" onclick="goBackFromTaskDetail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
+      </div>
+    </div>
+
     <!-- Loading Screen - startet als aktiv -->
     <div class="screen active" id="loadingScreen">
       <div class="loading">
@@ -3376,6 +3495,8 @@
     let appData = null;
     let previousScreen = 'dashboardScreen';
     let currentGoalDetail = null;
+    let currentTaskDetail = null;
+    let taskDetailPreviousScreen = 'dashboardScreen';
 
     // Auth Check
     (function init() {
@@ -4627,9 +4748,9 @@
       } else {
         tasksEl.innerHTML = tasks.map(task => `
           <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-            <div class="task-checkbox" onclick="toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
-            <div class="task-text" onclick="toggleTask('${task.id}', ${!task.completed})">${task.task_text}</div>
-            <button class="task-delete-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">×</button>
+            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
+            <div class="task-text" onclick="showTaskDetail('${task.id}')">${task.task_text}</div>
+            <div class="task-arrow" onclick="showTaskDetail('${task.id}')">›</div>
           </div>
         `).join('');
       }
@@ -4772,6 +4893,105 @@
           }, 300);
         }
       }
+    }
+
+    // Task Detail Functions
+    function showTaskDetail(taskId) {
+      // Task-Daten aus appData finden
+      const tasks = appData?.data?.today_tasks || [];
+      const task = tasks.find(t => t.id === taskId);
+
+      if (!task) {
+        showToast('Aufgabe nicht gefunden', 'error');
+        return;
+      }
+
+      currentTaskDetail = task;
+      taskDetailPreviousScreen = document.querySelector('.screen.active')?.id || 'dashboardScreen';
+
+      // UI befüllen
+      const details = task.task_details || {};
+      const timeIcons = {
+        'morgens': '🌅',
+        'mittags': '☀️',
+        'abends': '🌙',
+        'flexibel': '⏰'
+      };
+
+      document.getElementById('taskDetailTitle').textContent = task.task_text;
+      document.getElementById('taskDetailTime').textContent =
+        `${timeIcons[details.best_time] || '⏰'} ${(details.best_time || 'flexibel').charAt(0).toUpperCase() + (details.best_time || 'flexibel').slice(1)}`;
+      document.getElementById('taskDetailDuration').textContent =
+        `~${task.estimated_minutes || 15} Min`;
+
+      // Why-Section
+      const whyEl = document.getElementById('taskDetailWhy');
+      if (details.why) {
+        whyEl.innerHTML = `<strong>Warum diese Aufgabe?</strong><p>${details.why}</p>`;
+        whyEl.style.display = 'block';
+      } else {
+        whyEl.style.display = 'none';
+      }
+
+      // Steps-Section
+      const stepsEl = document.getElementById('taskDetailSteps');
+      if (details.steps && details.steps.length > 0) {
+        stepsEl.innerHTML = `
+          <strong>So gehst du vor:</strong>
+          <ol>${details.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+        `;
+        stepsEl.style.display = 'block';
+      } else {
+        stepsEl.style.display = 'none';
+      }
+
+      // Button-Status
+      const completeBtn = document.getElementById('taskCompleteBtn');
+      if (task.completed) {
+        completeBtn.textContent = '✓ Bereits erledigt';
+        completeBtn.disabled = true;
+        completeBtn.style.opacity = '0.5';
+      } else {
+        completeBtn.textContent = '✓ Erledigt';
+        completeBtn.disabled = false;
+        completeBtn.style.opacity = '1';
+      }
+
+      showScreen('taskDetailScreen', 'forward');
+    }
+
+    function startTask() {
+      showToast('Los geht\'s! Du schaffst das! 💪', 'success', 2000);
+    }
+
+    async function completeTaskFromDetail() {
+      if (!currentTaskDetail) return;
+
+      const btn = document.getElementById('taskCompleteBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gespeichert...';
+
+      // Task als erledigt markieren
+      await toggleTask(currentTaskDetail.id, true);
+
+      // Update local state
+      if (currentTaskDetail) {
+        currentTaskDetail.completed = true;
+      }
+
+      // Kurze Erfolgsmeldung
+      showToast('Aufgabe erledigt! 🎉', 'success', 2000);
+
+      // Zurück zur vorherigen Seite
+      setTimeout(() => {
+        showScreen(taskDetailPreviousScreen, 'back');
+        currentTaskDetail = null;
+      }, 500);
+    }
+
+    function goBackFromTaskDetail() {
+      showScreen(taskDetailPreviousScreen, 'back');
+      currentTaskDetail = null;
     }
 
     // Aktualisiert alle Fortschrittsanzeigen für Tasks
@@ -5115,9 +5335,9 @@
       } else {
         tasksContainer.innerHTML = tasks.map(task => `
           <div class="progress-task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-            <div class="progress-task-checkbox" onclick="toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
-            <div class="progress-task-text" onclick="toggleTask('${task.id}', ${!task.completed})">${task.task_text}</div>
-            <button class="task-delete-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">×</button>
+            <div class="progress-task-checkbox" onclick="event.stopPropagation(); toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
+            <div class="progress-task-text" onclick="showTaskDetail('${task.id}')">${task.task_text}</div>
+            <div class="task-arrow" onclick="showTaskDetail('${task.id}')">›</div>
           </div>
         `).join('');
       }

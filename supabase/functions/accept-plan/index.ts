@@ -116,7 +116,13 @@ Deno.serve(async (req) => {
         task_text: t.task,
         task_order: idx,
         ai_generated: true,
-        estimated_minutes: t.duration_minutes || 15
+        estimated_minutes: t.duration_minutes || 15,
+        task_details: {
+          steps: t.steps || [],
+          why: t.why || '',
+          best_time: t.best_time || 'flexibel',
+          frequency: t.frequency || 'daily'
+        }
       }))
 
     // Fallback: Wenn keine Tasks im Plan, erstelle eine Standard-Task
@@ -129,7 +135,13 @@ Deno.serve(async (req) => {
         task_text: `Arbeite 30 Minuten an: ${goalTitle}`,
         task_order: 0,
         ai_generated: true,
-        estimated_minutes: 30
+        estimated_minutes: 30,
+        task_details: {
+          steps: [],
+          why: '',
+          best_time: 'flexibel',
+          frequency: 'daily'
+        }
       }]
     }
 

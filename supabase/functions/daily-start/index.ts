@@ -82,11 +82,11 @@ Deno.serve(async (req) => {
 
     const pendingReview = yesterdayTasks || []
 
-    // 4. Hole heutige Tasks
+    // 4. Hole heutige Tasks (inkl. task_details für Detail-Ansicht)
     let { data: todayTasks, error: tasksError } = await supabase
       .schema('core')
       .from('daily_tasks')
-      .select('id, task_text, completed, goal_id, task_order')
+      .select('id, task_text, completed, goal_id, task_order, estimated_minutes, task_details')
       .eq('user_id', userId)
       .eq('date', today)
       .order('task_order', { ascending: true })
@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
 
       console.log(`Auto-generating ${dailyTasks.length} tasks for goal ${goal.id} (${goal.title})`)
 
-      // Erstelle Tasks aus dem Plan
+      // Erstelle Tasks aus dem Plan (inkl. task_details für Detail-Ansicht)
       const tasksToInsert = dailyTasks.map((t: any, idx: number) => ({
         user_id: userId,
         goal_id: goal.id,
@@ -129,7 +129,13 @@ Deno.serve(async (req) => {
         task_text: t.task || t.task_text || `Aufgabe ${idx + 1}`,
         task_order: idx,
         ai_generated: true,
-        estimated_minutes: t.duration_minutes || t.estimated_minutes || 15
+        estimated_minutes: t.duration_minutes || t.estimated_minutes || 15,
+        task_details: {
+          steps: t.steps || [],
+          why: t.why || '',
+          best_time: t.best_time || 'flexibel',
+          frequency: t.frequency || 'daily'
+        }
       }))
 
       const { data: newTasks, error: insertError } = await supabase
