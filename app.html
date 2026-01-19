@@ -678,13 +678,13 @@
     .mood-speech-bubble,
     .energy-speech-bubble {
       position: absolute;
-      top: -12px;
+      top: -20px;
       left: 0;
       right: 0;
       background: white;
       color: var(--text-primary);
-      padding: 14px 20px;
-      border-radius: 16px;
+      padding: 12px 24px;
+      border-radius: 20px;
       font-size: 14px;
       font-weight: 500;
       text-align: center;
@@ -693,7 +693,7 @@
       opacity: 0;
       pointer-events: none;
       z-index: 100;
-      min-height: 44px;
+      min-height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -704,10 +704,13 @@
     .energy-speech-bubble::after {
       content: '';
       position: absolute;
-      bottom: -10px;
-      left: 28px;
-      border: 10px solid transparent;
-      border-top-color: white;
+      bottom: -15px;
+      left: 24px;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 16px solid white;
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.05));
     }
 
@@ -2123,12 +2126,12 @@
     /* Speech Bubble über "Heute" (Dashboard) */
     .dashboard-bubble {
       position: absolute;
-      bottom: calc(100% + 8px);
+      bottom: calc(100% + 18px);
       left: 0;
       background: white;
       color: var(--text-primary);
-      padding: 12px 20px;
-      border-radius: 16px;
+      padding: 12px 24px;
+      border-radius: 20px;
       font-size: 14px;
       font-weight: 500;
       white-space: nowrap;
@@ -2150,8 +2153,11 @@
       position: absolute;
       top: 100%;
       left: 20px;
-      border: 10px solid transparent;
-      border-top-color: white;
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 16px solid white;
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.05));
     }
 
