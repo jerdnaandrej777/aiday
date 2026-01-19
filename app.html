@@ -3815,8 +3815,9 @@
 
     let motivationHideTimeout = null;
 
-    function showMotivationQuote(triggerType) {
-      if (!canShowMotivation()) {
+    function showMotivationQuote(triggerType, skipCooldown = false) {
+      // Check cooldown only if not skipped (e.g., for task reminders)
+      if (!skipCooldown && !canShowMotivation()) {
         console.log('Motivation cooldown active, skipping quote');
         return;
       }
@@ -3831,7 +3832,7 @@
       if (quoteTextEl) quoteTextEl.textContent = `„${quote.text}"`;
       if (quoteAuthorEl) quoteAuthorEl.textContent = `— ${quote.author}`;
 
-      // Set class based on trigger type
+      // Set class based on trigger type (mood)
       bubble.className = 'motivation-speech-bubble';
       if (triggerType === 'bad') {
         bubble.classList.add('bad');
@@ -3839,6 +3840,10 @@
         bubble.classList.add('terrible');
       } else if (triggerType === 'tasks') {
         bubble.classList.add('tasks-reminder');
+      } else if (triggerType === 'great' || triggerType === 'good') {
+        // Positive moods get a green gradient
+        bubble.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        bubble.style.boxShadow = '0 8px 32px rgba(16, 185, 129, 0.3)';
       }
       // neutral uses default cyan gradient
 
@@ -3857,9 +3862,11 @@
         hideMotivationBubble();
       }, 4500);
 
-      // Save timestamp
-      lastMotivationTime = Date.now();
-      localStorage.setItem('aiday_last_motivation', lastMotivationTime.toString());
+      // Save timestamp (only for cooldown-relevant triggers)
+      if (!skipCooldown) {
+        lastMotivationTime = Date.now();
+        localStorage.setItem('aiday_last_motivation', lastMotivationTime.toString());
+      }
     }
 
     function hideMotivationBubble() {
@@ -3878,11 +3885,19 @@
       setTimeout(() => {
         bubble.classList.remove('hiding');
         bubble.className = 'motivation-speech-bubble';
+        // Reset inline styles (for positive mood colors)
+        bubble.style.background = '';
+        bubble.style.boxShadow = '';
       }, 400);
     }
 
-    function checkMoodForMotivation(mood) {
-      // Show motivation for non-positive moods (neutral, bad, terrible)
+    function checkMoodForMotivation(mood, fromCheckin = false) {
+      // After check-in: always show quote (skip cooldown)
+      if (fromCheckin) {
+        showMotivationQuote(mood, true); // skipCooldown = true
+        return;
+      }
+      // From dashboard load: only show for non-positive moods with cooldown
       if (mood === 'neutral' || mood === 'bad' || mood === 'terrible') {
         showMotivationQuote(mood);
       }
@@ -4396,7 +4411,7 @@
           showToast('Check-in erfolgreich!', 'success', 2000);
 
           // Check if motivation quote should be shown
-          checkMoodForMotivation(checkinData.mood);
+          checkMoodForMotivation(checkinData.mood, true); // fromCheckin = true
 
           // Short delay to show success
           setTimeout(() => {
