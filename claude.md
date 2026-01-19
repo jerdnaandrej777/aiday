@@ -23,7 +23,7 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 **Vision:** Nutzer dabei unterstützen, ihre Träume in konkrete Tagesziele zu verwandeln und diese mit Hilfe eines KI-Coaches zu erreichen.
 
 **Aktueller Stand:** Vollständige PWA mit täglichem Coaching-Flow:
-- Check-in (Stimmung, Energie)
+- Check-in (Stimmung, Energie) mit animierter Pflichtfeld-Validierung
 - Ziel-Definition mit AI-Klarifizierung
 - **Personalisierte Aktionspläne basierend auf Benutzerprofil**
 - Tägliche Tasks mit Fortschrittsverfolgung
@@ -35,6 +35,8 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Mobile-optimiertes Layout**
 - **Installierbar als PWA (Android, iOS, Desktop)**
 - **Offline-Funktionalität**
+- **Disziplin-Motivations-Feature** (Zitate bei schlechter Stimmung)
+- **Einheitliches Sprechblasen-Design** (weiß, Pfeil links)
 
 ---
 
@@ -204,6 +206,11 @@ aiday/
 - [x] **Klickbare Mood Face** mit mood-spezifischen Animationen + Speech Bubble
 - [x] **Dynamischer Header-Button** (Dashboard ↔ Mein Fortschritt)
 - [x] **Animierte Energielevel-Validierung** (Puls-Animation + Sprechblase)
+- [x] **Animierte Stimmungs-Validierung** (Puls-Animation + Sprechblase) ← NEU
+- [x] **Einheitliches Sprechblasen-Design** (weiß, Pfeil außen links) ← NEU
+- [x] **Dashboard Sprechblase über "Heute"** beim Mood Face Klick ← NEU
+- [x] **Disziplin-Motivations-Feature** (~40 Zitate, 4h Cooldown) ← NEU
+- [x] **Erhöhte API-Timeouts** (60-120s für AI-Calls) ← NEU
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
 - [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
@@ -962,4 +969,182 @@ function showEnergyAttention() {
   slider.classList.add('needs-attention');
   bubble.classList.add('show');
 }
+```
+
+### 27. Einheitliches Sprechblasen-Design
+**Feature:** Alle Sprechblasen (Mood, Energy, Dashboard) haben jetzt ein einheitliches weißes Design
+
+**Design-Eigenschaften:**
+- Weißer Hintergrund mit leichtem Schatten
+- Border: 1px solid var(--glass-border)
+- Border-radius: 20px (abgerundete Ecken)
+- Padding: 12px 24px (mehr Breite für Text)
+- Pfeil außen links (nicht zentriert)
+
+**CSS:**
+```css
+.mood-speech-bubble,
+.energy-speech-bubble {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  background: white;
+  color: var(--text-primary);
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--glass-border);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mood-speech-bubble::after,
+.energy-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 24px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 16px solid white;
+}
+```
+
+### 28. Dashboard Sprechblase über "Heute"
+**Feature:** Beim Klick auf das Mood Face erscheint die Sprechblase über dem Wort "Heute"
+
+**HTML-Struktur:**
+```html
+<div class="progress-card-header">
+  <div class="heute-container">
+    <h3>Heute</h3>
+    <div class="mood-speech-bubble dashboard-bubble" id="moodSpeechBubble"></div>
+  </div>
+  <span class="progress-date" id="progressDate"></span>
+</div>
+```
+
+**CSS:**
+```css
+.heute-container {
+  position: relative;
+}
+
+.dashboard-bubble {
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 0;
+  background: white;
+  padding: 12px 24px;
+  border-radius: 20px;
+  white-space: nowrap;
+  width: max-content;
+  min-width: 120px;
+  max-width: 300px;
+}
+
+.dashboard-bubble::after {
+  top: 100%;
+  left: 20px;
+  border-top: 16px solid white;
+}
+```
+
+### 29. Animierte Stimmungs-Validierung
+**Feature:** Pflichtfeld-Validierung für Stimmungsauswahl mit Animation (wie bei Energielevel)
+
+**Auslöser:** Klick auf "Weiter" ohne Stimmungsauswahl
+
+**Animation:**
+- Wellenförmige Puls-Animation der 5 Emoji-Buttons
+- Sprechblase "Wie fühlst du dich heute? 🤔" erscheint
+- Auto-Scroll zum Mood-Bereich
+
+**JavaScript:**
+```javascript
+function showMoodAttention() {
+  const formGroup = document.getElementById('moodFormGroup');
+  const buttons = document.getElementById('moodButtons');
+  const bubble = document.getElementById('moodSpeechBubbleCheckin');
+
+  if (buttons && bubble && formGroup) {
+    formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => {
+      buttons.classList.add('needs-attention');
+      bubble.classList.add('show');
+      setTimeout(() => { buttons.classList.remove('needs-attention'); }, 1000);
+      setTimeout(() => { bubble.classList.remove('show'); }, 2500);
+    }, 100);
+  }
+}
+```
+
+### 30. Disziplin-Motivations-Feature
+**Feature:** Motivierende Zitate bei nicht-positiver Stimmung oder unerledigten Tasks
+
+**Trigger:**
+- Nach Check-in bei neutral/bad/terrible Stimmung
+- Abends (nach 18:00) bei <50% erledigten Tasks
+
+**Cooldown:** Max 1x pro 4 Stunden (localStorage: `aiday_last_motivation`)
+
+**Zitate-Sammlung:** ~40 Zitate von:
+- Stoikern (Marc Aurel, Epiktet)
+- Modernen Persönlichkeiten (Jim Rohn, Steve Jobs, Henry Ford)
+- Klassikern (Goethe, Einstein, Edison)
+
+**JavaScript-Funktionen:**
+```javascript
+let lastMotivationTime = 0;
+const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden
+let pendingMotivationMood = null;
+
+function initMotivationSystem() { /* Lädt Cooldown aus localStorage */ }
+function canShowMotivation() { /* Prüft 4h-Cooldown */ }
+function getRandomQuote() { /* Holt zufälliges Zitat */ }
+function showMotivationQuote(triggerType) { /* Zeigt Bubble */ }
+function checkMoodForMotivation(mood) { /* Prüft nach Check-in */ }
+function checkTasksForMotivation(tasks) { /* Prüft abends */ }
+```
+
+### 31. Detaillierte Task-Anleitungen (AI-generiert)
+**Feature:** Ausführliche Schritt-für-Schritt Anleitungen für jede Tagesaufgabe
+
+**Inhalt pro Task:**
+- **Warum:** Erklärung der Wichtigkeit
+- **Schritte:** 3-5 konkrete Handlungsschritte
+- **Kategorie-spezifisch:** Angepasst an Entspannung, Sport, Lernen, etc.
+
+**JavaScript:**
+```javascript
+function generateTaskGuidance(task) {
+  const category = detectTaskCategory(task);
+  return {
+    why: getCategoryWhy(category),
+    steps: getCategorySteps(category, task)
+  };
+}
+```
+
+### 32. Erhöhte API-Timeouts
+**Problem:** Timeout-Fehler bei AI-Plan-Generierung
+
+**Lösung:** Timeouts erhöht:
+- Standard: 60 Sekunden (vorher 30s)
+- goal-clarify: 90 Sekunden
+- goal-regenerate-plan: 90 Sekunden
+- goals-setup: 120 Sekunden
+
+**Code:**
+```javascript
+const timeoutMs = options.timeout || 60000;
+// Bei AI-Calls: timeout: 90000 oder 120000
 ```
