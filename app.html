@@ -595,6 +595,7 @@
       gap: 10px;
       justify-content: center;
       margin: 16px 0;
+      position: relative;
     }
 
     .energy-level {
@@ -622,6 +623,57 @@
       border-color: var(--success);
       background: rgba(16, 185, 129, 0.15);
       color: var(--success);
+    }
+
+    /* Energy Level Attention Animation */
+    .energy-slider.needs-attention .energy-level {
+      animation: energyPulse 0.6s ease-in-out;
+    }
+
+    .energy-slider.needs-attention .energy-level:nth-child(1) { animation-delay: 0s; }
+    .energy-slider.needs-attention .energy-level:nth-child(2) { animation-delay: 0.08s; }
+    .energy-slider.needs-attention .energy-level:nth-child(3) { animation-delay: 0.16s; }
+    .energy-slider.needs-attention .energy-level:nth-child(4) { animation-delay: 0.24s; }
+    .energy-slider.needs-attention .energy-level:nth-child(5) { animation-delay: 0.32s; }
+
+    @keyframes energyPulse {
+      0%, 100% { transform: scale(1); border-color: var(--bg-input); }
+      25% { transform: scale(1.15); border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+      50% { transform: scale(0.95); }
+      75% { transform: scale(1.1); border-color: var(--accent); }
+    }
+
+    /* Energy Speech Bubble */
+    .energy-speech-bubble {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      color: white;
+      padding: 10px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .energy-speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: var(--secondary);
+    }
+
+    .energy-speech-bubble.show {
+      animation: bubblePopIn 0.3s ease forwards, bubbleFadeOut 0.3s ease 2.2s forwards;
     }
 
     /* Buttons */
@@ -2988,7 +3040,9 @@
 
         <div class="form-group">
           <label class="form-label">Wie ist dein Energielevel? (1-5)</label>
-          <div class="energy-slider">
+          <div class="energy-slider" id="energySlider">
+            <!-- Speech Bubble -->
+            <div class="energy-speech-bubble" id="energySpeechBubble">Bitte wähle dein Energielevel! ⚡</div>
             <button class="energy-level" data-level="1" onclick="selectEnergy(1)">1</button>
             <button class="energy-level" data-level="2" onclick="selectEnergy(2)">2</button>
             <button class="energy-level" data-level="3" onclick="selectEnergy(3)">3</button>
@@ -3855,6 +3909,43 @@
       document.querySelector(`[data-level="${level}"]`).classList.add('selected');
       checkinData.energy_level = level;
       updateCheckinButton();
+
+      // Hide attention animation if showing
+      const slider = document.getElementById('energySlider');
+      const bubble = document.getElementById('energySpeechBubble');
+      if (slider) slider.classList.remove('needs-attention');
+      if (bubble) bubble.classList.remove('show');
+    }
+
+    // Show attention animation for energy selection
+    function showEnergyAttention() {
+      const slider = document.getElementById('energySlider');
+      const bubble = document.getElementById('energySpeechBubble');
+
+      if (slider && bubble) {
+        // Remove and re-add class to restart animation
+        slider.classList.remove('needs-attention');
+        bubble.classList.remove('show');
+
+        // Scroll to energy slider
+        slider.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Trigger animation after short delay
+        setTimeout(() => {
+          slider.classList.add('needs-attention');
+          bubble.classList.add('show');
+
+          // Remove animation class after completion
+          setTimeout(() => {
+            slider.classList.remove('needs-attention');
+          }, 1000);
+
+          // Remove bubble after display time
+          setTimeout(() => {
+            bubble.classList.remove('show');
+          }, 2500);
+        }, 100);
+      }
     }
 
     function updateCheckinButton() {
@@ -3863,6 +3954,12 @@
 
     // Submit Check-in
     async function submitCheckin() {
+      // Check if energy level is selected
+      if (!checkinData.energy_level) {
+        showEnergyAttention();
+        return;
+      }
+
       const btn = document.getElementById('checkinSubmit');
       const originalText = btn.textContent;
       btn.disabled = true;
