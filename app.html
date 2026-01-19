@@ -3842,6 +3842,9 @@
       earnedAchievements: []
     };
 
+    // Timezone-Offset für API-Calls (muss vor init definiert sein)
+    const userTimezoneOffset = new Date().getTimezoneOffset();
+
     // Auth Check
     (function init() {
       const token = localStorage.getItem('aiday_token');
@@ -4416,9 +4419,6 @@
         showScreen('checkinScreen', 'forward');
       }
     }
-
-    // Timezone-Offset für API-Calls (einmal berechnen)
-    const userTimezoneOffset = new Date().getTimezoneOffset();
 
     // Generiert einen eindeutigen Idempotency-Key
     function generateIdempotencyKey() {
