@@ -1148,3 +1148,47 @@ function generateTaskGuidance(task) {
 const timeoutMs = options.timeout || 60000;
 // Bei AI-Calls: timeout: 90000 oder 120000
 ```
+
+### 33. Dashboard Sprechblase über Stats positioniert
+**Feature:** Sprechblase beim Mood-Face-Klick erscheint über den "Heute"-Stats
+
+**Positionierung:**
+- Eigener Container `.dashboard-bubble-container` direkt vor dem Stats-Bereich
+- Überlappt das Wort "Heute" mit `top: -45px`
+- Pfeil zeigt auf das Stimmungs-Emoji
+
+**CSS:**
+```css
+.dashboard-bubble-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+.dashboard-bubble {
+  position: absolute;
+  top: -45px;
+  left: -8px;
+  right: -8px;
+}
+```
+
+### 34. Dashboard Sprechblase breitere Darstellung
+**Feature:** Sprechblase nutzt die volle Kartenbreite
+
+**Änderungen:**
+- Negative Margins (`left: -8px; right: -8px`) für volle Kartenbreite
+- `white-space: nowrap` verhindert Textumbruch
+- Text bleibt einzeilig für bessere Lesbarkeit
+
+**CSS:**
+```css
+.dashboard-bubble {
+  left: -8px;
+  right: -8px;
+  white-space: nowrap;
+  text-align: center;
+}
+```
