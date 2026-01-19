@@ -83,31 +83,7 @@ Deno.serve(async (req) => {
       return errorResponse(`Database error: ${dayError.message}`, 500)
     }
 
-    // 2. Lösche alte Ziele für den heutigen day_entry (um Limit nicht zu überschreiten)
-    const { error: deleteError } = await supabase
-      .schema('core')
-      .from('goals')
-      .delete()
-      .eq('day_entry_id', dayEntry.id)
-
-    if (deleteError) {
-      console.error('Delete old goals error:', deleteError)
-      // Nicht abbrechen, nur loggen - vielleicht gibt es keine alten Ziele
-    }
-
-    // Lösche auch alte Langzeit-Ziele des Users (von anderen Tagen)
-    const { error: deleteLongtermError } = await supabase
-      .schema('core')
-      .from('goals')
-      .delete()
-      .eq('user_id', userId)
-      .eq('is_longterm', true)
-
-    if (deleteLongtermError) {
-      console.error('Delete longterm goals error:', deleteLongtermError)
-    }
-
-    // 3. Erstelle neue Langzeit-Ziele
+    // 2. Erstelle neue Langzeit-Ziele (KEINE Löschung alter Ziele!)
     const goalsToInsert = goals.map((g, idx) => ({
       user_id: userId,
       day_entry_id: dayEntry.id,

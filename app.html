@@ -4523,8 +4523,8 @@
         subtitle.textContent = 'Definiere ein weiteres Ziel (optional)';
       }
 
-      // Show add button only after first goal is added
-      document.getElementById('goalAdd').style.display = goals.length > 0 && goals.length < 5 ? 'block' : 'none';
+      // Show add button only after first goal is added (kein Limit mehr)
+      document.getElementById('goalAdd').style.display = goals.length > 0 ? 'block' : 'none';
 
       // Update submit button text
       const submitBtn = document.getElementById('goalSubmit');
