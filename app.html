@@ -9684,10 +9684,15 @@
           }
         });
 
+        console.log('loadHabits result:', result);
+
         if (result.error || !result.data) {
           console.error('Error loading habits:', result.error);
           return;
         }
+
+        console.log('loadHabits data:', result.data);
+        console.log('loadHabits habits:', result.data.habits);
 
         habitsData = result.data;
         renderHabits();
@@ -9698,6 +9703,7 @@
     }
 
     function renderHabits() {
+      console.log('renderHabits called, habitsData:', habitsData);
       const todayList = document.getElementById('todayHabitsList');
       const allList = document.getElementById('allHabitsList');
       const today = habitsData.today || new Date().toISOString().split('T')[0];
