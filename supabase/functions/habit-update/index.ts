@@ -106,6 +106,12 @@ const GetHabitsSchema = z.object({
   timezone_offset: z.number().optional(),
 })
 
+const RegenerateBenefitsSchema = z.object({
+  action: z.literal('regenerate_benefits'),
+  habit_id: z.string().uuid(),
+  timezone_offset: z.number().optional(),
+})
+
 const RequestSchema = z.union([
   CreateHabitSchema,
   UpdateHabitSchema,
@@ -113,6 +119,7 @@ const RequestSchema = z.union([
   CompleteHabitSchema,
   UncompleteHabitSchema,
   GetHabitsSchema,
+  RegenerateBenefitsSchema,
 ])
 
 // XP für Habit-Completion
@@ -506,6 +513,48 @@ Deno.serve(async (req) => {
       return successResponse({
         success: true,
         action: 'uncompleted',
+      })
+    }
+
+    // === REGENERATE_BENEFITS: Benefits für Habit neu generieren ===
+    if (data.action === 'regenerate_benefits') {
+      const { habit_id } = data
+
+      // Hole Habit-Details
+      const { data: habit, error: habitError } = await supabase
+        .schema('core')
+        .from('habits')
+        .select('id, title, description')
+        .eq('id', habit_id)
+        .eq('user_id', userId)
+        .single()
+
+      if (habitError || !habit) {
+        return errorResponse('Habit not found', 404)
+      }
+
+      // AI: Generiere neue Vorteile
+      const benefits = await generateHabitBenefits(habit.title, habit.description)
+
+      // Update Habit mit neuen Benefits
+      const { data: updatedHabit, error: updateError } = await supabase
+        .schema('core')
+        .from('habits')
+        .update({ benefits })
+        .eq('id', habit_id)
+        .eq('user_id', userId)
+        .select()
+        .single()
+
+      if (updateError) {
+        return errorResponse(`Failed to update benefits: ${updateError.message}`, 500)
+      }
+
+      return successResponse({
+        success: true,
+        action: 'benefits_regenerated',
+        habit: updatedHabit,
+        benefits,
       })
     }
 

@@ -4193,7 +4193,7 @@
     }
 
     .btn-danger {
-      background: var(--error);
+      background: var(--danger);
       color: white;
     }
 
@@ -10295,13 +10295,15 @@
 
       if (benefits.length > 0) {
         benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
-        benefitsList.parentElement.style.display = 'block';
       } else {
-        // Falls keine Vorteile vorhanden, zeige generische
+        // Falls keine Vorteile vorhanden, zeige Button zum Generieren
         benefitsList.innerHTML = `
-          <li>Regelmäßige Gewohnheiten verbessern deine Disziplin</li>
-          <li>Kleine tägliche Schritte führen zu großen Veränderungen</li>
-          <li>Tracking hilft dir, motiviert zu bleiben</li>
+          <li style="display: block; text-align: center; border: none; padding: 16px;">
+            <p style="color: var(--text-muted); margin-bottom: 12px;">Noch keine AI-generierten Vorteile vorhanden</p>
+            <button class="btn btn-primary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 14px;">
+              ✨ Vorteile generieren
+            </button>
+          </li>
         `;
       }
 
@@ -10387,6 +10389,56 @@
       } catch (e) {
         console.error('Failed to delete habit:', e);
         showToast('Fehler beim Löschen', 'error');
+      }
+    }
+
+    async function regenerateHabitBenefits(habitId) {
+      const btn = document.getElementById('regenerateBenefitsBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Wird generiert...';
+      }
+
+      try {
+        const result = await apiCall('/functions/v1/habit-update', {
+          method: 'POST',
+          body: {
+            action: 'regenerate_benefits',
+            habit_id: habitId
+          },
+          timeout: 30000
+        });
+
+        if (result.error) {
+          showToast('Fehler: ' + result.error, 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '✨ Vorteile generieren';
+          }
+          return;
+        }
+
+        // Benefits in der UI aktualisieren
+        const benefits = result.data?.benefits || [];
+        const benefitsList = document.getElementById('habitDetailBenefits');
+        if (benefitsList && benefits.length > 0) {
+          benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+        }
+
+        // Auch im lokalen Daten-Cache aktualisieren
+        if (currentHabitDetail) {
+          currentHabitDetail.benefits = benefits;
+        }
+
+        showToast('Vorteile erfolgreich generiert!', 'success');
+        await loadHabits(); // Habits neu laden für Aktualisierung
+      } catch (e) {
+        console.error('Failed to regenerate benefits:', e);
+        showToast('Fehler beim Generieren', 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '✨ Vorteile generieren';
+        }
       }
     }
 
