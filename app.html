@@ -2115,23 +2115,24 @@
     .heart-2 { animation-delay: 0.2s; }
     .heart-3 { animation-delay: 0.4s; }
 
-    /* Speech Bubble for Mood Face (Dashboard) */
+    /* Speech Bubble for Mood Face (Dashboard) - wie Check-in Style */
     .stat-circle .mood-speech-bubble {
       position: absolute;
-      bottom: calc(100% + 15px);
+      bottom: calc(100% + 20px);
       left: 50%;
       transform: translateX(-50%);
-      background: var(--bg-card);
-      color: var(--text);
-      padding: 14px 20px;
+      background: white;
+      color: var(--text-primary);
+      padding: 12px 20px;
       border-radius: 16px;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 500;
       white-space: normal;
       width: max-content;
-      min-width: 120px;
+      min-width: 150px;
       max-width: 300px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--glass-border);
       opacity: 0;
       pointer-events: none;
       z-index: 100;
@@ -2147,7 +2148,8 @@
       left: 50%;
       transform: translateX(-50%);
       border: 10px solid transparent;
-      border-top-color: var(--bg-card);
+      border-top-color: white;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.05));
     }
 
     .stat-circle .mood-speech-bubble.show {
@@ -2165,36 +2167,7 @@
       100% { opacity: 0; transform: translateY(-10px) scale(0.8); }
     }
 
-    /* Mood-specific bubble colors (Dashboard) */
-    .stat-circle .mood-speech-bubble.great {
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-      color: #1f2937;
-    }
-    .stat-circle .mood-speech-bubble.great::after { border-top-color: #f59e0b; }
-
-    .stat-circle .mood-speech-bubble.good {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      color: white;
-    }
-    .stat-circle .mood-speech-bubble.good::after { border-top-color: #8b5cf6; }
-
-    .stat-circle .mood-speech-bubble.neutral {
-      background: linear-gradient(135deg, #22d3ee, #06b6d4);
-      color: #1f2937;
-    }
-    .stat-circle .mood-speech-bubble.neutral::after { border-top-color: #06b6d4; }
-
-    .stat-circle .mood-speech-bubble.bad {
-      background: linear-gradient(135deg, #f87171, #ef4444);
-      color: white;
-    }
-    .stat-circle .mood-speech-bubble.bad::after { border-top-color: #ef4444; }
-
-    .stat-circle .mood-speech-bubble.terrible {
-      background: linear-gradient(135deg, #ec4899, #db2777);
-      color: white;
-    }
-    .stat-circle .mood-speech-bubble.terrible::after { border-top-color: #db2777; }
+    /* Dashboard bubble is always white - no mood-specific colors */
 
     /* Motivation Speech Bubble */
     .motivation-speech-bubble {
