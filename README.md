@@ -53,7 +53,18 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Erreichte Ziele**: Übersicht abgeschlossener Ziele mit Statistiken (Wochen, Meilensteine, Tasks)
 - **AI-Plan Regenerieren**: Neuen Plan für bestehendes Ziel ohne Plan generieren
 - **Optimistische UI-Updates**: Tasks werden sofort visuell aktualisiert
-- **Gamification-System** (NEU): XP, Level, Achievements für Motivation
+- **Gamification-System**: XP, Level, Achievements für Motivation
+
+### Phase 4-7 Features (NEU)
+- **Habit Tracking**: Wiederkehrende Gewohnheiten mit Streak-Berechnung
+- **Pomodoro Timer**: 25min Fokus + 5min Pause im Task-Detail
+- **Task Priorität**: High/Medium/Low mit variablen XP (+20/+10/+5)
+- **Streak Recovery**: 3-Tage Comeback-Challenge bei verlorener Streak
+- **Weekly Deep Review**: AI-Analyse der Wochenperformance
+- **Burnout Detection**: Automatische Warnung + Recovery Mode
+- **Notification Preferences**: Quiet Hours, Reminder-Zeit konfigurierbar
+- **Coaching Style**: Personalisierung (supportive/challenging/balanced)
+- **Smart Task Adjustment**: AI splittet schwierige Tasks automatisch
 
 ### Profil-System (NEU)
 - **Persönliche Daten**: Alter, Beruf, Bildung, Familienstand
@@ -115,7 +126,12 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 | `accept-plan` | POST | Plan akzeptieren, initiale Tasks erstellen |
 | `task-update` | POST | Task abhaken/löschen + XP vergeben |
 | `daily-review` | POST | Tagesreview |
-| `gamification-award` | POST | XP vergeben & Achievements prüfen (NEU) |
+| `gamification-award` | POST | XP vergeben & Achievements prüfen |
+| `habit-update` | POST | Habit CRUD + Complete/Uncomplete (NEU) |
+| `task-adjust-ai` | POST | AI-basiertes Task-Splitting (NEU) |
+| `streak-recovery` | POST | 3-Tage Streak Recovery Challenge (NEU) |
+| `weekly-reflection` | POST | Weekly Deep Review mit AI (NEU) |
+| `burnout-assessment` | POST | Burnout Detection + Recovery Mode (NEU) |
 
 #### Auth & Profil
 | Function | Methode | Beschreibung |
@@ -448,6 +464,11 @@ supabase functions deploy daily-checkin --no-verify-jwt
 supabase functions deploy daily-review --no-verify-jwt
 supabase functions deploy task-update --no-verify-jwt
 supabase functions deploy gamification-award --no-verify-jwt
+supabase functions deploy habit-update --no-verify-jwt
+supabase functions deploy task-adjust-ai --no-verify-jwt
+supabase functions deploy streak-recovery --no-verify-jwt
+supabase functions deploy weekly-reflection --no-verify-jwt
+supabase functions deploy burnout-assessment --no-verify-jwt
 supabase functions deploy auth-profile --no-verify-jwt
 supabase functions deploy auth-onboarding --no-verify-jwt
 ```

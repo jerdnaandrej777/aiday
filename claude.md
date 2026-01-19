@@ -37,9 +37,17 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Offline-Funktionalität**
 - **Disziplin-Motivations-Feature** (Zitate bei schlechter Stimmung)
 - **Einheitliches Sprechblasen-Design** (weiß, Pfeil links)
-- **Gamification-System** (XP, Level, Achievements) ← NEU
-- **Timezone-Support** für korrekte Datumsberechnung ← NEU
-- **Idempotency-Keys** verhindert doppelte Einträge ← NEU
+- **Gamification-System** (XP, Level, Achievements)
+- **Timezone-Support** für korrekte Datumsberechnung
+- **Idempotency-Keys** verhindert doppelte Einträge
+- **Habit Tracking System** mit Streak-Berechnung pro Habit ← NEU
+- **Pomodoro Timer** (25min Fokus + 5min Pause) ← NEU
+- **Task Priorität** (High/Medium/Low mit variablen XP) ← NEU
+- **Streak Recovery** (3-Tage Comeback-Challenge, max 1x/Monat) ← NEU
+- **Weekly Deep Review** mit AI-Analyse ← NEU
+- **Burnout Detection** mit automatischer Warnung ← NEU
+- **Notification Preferences** (Quiet Hours, Reminder-Zeit) ← NEU
+- **Coaching Style Personalisierung** (supportive/challenging/balanced) ← NEU
 
 ---
 
@@ -108,6 +116,13 @@ aiday/
 │   │   ├── task-update/          # POST - Task aktualisieren/löschen
 │   │   ├── goal-delete/          # POST - Ziel löschen (mit Bestätigung)
 │   │   │
+│   │   │── # === PHASE 4-7 FEATURES (NEU) ===
+│   │   ├── habit-update/         # POST - Habit CRUD + Complete/Uncomplete
+│   │   ├── task-adjust-ai/       # POST - AI-basiertes Task-Splitting
+│   │   ├── streak-recovery/      # POST - 3-Tage Streak Recovery Challenge
+│   │   ├── weekly-reflection/    # POST - Weekly Deep Review mit AI
+│   │   ├── burnout-assessment/   # POST - Burnout Detection + Recovery Mode
+│   │   │
 │   │   │── # === LEGACY ===
 │   │   ├── coach-plan/           # POST - AI Tagesplan (alt)
 │   │   ├── coach-checkin/        # POST - AI Check-in (alt)
@@ -115,7 +130,11 @@ aiday/
 │   │   └── reminders-dispatch/   # POST - Push versenden
 │   │
 │   └── migrations/
-│       └── 20240103000000_profile_personal.sql
+│       ├── 20240103000000_profile_personal.sql
+│       ├── 20260121000000_habit_tracking.sql      # NEU: Habits + Habit_Logs
+│       ├── 20260121000001_task_priority.sql       # NEU: Task Priorität
+│       ├── 20260121000002_streak_recovery.sql     # NEU: Streak Recovery
+│       └── 20260121000003_notification_preferences.sql  # NEU: Notifications
 │
 ├── db/                           # SQL Migrations
 │   ├── 001_init.sql              # Basis-Schema
@@ -174,6 +193,48 @@ aiday/
   - Beste Tageszeit (🌅 Morgens, ☀️ Mittags, 🌙 Abends)
   - Schritt-für-Schritt Anleitung (3-5 konkrete Schritte)
   - Erklärung warum die Aufgabe wichtig ist
+- [x] **Coaching Style Personalisierung** (NEU)
+  - Supportive: Einfühlsam, ermutigend
+  - Challenging: Direkt, fordernd
+  - Balanced: Ausgewogen
+- [x] **Smart Task Adjustment** - AI splittet schwierige Tasks (NEU)
+- [x] **Weekly Reflection AI** - Wochenanalyse mit Patterns (NEU)
+- [x] **Burnout Detection AI** - Recovery-Vorschläge (NEU)
+- [x] **Streak Recovery AI** - 3-Tage Comeback-Plan (NEU)
+
+### Phase 4-7 Features (NEU)
+- [x] **Habit Tracking System**
+  - Wiederkehrende Gewohnheiten (täglich, wochentags, 3x/Woche)
+  - Streak-Berechnung pro Habit (aktuell + bester)
+  - +5 XP pro Habit-Completion
+  - Grüne-Felder-Kalender UI
+- [x] **Pomodoro Timer**
+  - 25min Fokus + 5min Pause (konfigurierbar)
+  - Visual Countdown im Task-Detail
+  - Audio-Alert bei Fertig
+  - Pause/Resume Funktion
+- [x] **Task Priorität**
+  - 🔴 High (Must-Do) → +20 XP
+  - 🟡 Medium (Should-Do) → +10 XP
+  - 🟢 Low (Nice-to-Have) → +5 XP
+  - Sortierung nach Priorität
+- [x] **Streak Recovery Challenge**
+  - "Streak Rescue" bei verlorener Streak
+  - 3-Tage Recovery Challenge mit AI-Plan
+  - +200 Bonus XP bei erfolgreicher Rückkehr
+  - Max 1x pro Monat nutzbar
+- [x] **Weekly Deep Review**
+  - Reflexions-Fragen nach Weekly Report
+  - AI analysiert Patterns
+  - Vorschläge für nächste Woche
+- [x] **Burnout Detection**
+  - Automatische Warnung bei Completion Rate <30%
+  - Analyse von Mood + Energy Trends
+  - "Recovery Mode" aktivierbar (7 Tage, 50% weniger Tasks)
+- [x] **Notification Preferences**
+  - Check-in Reminder Zeit einstellen
+  - Quiet Hours (z.B. 22:00-07:00)
+  - Benachrichtigungs-Typen an/aus
 
 ### PWA-Features (NEU)
 - [x] **Installierbar auf Homescreen** (Android, iOS, Desktop)
@@ -183,7 +244,7 @@ aiday/
 - [x] **Automatische Update-Erkennung**
 - [x] **Offline-Banner bei Verbindungsverlust**
 
-### Frontend (app.html) - 11 Screens
+### Frontend (app.html) - 12+ Screens
 - [x] Dashboard (Hauptscreen nach Login)
 - [x] Check-in Screen
 - [x] **Review Screen (Aufgaben vom Vortag bewerten)**
@@ -269,6 +330,11 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 | `daily-review` | POST | Tagesreview mit AI-Feedback | GPT-4o-mini |
 | `task-update` | POST | Task abhaken/löschen + XP vergeben | - |
 | `gamification-award` | POST | XP vergeben & Achievements prüfen | - |
+| `habit-update` | POST | Habit CRUD + Complete/Uncomplete | - |
+| `task-adjust-ai` | POST | AI-basiertes Task-Splitting | GPT-4o-mini |
+| `streak-recovery` | POST | 3-Tage Streak Recovery Challenge | GPT-4o-mini |
+| `weekly-reflection` | POST | Weekly Deep Review mit AI-Analyse | GPT-4o-mini |
+| `burnout-assessment` | POST | Burnout Detection + Recovery Mode | GPT-4o-mini |
 | `coach-plan` | POST | AI-Tagesplan (LEGACY) | GPT-4o-mini |
 | `coach-checkin` | POST | AI-Coaching Feedback (LEGACY) | GPT-4o-mini |
 | `auth-profile` | GET/POST | Benutzerprofil | - |
@@ -289,9 +355,9 @@ supabase.from('user_profile')
 ## Datenbank-Schema
 
 ### Schemas
-- **core**: user_profile, day_entries, goals, action_steps, daily_checkins, daily_tasks, achievements, user_achievements
+- **core**: user_profile, day_entries, goals, action_steps, daily_checkins, daily_tasks, achievements, user_achievements, **habits**, **habit_logs**, **streak_recoveries**
 - **coach**: ai_suggestions
-- **notifications**: push_tokens
+- **notifications**: push_tokens, **notification_history**
 - **analytics**: month_rollup (Materialized View)
 - **audit**: event_log
 
@@ -365,8 +431,81 @@ core.daily_tasks
   - skipped BOOLEAN
   - skip_reason TEXT
   - ai_generated BOOLEAN
-  - estimated_minutes INTEGER DEFAULT 15  -- NEU: Geschätzte Dauer
+  - estimated_minutes INTEGER DEFAULT 15  -- Geschätzte Dauer
+  - priority TEXT DEFAULT 'medium'        -- NEU: 'high', 'medium', 'low'
+  - xp_reward INTEGER                     -- NEU: Variable XP basierend auf Priorität
   - created_at TIMESTAMPTZ
+```
+
+### Habit Tracking Tabellen (NEU - Phase 4)
+```sql
+-- Habits Definition
+core.habits
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - title TEXT NOT NULL
+  - description TEXT
+  - frequency TEXT DEFAULT 'daily'        -- 'daily', 'weekdays', '3x_week', 'weekly'
+  - target_days INTEGER[]                 -- z.B. {1,2,3,4,5} für Mo-Fr
+  - xp_reward INTEGER DEFAULT 5
+  - current_streak INTEGER DEFAULT 0
+  - best_streak INTEGER DEFAULT 0
+  - is_active BOOLEAN DEFAULT true
+  - created_at TIMESTAMPTZ
+
+-- Habit Completion Logs
+core.habit_logs
+  - id UUID PRIMARY KEY
+  - habit_id UUID (FK habits)
+  - user_id UUID (FK auth.users)
+  - date DATE NOT NULL
+  - completed BOOLEAN DEFAULT true
+  - created_at TIMESTAMPTZ
+  - UNIQUE(habit_id, date)
+```
+
+### Streak Recovery Tabelle (NEU - Phase 5)
+```sql
+core.streak_recoveries
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - recovery_date DATE NOT NULL
+  - previous_streak INTEGER NOT NULL      -- Streak vor dem Verlust
+  - recovered_streak INTEGER NOT NULL     -- Wiederhergestellte Streak (-1 Tag)
+  - challenge_start_date DATE
+  - challenge_end_date DATE
+  - challenge_days_completed INTEGER DEFAULT 0  -- 0-3
+  - recovery_challenge_completed BOOLEAN DEFAULT false
+  - bonus_xp_awarded INTEGER DEFAULT 0
+  - created_at TIMESTAMPTZ
+```
+
+### Notification History (NEU - Phase 7)
+```sql
+notifications.notification_history
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - notification_type TEXT NOT NULL       -- 'checkin_reminder', 'streak_warning', etc.
+  - title TEXT
+  - body TEXT
+  - sent_at TIMESTAMPTZ DEFAULT now()
+  - read_at TIMESTAMPTZ
+```
+
+### user_profile Erweiterungen (NEU)
+```sql
+-- Notification Preferences (JSONB)
+core.user_profile.notification_preferences DEFAULT '{
+  "push_enabled": true,
+  "checkin_reminder": true,
+  "checkin_reminder_time": "08:00",
+  "quiet_hours_enabled": false,
+  "quiet_hours_start": "22:00",
+  "quiet_hours_end": "07:00",
+  "streak_warning": true,
+  "weekly_report": true,
+  "recovery_mode_active": false
+}'
 ```
 
 ---

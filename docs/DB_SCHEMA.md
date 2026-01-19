@@ -7,9 +7,9 @@ Hinweis: Die vollständige Definition steht in `db/001_init.sql`, `db/002_auth.s
 ---
 
 ## Schemas
-- **core**: Benutzerprofile, Tageseinträge, Ziele, Tasks, Achievements, User-Achievements
+- **core**: Benutzerprofile, Tageseinträge, Ziele, Tasks, Achievements, User-Achievements, **Habits**, **Habit_Logs**, **Streak_Recoveries**
 - **coach**: AI-Vorschläge
-- **notifications**: Push-Tokens
+- **notifications**: Push-Tokens, **Notification_History**
 - **analytics**: Monatsstatistiken (Materialized View)
 - **audit**: Event-Log
 
@@ -293,6 +293,116 @@ CREATE TABLE core.user_achievements (
 );
 ```
 
+### core.habits (NEU - Phase 4)
+Wiederkehrende Gewohnheiten.
+
+```sql
+CREATE TABLE core.habits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  frequency TEXT NOT NULL DEFAULT 'daily',  -- 'daily', 'weekdays', '3x_week', 'weekly'
+  target_days INTEGER[] DEFAULT '{1,2,3,4,5,6,0}',  -- 0=So, 1=Mo, ..., 6=Sa
+  xp_reward INTEGER DEFAULT 5,
+  current_streak INTEGER DEFAULT 0,
+  best_streak INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### core.habit_logs (NEU - Phase 4)
+Completion-Log für Habits.
+
+```sql
+CREATE TABLE core.habit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  habit_id UUID NOT NULL REFERENCES core.habits(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  completed BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(habit_id, date)
+);
+```
+
+### core.streak_recoveries (NEU - Phase 5)
+Streak Recovery Challenges.
+
+```sql
+CREATE TABLE core.streak_recoveries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recovery_date DATE NOT NULL,
+  previous_streak INTEGER NOT NULL,
+  recovered_streak INTEGER NOT NULL,
+  challenge_start_date DATE,
+  challenge_end_date DATE,
+  challenge_days_completed INTEGER DEFAULT 0,
+  recovery_challenge_completed BOOLEAN DEFAULT false,
+  bonus_xp_awarded INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### notifications.notification_history (NEU - Phase 7)
+Versendete Benachrichtigungen.
+
+```sql
+CREATE TABLE notifications.notification_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  notification_type TEXT NOT NULL,  -- 'checkin_reminder', 'streak_warning', etc.
+  title TEXT,
+  body TEXT,
+  sent_at TIMESTAMPTZ DEFAULT now(),
+  read_at TIMESTAMPTZ
+);
+```
+
+### core.user_profile Erweiterungen (NEU - Phase 7)
+Notification Preferences als JSONB.
+
+```sql
+-- Neue Spalte
+ALTER TABLE core.user_profile
+ADD COLUMN IF NOT EXISTS notification_preferences JSONB DEFAULT '{
+  "push_enabled": true,
+  "checkin_reminder": true,
+  "checkin_reminder_time": "08:00",
+  "quiet_hours_enabled": false,
+  "quiet_hours_start": "22:00",
+  "quiet_hours_end": "07:00",
+  "streak_warning": true,
+  "weekly_report": true,
+  "recovery_mode_active": false,
+  "recovery_mode_start": null,
+  "recovery_mode_end": null,
+  "task_reduction_percent": null
+}'::jsonb;
+```
+
+### core.daily_tasks Erweiterungen (NEU - Phase 4)
+Task Priorität und variable XP.
+
+```sql
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS priority TEXT DEFAULT 'medium'
+  CHECK (priority IN ('high', 'medium', 'low'));
+
+ALTER TABLE core.daily_tasks
+ADD COLUMN IF NOT EXISTS xp_reward INTEGER;
+```
+
+**XP nach Priorität:**
+| Priorität | XP |
+|-----------|-----|
+| high | 20 |
+| medium | 10 |
+| low | 5 |
+
 ---
 
 ## Migrationen
@@ -308,9 +418,13 @@ CREATE TABLE core.user_achievements (
 | `supabase/migrations/20260118235600_migrate_plans_to_goals.sql` | **NEU:** Bestehende Pläne migrieren |
 | `supabase/migrations/20260119001000_fix_ai_suggestions_kind.sql` | **NEU:** CHECK Constraint erweitern |
 | `db/20260119_increase_goals_limit.sql` | Ziel-Limit von 10 auf 10.000 erhöht |
-| `db/20260119_fix_task_race_condition.sql` | **NEU:** Unique Constraint für Tasks (Race Condition Fix) |
-| `db/20260119_add_idempotency_key.sql` | **NEU:** Idempotency-Key Spalte für Goals |
-| `db/20260119_gamification.sql` | **NEU:** Gamification-Schema (XP, Level, Achievements) |
+| `db/20260119_fix_task_race_condition.sql` | Unique Constraint für Tasks (Race Condition Fix) |
+| `db/20260119_add_idempotency_key.sql` | Idempotency-Key Spalte für Goals |
+| `db/20260119_gamification.sql` | Gamification-Schema (XP, Level, Achievements) |
+| `supabase/migrations/20260121000000_habit_tracking.sql` | **NEU:** Habits + Habit_Logs Tabellen |
+| `supabase/migrations/20260121000001_task_priority.sql` | **NEU:** Task Priorität + XP Reward |
+| `supabase/migrations/20260121000002_streak_recovery.sql` | **NEU:** Streak Recovery Tabelle |
+| `supabase/migrations/20260121000003_notification_preferences.sql` | **NEU:** Notification Preferences + History |
 
 ### Bekannte Schema-Probleme & Fixes
 

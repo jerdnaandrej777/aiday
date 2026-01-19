@@ -18,7 +18,16 @@
 | `accept-plan` | POST | Plan akzeptieren, Tasks erstellen |
 | `task-update` | POST | Task abhaken/löschen + XP vergeben |
 | `daily-review` | POST | Tagesreview |
-| `gamification-award` | POST | XP vergeben & Achievements prüfen (NEU) |
+| `gamification-award` | POST | XP vergeben & Achievements prüfen |
+
+### Phase 4-7 Features (NEU)
+| Function | Methode | Beschreibung |
+|----------|---------|--------------|
+| `habit-update` | POST | Habit CRUD + Complete/Uncomplete |
+| `task-adjust-ai` | POST | AI-basiertes Task-Splitting |
+| `streak-recovery` | POST | 3-Tage Streak Recovery Challenge |
+| `weekly-reflection` | POST | Weekly Deep Review mit AI-Analyse |
+| `burnout-assessment` | POST | Burnout Detection + Recovery Mode |
 
 ### Auth & Profil
 | Function | Methode | Beschreibung |
@@ -270,6 +279,129 @@ X-Idempotency-Key: user123-1705600000000-abc123xyz
 
 // Verhindert doppelte Einträge bei Doppelklick
 // Bei Duplikat wird cached Response zurückgegeben
+```
+
+---
+
+## Phase 4-7 Endpoints (NEU)
+
+### habit-update
+Habit Management - CRUD und Completion.
+
+**POST** `/functions/v1/habit-update`
+
+```json
+// GET - Alle Habits
+{ "action": "get" }
+
+// CREATE
+{
+  "action": "create",
+  "title": "Meditation",
+  "frequency": "daily",      // 'daily', 'weekdays', '3x_week', 'weekly'
+  "xp_reward": 5
+}
+
+// COMPLETE
+{ "action": "complete", "habit_id": "uuid" }
+
+// Response
+{
+  "success": true,
+  "habit": { "current_streak": 5, "best_streak": 12 },
+  "gamification": { "xp_earned": 5, "total_xp": 1245 }
+}
+```
+
+### task-adjust-ai
+AI-basiertes Task-Splitting für schwierige Aufgaben.
+
+**POST** `/functions/v1/task-adjust-ai`
+
+```json
+// Request
+{
+  "task_id": "uuid",
+  "reason": "Zu wenig Zeit"
+}
+
+// Response
+{
+  "empathy_message": "Das verstehe ich!",
+  "new_tasks": [
+    { "task_text": "Kleinere Aufgabe 1", "estimated_minutes": 10 }
+  ]
+}
+```
+
+### streak-recovery
+3-Tage Comeback-Challenge nach verlorener Streak.
+
+**POST** `/functions/v1/streak-recovery`
+
+```json
+// CHECK
+{ "action": "check" }
+// → { "can_recover": true, "previous_streak": 14 }
+
+// START
+{ "action": "start" }
+// → AI-generierter 3-Tage Comeback-Plan
+
+// UPDATE_PROGRESS
+{ "action": "update_progress", "recovery_id": "uuid" }
+// → Bei Tag 3: +200 Bonus-XP, Streak wiederhergestellt
+```
+
+### weekly-reflection
+Weekly Deep Review mit AI-Analyse.
+
+**POST** `/functions/v1/weekly-reflection`
+
+```json
+// GET_DATA - Wochendaten
+{ "action": "get_data" }
+
+// SUBMIT_REFLECTION
+{
+  "action": "submit_reflection",
+  "what_went_well": "Sport hat geklappt",
+  "what_didnt_work": "Zu wenig Schlaf"
+}
+
+// Response
+{
+  "analysis": {
+    "positive_insights": ["..."],
+    "patterns_detected": ["..."],
+    "next_week_suggestions": [{ "suggestion": "...", "why": "..." }]
+  }
+}
+```
+
+### burnout-assessment
+Burnout Detection und Recovery Mode.
+
+**POST** `/functions/v1/burnout-assessment`
+
+```json
+// CHECK
+{ "action": "check" }
+
+// Response
+{
+  "burnout_score": 65,
+  "risk_level": "medium",
+  "indicators": ["Niedrige Completion Rate (28%)"],
+  "recommendations": { ... },
+  "is_in_recovery_mode": false
+}
+
+// ACTIVATE_RECOVERY (7 Tage, 50% weniger Tasks)
+{ "action": "activate_recovery" }
+
+// DEACTIVATE_RECOVERY
+{ "action": "deactivate_recovery" }
 ```
 
 ---

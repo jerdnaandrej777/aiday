@@ -31,9 +31,15 @@ supabase.schema('notifications').from('push_tokens')
 supabase.schema('analytics').from('month_rollup')
 supabase.schema('audit').from('event_log')
 
-// Gamification (NEU)
+// Gamification
 supabase.schema('core').from('achievements')
 supabase.schema('core').from('user_achievements')
+
+// Phase 4-7 Features (NEU)
+supabase.schema('core').from('habits')
+supabase.schema('core').from('habit_logs')
+supabase.schema('core').from('streak_recoveries')
+supabase.schema('notifications').from('notification_history')
 ```
 
 **Wichtig:** Ohne `.schema()` sucht Supabase im `public` Schema und findet die Tabellen nicht!
@@ -387,6 +393,236 @@ Pfad: `functions/v1/auth-delete-account`
 Pfad: `functions/v1/auth-export-data`
 - Methode: GET
 - GDPR-Datenexport
+
+---
+
+## Phase 4-7 Features (NEU)
+
+### habit-update
+Pfad: `functions/v1/habit-update`
+- Methode: POST
+- Auth: required
+- Vollständiges Habit CRUD + Complete/Uncomplete
+- Body:
+```json
+// GET - Alle Habits abrufen
+{ "action": "get" }
+
+// CREATE - Neues Habit erstellen
+{
+  "action": "create",
+  "title": "Meditation",
+  "description": "10 Minuten am Morgen",
+  "frequency": "daily",          // 'daily', 'weekdays', '3x_week', 'weekly'
+  "target_days": [1,2,3,4,5],    // Mo-Fr
+  "xp_reward": 5
+}
+
+// COMPLETE - Habit für heute abhaken
+{ "action": "complete", "habit_id": "uuid" }
+
+// UNCOMPLETE - Completion rückgängig machen
+{ "action": "uncomplete", "habit_id": "uuid" }
+
+// UPDATE - Habit bearbeiten
+{ "action": "update", "habit_id": "uuid", "title": "Neuer Titel" }
+
+// DELETE - Habit löschen
+{ "action": "delete", "habit_id": "uuid" }
+```
+- Response bei `action: "complete"`:
+```json
+{
+  "success": true,
+  "message": "Habit completed",
+  "habit": {
+    "id": "uuid",
+    "current_streak": 5,
+    "best_streak": 12
+  },
+  "gamification": {
+    "xp_earned": 5,
+    "total_xp": 1245,
+    "new_achievements": []
+  }
+}
+```
+
+### task-adjust-ai
+Pfad: `functions/v1/task-adjust-ai`
+- Methode: POST
+- Auth: required
+- AI splittet schwierige/zu lange Tasks in kleinere Teile
+- Body:
+```json
+{
+  "task_id": "uuid",
+  "reason": "Zu wenig Zeit heute"
+}
+```
+- Response:
+```json
+{
+  "success": true,
+  "empathy_message": "Das verstehe ich! Manchmal ist weniger mehr.",
+  "original_task": { "id": "uuid", "task_text": "..." },
+  "new_tasks": [
+    { "task_text": "Kleinere Aufgabe 1", "estimated_minutes": 10 },
+    { "task_text": "Kleinere Aufgabe 2", "estimated_minutes": 15 }
+  ],
+  "adjustment_type": "split"  // 'split', 'simplify', 'postpone'
+}
+```
+
+### streak-recovery
+Pfad: `functions/v1/streak-recovery`
+- Methode: POST
+- Auth: required
+- 3-Tage Comeback-Challenge nach verlorener Streak
+- Body:
+```json
+// CHECK - Prüfe ob Recovery verfügbar
+{ "action": "check" }
+
+// START - Recovery Challenge starten
+{ "action": "start" }
+
+// UPDATE_PROGRESS - Täglichen Fortschritt aktualisieren
+{ "action": "update_progress", "recovery_id": "uuid" }
+```
+- Response bei `action: "check"`:
+```json
+{
+  "can_recover": true,
+  "streak_lost": true,
+  "previous_streak": 14,
+  "best_streak": 21,
+  "last_active": "2026-01-17",
+  "recovery_available_in_days": 0,  // 0 = jetzt verfügbar
+  "active_recovery": null
+}
+```
+- Response bei `action: "start"`:
+```json
+{
+  "success": true,
+  "recovery": {
+    "id": "uuid",
+    "previous_streak": 14,
+    "recovered_streak": 13,
+    "challenge_end_date": "2026-01-22"
+  },
+  "comeback_plan": {
+    "motivation_message": "Du schaffst das!",
+    "comeback_plan": {
+      "day_1": { "intensity": 50, "focus": "Sanfter Start", "tasks": ["..."] },
+      "day_2": { "intensity": 75, "focus": "Aufbau", "tasks": ["..."] },
+      "day_3": { "intensity": 100, "focus": "Volle Kraft", "tasks": ["..."] }
+    },
+    "reward_promise": "+200 Bonus-XP bei erfolgreicher Recovery!"
+  }
+}
+```
+
+### weekly-reflection
+Pfad: `functions/v1/weekly-reflection`
+- Methode: POST
+- Auth: required
+- Weekly Deep Review mit AI-Analyse
+- Body:
+```json
+// GET_DATA - Wochendaten für Review holen
+{ "action": "get_data" }
+
+// SUBMIT_REFLECTION - Reflexion einreichen
+{
+  "action": "submit_reflection",
+  "what_went_well": "Sport hat gut geklappt",
+  "what_didnt_work": "Zu wenig Schlaf",
+  "mood_notes": "Insgesamt positiv"
+}
+
+// GET_ANALYSIS - Letzte Analyse abrufen
+{ "action": "get_analysis" }
+```
+- Response bei `action: "submit_reflection"`:
+```json
+{
+  "success": true,
+  "analysis": {
+    "positive_insights": ["Sport-Routine hat sich gefestigt"],
+    "challenges_analysis": ["Schlafmangel korreliert mit niedriger Energie"],
+    "patterns_detected": ["Produktivität sinkt nach 21:00"],
+    "next_week_suggestions": [
+      { "suggestion": "Schlafenszeit auf 22:30 setzen", "why": "Mehr Energie am Morgen" }
+    ],
+    "motivation_message": "Du bist auf dem richtigen Weg!",
+    "focus_area": "Schlafqualität"
+  },
+  "stats": {
+    "total_tasks": 21,
+    "completed_tasks": 16,
+    "completion_rate": 76
+  }
+}
+```
+
+### burnout-assessment
+Pfad: `functions/v1/burnout-assessment`
+- Methode: POST
+- Auth: required
+- Burnout Detection und Recovery Mode
+- Body:
+```json
+// CHECK - Burnout-Indikatoren prüfen
+{ "action": "check" }
+
+// ACTIVATE_RECOVERY - Recovery Mode aktivieren (7 Tage)
+{ "action": "activate_recovery" }
+
+// DEACTIVATE_RECOVERY - Recovery Mode deaktivieren
+{ "action": "deactivate_recovery" }
+```
+- Response bei `action: "check"`:
+```json
+{
+  "burnout_score": 65,           // 0-100
+  "risk_level": "medium",        // 'low', 'medium', 'high'
+  "indicators": [
+    "Niedrige Completion Rate (28%)",
+    "3 Tage schlechte Stimmung in Folge"
+  ],
+  "stats": {
+    "completion_rate": 28,
+    "avg_mood": 2.1,
+    "avg_energy": 1.8,
+    "bad_mood_streak": 3,
+    "days_analyzed": 7
+  },
+  "warning": "Es sieht aus, als hättest du gerade viel um die Ohren.",
+  "recommendations": {
+    "warning_message": "...",
+    "recommendations": [
+      { "type": "reduce", "suggestion": "Reduziere auf 2 Tasks/Tag", "why": "..." },
+      { "type": "selfcare", "suggestion": "30min Spaziergang täglich", "why": "..." }
+    ],
+    "recovery_mode_suggestion": {
+      "duration_days": 7,
+      "task_reduction_percent": 50,
+      "daily_selfcare_reminder": "..."
+    }
+  },
+  "is_in_recovery_mode": false
+}
+```
+
+**Burnout-Thresholds:**
+| Indikator | Schwelle | Score-Beitrag |
+|-----------|----------|---------------|
+| Completion Rate | < 30% | +30 |
+| Bad Mood Streak | >= 3 Tage | +35 |
+| Avg Energy | < 2 | +25 |
+| Avg Mood | < 2.5 | +10 |
 
 ---
 
