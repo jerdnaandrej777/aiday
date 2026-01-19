@@ -4062,6 +4062,145 @@
       color: white;
     }
 
+    .habit-info-icon {
+      font-size: 18px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+
+    .habit-item:hover .habit-info-icon {
+      opacity: 1;
+    }
+
+    .habit-icon,
+    .habit-info {
+      cursor: pointer;
+    }
+
+    /* Habit Detail Modal */
+    .habit-detail-modal {
+      max-width: 420px;
+    }
+
+    .habit-detail-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .habit-detail-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .habit-detail-description {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .habit-detail-stats {
+      display: flex;
+      justify-content: space-around;
+      background: var(--bg-input);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .habit-stat-mini {
+      text-align: center;
+    }
+
+    .habit-stat-mini-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .habit-stat-mini-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .habit-detail-benefits {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .habit-benefits-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .habit-benefits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .habit-benefits-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--text);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .habit-benefits-list li:last-child {
+      border-bottom: none;
+    }
+
+    .habit-benefits-list li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .habit-detail-frequency {
+      text-align: center;
+      padding: 12px;
+      background: var(--bg-input);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
     .habit-calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -5007,11 +5146,10 @@
         <div id="habitCalendar" class="habit-calendar"></div>
       </div>
 
-      <!-- All Habits List -->
-      <div class="card">
-        <h2 class="card-title">Alle Habits</h2>
-        <div id="allHabitsList" class="habits-list"></div>
-      </div>
+      <!-- All Habits Button -->
+      <button class="btn btn-secondary" onclick="showAllHabitsModal()" style="width: 100%; margin-bottom: 16px;">
+        📋 Alle Habits verwalten
+      </button>
 
       <button class="footer-back-btn" onclick="showScreen('dashboardScreen', 'back')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5064,6 +5202,64 @@
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="closeAddHabitModal()">Abbrechen</button>
           <button class="btn btn-primary" onclick="createHabit()">Erstellen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Habit Detail Modal -->
+    <div class="modal-overlay" id="habitDetailModal" style="display: none;">
+      <div class="modal habit-detail-modal">
+        <button class="modal-close-btn" onclick="closeHabitDetailModal()">×</button>
+
+        <div class="habit-detail-header">
+          <div class="habit-detail-icon" id="habitDetailIcon">✨</div>
+          <h2 class="modal-title" id="habitDetailTitle">Habit Name</h2>
+          <p class="habit-detail-description" id="habitDetailDescription"></p>
+        </div>
+
+        <div class="habit-detail-stats">
+          <div class="habit-stat-mini">
+            <span class="habit-stat-mini-value" id="habitDetailStreak">0</span>
+            <span class="habit-stat-mini-label">🔥 Aktuelle Streak</span>
+          </div>
+          <div class="habit-stat-mini">
+            <span class="habit-stat-mini-value" id="habitDetailBestStreak">0</span>
+            <span class="habit-stat-mini-label">🏆 Beste Streak</span>
+          </div>
+          <div class="habit-stat-mini">
+            <span class="habit-stat-mini-value" id="habitDetailTotal">0</span>
+            <span class="habit-stat-mini-label">✅ Gesamt</span>
+          </div>
+        </div>
+
+        <div class="habit-detail-benefits">
+          <h3 class="habit-benefits-title">💡 Warum diese Gewohnheit gut für dich ist</h3>
+          <ul class="habit-benefits-list" id="habitDetailBenefits">
+            <!-- Wird dynamisch gefüllt -->
+          </ul>
+        </div>
+
+        <div class="habit-detail-frequency" id="habitDetailFrequency">
+          <!-- Frequenz-Anzeige -->
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeHabitDetailModal()">Schließen</button>
+          <button class="btn btn-danger" onclick="deleteHabit()" id="deleteHabitBtn">Löschen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Habits Modal -->
+    <div class="modal-overlay" id="allHabitsModal" style="display: none;">
+      <div class="modal" style="max-width: 450px;">
+        <button class="modal-close-btn" onclick="closeAllHabitsModal()">×</button>
+        <h2 class="modal-title">📋 Alle Habits</h2>
+        <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 14px;">Klicke auf einen Habit für Details</p>
+        <div id="allHabitsList" class="habits-list" style="max-height: 400px; overflow-y: auto;"></div>
+        <div class="modal-actions" style="margin-top: 16px;">
+          <button class="btn btn-secondary" onclick="closeAllHabitsModal()">Schließen</button>
+          <button class="btn btn-primary" onclick="closeAllHabitsModal(); showAddHabitModal();">+ Neuer Habit</button>
         </div>
       </div>
     </div>
@@ -9743,11 +9939,9 @@
     function renderHabits() {
       console.log('renderHabits called, habitsData:', habitsData);
       const todayList = document.getElementById('todayHabitsList');
-      const allList = document.getElementById('allHabitsList');
       const today = habitsData.today || new Date().toISOString().split('T')[0];
 
       console.log('todayList element:', todayList);
-      console.log('allList element:', allList);
 
       // Finde Logs für heute
       const todayLogs = new Map();
@@ -9780,8 +9974,8 @@
       if (todayDoneEl) todayDoneEl.textContent = `${todayDone}/${activeHabits.length}`;
 
       // Heute-Liste rendern
-      if (!todayList || !allList) {
-        console.log('Lists not found, skipping render');
+      if (!todayList) {
+        console.log('todayList not found, skipping render');
         return;
       }
 
@@ -9794,7 +9988,6 @@
             <button class="empty-state-btn" onclick="showAddHabitModal()">+ Habit erstellen</button>
           </div>
         `;
-        allList.innerHTML = '';
         return;
       }
 
@@ -9803,16 +9996,16 @@
         const isCompleted = log?.completed || false;
 
         return `
-          <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
-            <div class="habit-icon">${habit.icon || '✨'}</div>
-            <div class="habit-info">
+          <div class="habit-item ${isCompleted ? 'completed' : ''}">
+            <div class="habit-icon" onclick="showHabitDetail('${habit.id}')">${habit.icon || '✨'}</div>
+            <div class="habit-info" onclick="showHabitDetail('${habit.id}')">
               <div class="habit-title">${escapeHtml(habit.title)}</div>
               <div class="habit-streak">
                 <span class="habit-streak-fire">🔥</span>
                 ${habit.current_streak || 0} Tage
               </div>
             </div>
-            <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+            <div class="habit-checkbox ${isCompleted ? 'checked' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
               ${isCompleted ? '✓' : ''}
             </div>
           </div>
@@ -9821,22 +10014,6 @@
 
       console.log('todayHtml:', todayHtml);
       todayList.innerHTML = todayHtml;
-
-      // Alle Habits Liste
-      const allHtml = activeHabits.map(habit => `
-        <div class="habit-item" onclick="toggleHabit('${habit.id}', true)">
-          <div class="habit-icon">${habit.icon || '✨'}</div>
-          <div class="habit-info">
-            <div class="habit-title">${escapeHtml(habit.title)}</div>
-            <div class="habit-streak">
-              Beste: ${habit.best_streak || 0} Tage | Total: ${habit.total_completions || 0}
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      console.log('allHtml:', allHtml);
-      allList.innerHTML = allHtml;
 
       // Kalender rendern
       renderHabitCalendar();
@@ -9912,12 +10089,12 @@
             const isCompleted = log?.completed || false;
 
             return `
-              <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
-                <div class="habit-icon">${habit.icon || '✨'}</div>
-                <div class="habit-info">
+              <div class="habit-item ${isCompleted ? 'completed' : ''}">
+                <div class="habit-icon" onclick="showHabitDetail('${habit.id}')">${habit.icon || '✨'}</div>
+                <div class="habit-info" onclick="showHabitDetail('${habit.id}')">
                   <div class="habit-title">${escapeHtml(habit.title)}</div>
                 </div>
-                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
                   ${isCompleted ? '✓' : ''}
                 </div>
               </div>
@@ -9945,13 +10122,13 @@
             const isCompleted = log?.completed || false;
 
             return `
-              <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
-                <div class="habit-icon">${habit.icon || '✨'}</div>
-                <div class="habit-info">
+              <div class="habit-item ${isCompleted ? 'completed' : ''}">
+                <div class="habit-icon" onclick="showHabitDetail('${habit.id}')">${habit.icon || '✨'}</div>
+                <div class="habit-info" onclick="showHabitDetail('${habit.id}')">
                   <div class="habit-title">${escapeHtml(habit.title)}</div>
                   <div class="habit-streak">🔥 ${habit.current_streak || 0} Tage</div>
                 </div>
-                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
                   ${isCompleted ? '✓' : ''}
                 </div>
               </div>
@@ -10058,9 +10235,124 @@
       }
     }
 
+    let currentHabitDetail = null;
+
     function showHabitDetail(habitId) {
-      // TODO: Implement habit detail view
-      showToast('Habit-Details kommen bald!', 'info');
+      const habit = habitsData.habits?.find(h => h.id === habitId);
+      if (!habit) {
+        showToast('Habit nicht gefunden', 'error');
+        return;
+      }
+
+      currentHabitDetail = habit;
+
+      // Modal-Daten füllen
+      document.getElementById('habitDetailIcon').textContent = habit.icon || '✨';
+      document.getElementById('habitDetailTitle').textContent = habit.title;
+      document.getElementById('habitDetailDescription').textContent = habit.description || '';
+      document.getElementById('habitDetailStreak').textContent = habit.current_streak || 0;
+      document.getElementById('habitDetailBestStreak').textContent = habit.best_streak || 0;
+      document.getElementById('habitDetailTotal').textContent = habit.total_completions || 0;
+
+      // Vorteile anzeigen
+      const benefitsList = document.getElementById('habitDetailBenefits');
+      const benefits = habit.benefits || [];
+
+      if (benefits.length > 0) {
+        benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+        benefitsList.parentElement.style.display = 'block';
+      } else {
+        // Falls keine Vorteile vorhanden, zeige generische
+        benefitsList.innerHTML = `
+          <li>Regelmäßige Gewohnheiten verbessern deine Disziplin</li>
+          <li>Kleine tägliche Schritte führen zu großen Veränderungen</li>
+          <li>Tracking hilft dir, motiviert zu bleiben</li>
+        `;
+      }
+
+      // Frequenz anzeigen
+      const frequencyMap = {
+        'daily': '📅 Täglich',
+        'weekdays': '💼 Wochentags (Mo-Fr)',
+        '3x_week': '🎯 3x pro Woche',
+        'weekly': '📆 Wöchentlich'
+      };
+      document.getElementById('habitDetailFrequency').textContent =
+        frequencyMap[habit.frequency] || '📅 Täglich';
+
+      // Modal öffnen
+      document.getElementById('habitDetailModal').style.display = 'flex';
+    }
+
+    function closeHabitDetailModal() {
+      document.getElementById('habitDetailModal').style.display = 'none';
+      currentHabitDetail = null;
+    }
+
+    function showAllHabitsModal() {
+      renderAllHabitsList();
+      document.getElementById('allHabitsModal').style.display = 'flex';
+    }
+
+    function closeAllHabitsModal() {
+      document.getElementById('allHabitsModal').style.display = 'none';
+    }
+
+    function renderAllHabitsList() {
+      const allList = document.getElementById('allHabitsList');
+      const activeHabits = habitsData.habits || [];
+
+      if (activeHabits.length === 0) {
+        allList.innerHTML = `
+          <div class="empty-state" style="padding: 20px;">
+            <p style="color: var(--text-muted);">Noch keine Habits erstellt</p>
+          </div>
+        `;
+        return;
+      }
+
+      allList.innerHTML = activeHabits.map(habit => `
+        <div class="habit-item" onclick="closeAllHabitsModal(); showHabitDetail('${habit.id}');">
+          <div class="habit-icon">${habit.icon || '✨'}</div>
+          <div class="habit-info">
+            <div class="habit-title">${escapeHtml(habit.title)}</div>
+            <div class="habit-streak">
+              Beste: ${habit.best_streak || 0} Tage | Total: ${habit.total_completions || 0}
+            </div>
+          </div>
+          <div class="habit-info-icon">→</div>
+        </div>
+      `).join('');
+    }
+
+    async function deleteHabit() {
+      if (!currentHabitDetail) return;
+
+      if (!confirm(`Möchtest du "${currentHabitDetail.title}" wirklich löschen?`)) {
+        return;
+      }
+
+      try {
+        const result = await apiCall('/functions/v1/habit-update', {
+          method: 'POST',
+          body: {
+            action: 'delete',
+            habit_id: currentHabitDetail.id
+          }
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          return;
+        }
+
+        closeHabitDetailModal();
+        showToast('Habit gelöscht', 'success');
+        await loadHabits();
+      } catch (e) {
+        console.error('Failed to delete habit:', e);
+        showToast('Fehler beim Löschen', 'error');
+      }
     }
 
     // ============================================

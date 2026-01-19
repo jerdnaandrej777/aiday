@@ -6,6 +6,50 @@ import { errorResponse, successResponse } from '../_shared/response.ts'
 import { createSupabaseClient, getAuthUser, extractToken } from '../_shared/supabase.ts'
 import { getUserToday, extractTimezoneOffset } from '../_shared/utils.ts'
 import { z } from 'https://esm.sh/zod@3'
+import OpenAI from 'https://esm.sh/openai@4'
+
+// OpenAI Client
+const openai = new OpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+})
+
+// AI: Generiere Vorteile für einen Habit
+async function generateHabitBenefits(title: string, description?: string): Promise<string[]> {
+  try {
+    const prompt = `Du bist ein Gesundheits- und Wellness-Coach. Generiere 4-5 konkrete Vorteile für folgende Gewohnheit:
+
+Gewohnheit: ${title}
+${description ? `Beschreibung: ${description}` : ''}
+
+Antworte NUR mit einem JSON-Array von Strings (auf Deutsch), z.B.:
+["Vorteil 1", "Vorteil 2", "Vorteil 3", "Vorteil 4"]
+
+Die Vorteile sollten:
+- Konkret und motivierend sein
+- Wissenschaftlich fundiert klingen
+- Kurz sein (max 15 Wörter pro Vorteil)
+- Positive Auswirkungen auf Gesundheit, Produktivität oder Wohlbefinden beschreiben`
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 300,
+    })
+
+    const content = response.choices[0]?.message?.content || '[]'
+
+    // Parse JSON Array
+    const benefits = JSON.parse(content)
+    if (Array.isArray(benefits)) {
+      return benefits.slice(0, 5) // Max 5 Vorteile
+    }
+    return []
+  } catch (e) {
+    console.error('Failed to generate habit benefits:', e)
+    return []
+  }
+}
 
 // Schemas für verschiedene Actions
 const CreateHabitSchema = z.object({
@@ -289,6 +333,14 @@ Deno.serve(async (req) => {
         }
       }
 
+      // AI: Generiere Vorteile für diesen Habit
+      let benefits: string[] = []
+      try {
+        benefits = await generateHabitBenefits(title, description)
+      } catch (e) {
+        console.error('Failed to generate benefits (non-critical):', e)
+      }
+
       const { data: newHabit, error: createError } = await supabase
         .schema('core')
         .from('habits')
@@ -301,6 +353,7 @@ Deno.serve(async (req) => {
           frequency,
           target_days: finalTargetDays,
           reminder_time,
+          benefits,
         })
         .select()
         .single()
