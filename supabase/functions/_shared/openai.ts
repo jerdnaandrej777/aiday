@@ -131,3 +131,108 @@ VERBOTEN - Diese Phrasen NIE verwenden:
 
 Sprich den Nutzer mit "du" an. Sei direkt, motivierend und realistisch.
 Antworte IMMER im JSON-Format.`
+
+// ============================================
+// Coaching Style Personalisierung
+// ============================================
+
+export type CoachingStyle = 'supportive' | 'challenging' | 'balanced'
+
+// Coaching Style Modifikatoren für System Prompts
+export const COACHING_STYLE_MODIFIERS: Record<CoachingStyle, string> = {
+  supportive: `
+COACHING-STIL: UNTERSTÜTZEND & EINFÜHLSAM
+- Sei besonders verständnisvoll und ermutigend
+- Betone Fortschritte, auch kleine
+- Verwende warme, einladende Sprache
+- Gib sanftes Feedback bei Rückschlägen
+- Feiere jeden Erfolg
+- Formulierungen wie: "Das ist toll!", "Du machst das großartig!", "Jeder Schritt zählt"`,
+
+  challenging: `
+COACHING-STIL: FORDERND & DIREKT
+- Sei direkt und auf den Punkt
+- Fordere den Nutzer heraus, mehr zu leisten
+- Keine Ausreden akzeptieren
+- Hohe Erwartungen setzen
+- Klare Deadlines und Accountability
+- Formulierungen wie: "Keine Ausreden!", "Du kannst mehr!", "Jetzt ist die Zeit zu handeln"`,
+
+  balanced: `
+COACHING-STIL: AUSGEWOGEN
+- Balance zwischen Ermutigung und Herausforderung
+- Realistisch aber optimistisch
+- Konstruktives Feedback
+- Anerkennung von Erfolgen mit Blick auf Verbesserungspotenzial
+- Pragmatische Vorschläge`,
+}
+
+/**
+ * Erweitert einen System Prompt mit dem Coaching Style des Users
+ * @param basePrompt Der ursprüngliche System Prompt
+ * @param coachingStyle Der Coaching Style aus dem User-Profil
+ * @returns Erweiterter System Prompt
+ */
+export function applyCoachingStyle(basePrompt: string, coachingStyle?: string): string {
+  const style = (coachingStyle as CoachingStyle) || 'balanced'
+  const modifier = COACHING_STYLE_MODIFIERS[style] || COACHING_STYLE_MODIFIERS.balanced
+
+  return `${basePrompt}
+
+${modifier}`
+}
+
+/**
+ * Erstellt einen personalisierten Prompt basierend auf User-Profil
+ * @param basePrompt Der ursprüngliche System Prompt
+ * @param profile User-Profil mit persönlichen Daten
+ * @returns Personalisierter System Prompt
+ */
+export function createPersonalizedPrompt(
+  basePrompt: string,
+  profile?: {
+    coaching_style?: string
+    age?: number
+    job?: string
+    hobbies?: string
+    strengths?: string
+    challenges?: string
+  }
+): string {
+  let prompt = basePrompt
+
+  // Coaching Style anwenden
+  prompt = applyCoachingStyle(prompt, profile?.coaching_style)
+
+  // Persönliche Kontext-Informationen hinzufügen (wenn verfügbar)
+  if (profile) {
+    const contextParts: string[] = []
+
+    if (profile.age) {
+      contextParts.push(`Alter: ${profile.age} Jahre`)
+    }
+    if (profile.job) {
+      contextParts.push(`Beruf: ${profile.job}`)
+    }
+    if (profile.hobbies) {
+      contextParts.push(`Hobbys: ${profile.hobbies}`)
+    }
+    if (profile.strengths) {
+      contextParts.push(`Stärken: ${profile.strengths}`)
+    }
+    if (profile.challenges) {
+      contextParts.push(`Herausforderungen: ${profile.challenges}`)
+    }
+
+    if (contextParts.length > 0) {
+      prompt += `
+
+NUTZER-KONTEXT:
+${contextParts.join('\n')}
+
+Berücksichtige diese Informationen bei deinen Antworten und Vorschlägen.`
+    }
+  }
+
+  return prompt
+}

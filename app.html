@@ -3950,6 +3950,664 @@
       pointer-events: none;
       z-index: 9999;
     }
+
+    /* ============================================
+       HABITS SCREEN STYLES
+       ============================================ */
+
+    .habit-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .habit-stat-card {
+      flex: 1;
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .habit-stat-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .habit-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .habits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .habit-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--bg-input);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .habit-item:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .habit-item.completed {
+      opacity: 0.7;
+    }
+
+    .habit-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border-radius: 12px;
+    }
+
+    .habit-info {
+      flex: 1;
+    }
+
+    .habit-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .habit-streak {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .habit-streak-fire {
+      color: #f59e0b;
+    }
+
+    .habit-checkbox {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .habit-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .habit-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .habit-calendar-header {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 4px;
+    }
+
+    .habit-calendar-day {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background: var(--bg-input);
+      color: var(--text-muted);
+    }
+
+    .habit-calendar-day.completed {
+      background: var(--success);
+      color: white;
+    }
+
+    .habit-calendar-day.today {
+      border: 2px solid var(--accent);
+    }
+
+    .habit-icon-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .habit-icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 2px solid var(--bg-input);
+      background: var(--bg-card);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .habit-icon-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .habit-icon-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    /* ============================================
+       POMODORO TIMER STYLES
+       ============================================ */
+
+    .pomodoro-timer {
+      display: flex;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    .pomodoro-circle {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+
+    .pomodoro-ring {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .pomodoro-ring-bg {
+      fill: none;
+      stroke: var(--bg-input);
+      stroke-width: 8;
+    }
+
+    .pomodoro-ring-fill {
+      fill: none;
+      stroke: url(#pomodoroGradient);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .pomodoro-time {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pomodoro-phase {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .pomodoro-phase.break {
+      color: var(--success);
+    }
+
+    .pomodoro-settings {
+      margin-top: 16px;
+    }
+
+    .pomodoro-duration-btns {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .pomodoro-duration-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--bg-input);
+      border-radius: 12px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pomodoro-duration-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .pomodoro-duration-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    /* ============================================
+       TASK PRIORITY STYLES
+       ============================================ */
+
+    .task-priority {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .task-priority.high {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+
+    .task-priority.medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+
+    .task-priority.low {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    .priority-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .priority-dot.high { background: #ef4444; }
+    .priority-dot.medium { background: #f59e0b; }
+    .priority-dot.low { background: #10b981; }
+
+    .priority-selector {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .priority-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--bg-input);
+      border-radius: 12px;
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .priority-btn:hover {
+      border-color: var(--glass-border);
+    }
+
+    .priority-btn.selected.high {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .priority-btn.selected.medium {
+      border-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .priority-btn.selected.low {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* ============================================
+       STREAK RECOVERY STYLES
+       ============================================ */
+
+    .streak-recovery-icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .streak-recovery-challenge {
+      background: var(--bg-input);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .streak-recovery-challenge h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .streak-recovery-challenge p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .recovery-progress {
+      display: flex;
+      gap: 8px;
+    }
+
+    .recovery-day {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: var(--bg-card);
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 2px solid var(--bg-input);
+    }
+
+    .recovery-day.completed {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .recovery-day.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ============================================
+       BURNOUT WARNING STYLES
+       ============================================ */
+
+    .burnout-icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .burnout-stats {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .burnout-stat {
+      flex: 1;
+      background: var(--bg-input);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .burnout-stat-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .burnout-stat-value {
+      display: block;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--warning);
+      margin-top: 4px;
+    }
+
+    /* ============================================
+       WEEKLY REVIEW STYLES
+       ============================================ */
+
+    .modal-large {
+      max-width: 500px;
+    }
+
+    .weekly-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .weekly-stat {
+      flex: 1;
+      background: var(--bg-input);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .weekly-stat-value {
+      display: block;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .weekly-stat-label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .weekly-analysis-item {
+      background: var(--bg-input);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .weekly-analysis-item h4 {
+      font-size: 13px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .weekly-analysis-item ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .weekly-suggestion {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-input);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .weekly-suggestion-icon {
+      font-size: 20px;
+    }
+
+    .weekly-suggestion-text {
+      flex: 1;
+    }
+
+    .weekly-suggestion-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .weekly-suggestion-why {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ============================================
+       NOTIFICATION SETTINGS STYLES
+       ============================================ */
+
+    .notification-setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .notification-setting:last-child {
+      border-bottom: none;
+    }
+
+    .notification-setting-label {
+      flex: 1;
+    }
+
+    .notification-setting-title {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .notification-setting-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .notification-toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      background: var(--bg-input);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .notification-toggle.active {
+      background: var(--success);
+    }
+
+    .notification-toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .notification-toggle.active .notification-toggle-slider {
+      transform: translateX(22px);
+    }
+
+    .time-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-input {
+      width: 80px;
+      padding: 8px 12px;
+      border: 2px solid var(--bg-input);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .time-input:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    /* Task Timer Badge (In Progress) */
+    .task-timer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--accent);
+      color: white;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      animation: timerPulse 2s infinite;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Goal Progress Visualization */
+    .goal-progress-visual {
+      margin: 16px 0;
+    }
+
+    .goal-progress-prediction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-input);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .goal-progress-prediction-icon {
+      font-size: 20px;
+    }
+
+    .goal-progress-prediction-text {
+      flex: 1;
+      font-size: 13px;
+    }
+
+    .goal-progress-prediction-text strong {
+      color: var(--accent);
+    }
+
+    .goal-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .goal-trend.up { color: var(--success); }
+    .goal-trend.down { color: var(--danger); }
+    .goal-trend.stable { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -3963,6 +4621,10 @@
       <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" style="stop-color:#10b981"/>
         <stop offset="100%" style="stop-color:#06b6d4"/>
+      </linearGradient>
+      <linearGradient id="pomodoroGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#ef4444"/>
+        <stop offset="100%" style="stop-color:#f59e0b"/>
       </linearGradient>
     </defs>
   </svg>
@@ -4242,6 +4904,239 @@
           </svg>
           Zurück
         </button>
+      </div>
+    </div>
+
+    <!-- Habits Screen -->
+    <div class="screen" id="habitsScreen">
+      <div class="card">
+        <div class="card-title">Meine Gewohnheiten</div>
+        <div class="card-subtitle">Baue positive Routinen auf</div>
+      </div>
+
+      <!-- Habit Stats -->
+      <div class="habit-stats">
+        <div class="habit-stat-card">
+          <span class="habit-stat-value" id="habitsActiveCount">0</span>
+          <span class="habit-stat-label">Aktive Habits</span>
+        </div>
+        <div class="habit-stat-card">
+          <span class="habit-stat-value" id="habitsBestStreak">0</span>
+          <span class="habit-stat-label">Beste Streak</span>
+        </div>
+        <div class="habit-stat-card">
+          <span class="habit-stat-value" id="habitsTodayDone">0/0</span>
+          <span class="habit-stat-label">Heute</span>
+        </div>
+      </div>
+
+      <!-- Today's Habits -->
+      <div class="card">
+        <div class="card-title">Heute zu erledigen</div>
+        <div id="todayHabitsList" class="habits-list"></div>
+      </div>
+
+      <!-- Habit Calendar -->
+      <div class="card">
+        <div class="card-title">Letzte 7 Tage</div>
+        <div id="habitCalendar" class="habit-calendar"></div>
+      </div>
+
+      <!-- All Habits List -->
+      <div class="card">
+        <div class="dashboard-card-header">
+          <h2 class="card-title">Alle Habits</h2>
+          <button class="see-all-btn" onclick="showAddHabitModal()">+ Neu</button>
+        </div>
+        <div id="allHabitsList" class="habits-list"></div>
+      </div>
+
+      <button class="footer-back-btn" onclick="showScreen('dashboardScreen', 'back')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Zurück zum Dashboard
+      </button>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div class="modal-overlay" id="addHabitModal" style="display: none;">
+      <div class="modal">
+        <h2 class="modal-title">Neue Gewohnheit</h2>
+
+        <div class="form-group">
+          <label class="form-label">Name *</label>
+          <input type="text" class="form-input" id="newHabitTitle" placeholder="z.B. 10 Min Meditation" maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Beschreibung (optional)</label>
+          <textarea class="form-textarea" id="newHabitDescription" placeholder="Warum ist diese Gewohnheit wichtig?" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Icon</label>
+          <div class="habit-icon-selector" id="habitIconSelector">
+            <button class="habit-icon-btn selected" data-icon="✨">✨</button>
+            <button class="habit-icon-btn" data-icon="🏃">🏃</button>
+            <button class="habit-icon-btn" data-icon="📚">📚</button>
+            <button class="habit-icon-btn" data-icon="💧">💧</button>
+            <button class="habit-icon-btn" data-icon="🧘">🧘</button>
+            <button class="habit-icon-btn" data-icon="💪">💪</button>
+            <button class="habit-icon-btn" data-icon="🥗">🥗</button>
+            <button class="habit-icon-btn" data-icon="😴">😴</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Häufigkeit</label>
+          <select class="form-input" id="newHabitFrequency">
+            <option value="daily">Täglich</option>
+            <option value="weekdays">Wochentags (Mo-Fr)</option>
+            <option value="3x_week">3x pro Woche</option>
+            <option value="weekly">Wöchentlich</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeAddHabitModal()">Abbrechen</button>
+          <button class="btn btn-primary" onclick="createHabit()">Erstellen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak Recovery Modal -->
+    <div class="modal-overlay" id="streakRecoveryModal" style="display: none;">
+      <div class="modal">
+        <div class="streak-recovery-icon">🔄</div>
+        <h2 class="modal-title">Streak Rescue</h2>
+        <p class="modal-text" id="streakRecoveryText">
+          Deine Streak von <strong id="lostStreakCount">0</strong> Tagen ist verloren gegangen.
+          Du kannst sie einmal im Monat wiederherstellen!
+        </p>
+
+        <div class="streak-recovery-challenge">
+          <h3>3-Tage Recovery Challenge</h3>
+          <p>Schließe 3 Tage in Folge ab und deine Streak wird wiederhergestellt (minus 1 Tag).</p>
+          <div class="recovery-progress" id="recoveryProgress">
+            <div class="recovery-day" data-day="1">Tag 1</div>
+            <div class="recovery-day" data-day="2">Tag 2</div>
+            <div class="recovery-day" data-day="3">Tag 3</div>
+          </div>
+        </div>
+
+        <div id="streakRecoveryPlan"></div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeStreakRecoveryModal()">Später</button>
+          <button class="btn btn-primary" id="startRecoveryBtn" onclick="startStreakRecovery()">Challenge starten</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Burnout Warning Modal -->
+    <div class="modal-overlay" id="burnoutModal" style="display: none;">
+      <div class="modal">
+        <div class="burnout-icon">💆</div>
+        <h2 class="modal-title">Nimm dir eine Pause</h2>
+        <p class="modal-text" id="burnoutMessage">
+          Es sieht so aus, als hättest du gerade viel um die Ohren.
+        </p>
+
+        <div class="burnout-stats" id="burnoutStats">
+          <div class="burnout-stat">
+            <span class="burnout-stat-label">Completion Rate</span>
+            <span class="burnout-stat-value" id="burnoutCompletionRate">--</span>
+          </div>
+          <div class="burnout-stat">
+            <span class="burnout-stat-label">Energie</span>
+            <span class="burnout-stat-value" id="burnoutEnergy">--</span>
+          </div>
+        </div>
+
+        <div id="burnoutRecommendations"></div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeBurnoutModal()">Verstanden</button>
+          <button class="btn btn-primary" onclick="activateRecoveryMode()">Recovery Mode aktivieren</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Review Modal -->
+    <div class="modal-overlay" id="weeklyReviewModal" style="display: none;">
+      <div class="modal modal-large">
+        <h2 class="modal-title">📊 Wochenrückblick</h2>
+
+        <div class="weekly-stats" id="weeklyStats">
+          <div class="weekly-stat">
+            <span class="weekly-stat-value" id="weeklyTasksCompleted">0</span>
+            <span class="weekly-stat-label">Aufgaben erledigt</span>
+          </div>
+          <div class="weekly-stat">
+            <span class="weekly-stat-value" id="weeklyCompletionRate">0%</span>
+            <span class="weekly-stat-label">Completion Rate</span>
+          </div>
+          <div class="weekly-stat">
+            <span class="weekly-stat-value" id="weeklyAvgEnergy">--</span>
+            <span class="weekly-stat-label">Ø Energie</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was lief diese Woche gut? ✨</label>
+          <textarea class="form-textarea" id="weeklyWhatWentWell" placeholder="Erfolge, Fortschritte, positive Momente..." rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Was hat nicht so gut geklappt? 🤔</label>
+          <textarea class="form-textarea" id="weeklyWhatDidntWork" placeholder="Hindernisse, Herausforderungen..." rows="3"></textarea>
+        </div>
+
+        <div id="weeklyAnalysis" style="display: none;">
+          <h3>AI-Analyse</h3>
+          <div id="weeklyAnalysisContent"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeWeeklyReviewModal()">Später</button>
+          <button class="btn btn-primary" id="submitWeeklyReviewBtn" onclick="submitWeeklyReview()">Analyse starten</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pomodoro Timer Modal -->
+    <div class="modal-overlay" id="pomodoroModal" style="display: none;">
+      <div class="modal">
+        <h2 class="modal-title" id="pomodoroTitle">🍅 Fokus-Timer</h2>
+        <p class="modal-text" id="pomodoroTaskName">Aktuelle Aufgabe</p>
+
+        <div class="pomodoro-timer">
+          <div class="pomodoro-circle">
+            <svg class="pomodoro-ring" viewBox="0 0 100 100">
+              <circle class="pomodoro-ring-bg" cx="50" cy="50" r="45"/>
+              <circle class="pomodoro-ring-fill" cx="50" cy="50" r="45" id="pomodoroRing"/>
+            </svg>
+            <span class="pomodoro-time" id="pomodoroTime">25:00</span>
+          </div>
+        </div>
+
+        <div class="pomodoro-phase" id="pomodoroPhase">Fokus-Zeit</div>
+
+        <div class="pomodoro-settings">
+          <label class="form-label">Fokus-Dauer</label>
+          <div class="pomodoro-duration-btns">
+            <button class="pomodoro-duration-btn" data-duration="15" onclick="setPomoDuration(15)">15 Min</button>
+            <button class="pomodoro-duration-btn selected" data-duration="25" onclick="setPomoDuration(25)">25 Min</button>
+            <button class="pomodoro-duration-btn" data-duration="45" onclick="setPomoDuration(45)">45 Min</button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="pomodoroStopBtn" onclick="stopPomodoro()">Abbrechen</button>
+          <button class="btn btn-primary" id="pomodoroStartBtn" onclick="togglePomodoro()">▶️ Starten</button>
+        </div>
       </div>
     </div>
 
@@ -4587,6 +5482,96 @@
           </div>
         </div>
 
+        <!-- Notification Settings Section -->
+        <div class="profile-section-divider"></div>
+        <h3 class="profile-section-title">Benachrichtigungen</h3>
+
+        <div class="notification-setting">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Check-in Erinnerung</div>
+            <div class="notification-setting-desc">Tägliche Erinnerung zum Check-in</div>
+          </div>
+          <button class="notification-toggle active" id="notifCheckinToggle" onclick="toggleNotificationSetting('checkin_reminder')">
+            <span class="notification-toggle-slider"></span>
+          </button>
+        </div>
+
+        <div class="notification-setting" id="checkinTimeRow">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Check-in Zeit</div>
+          </div>
+          <div class="time-picker">
+            <input type="time" class="time-input" id="notifCheckinTime" value="08:00" onchange="updateNotificationTime('checkin_reminder_time', this.value)">
+          </div>
+        </div>
+
+        <div class="notification-setting">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Abend-Review</div>
+            <div class="notification-setting-desc">Erinnerung zum Tagesrückblick</div>
+          </div>
+          <button class="notification-toggle active" id="notifReviewToggle" onclick="toggleNotificationSetting('evening_review')">
+            <span class="notification-toggle-slider"></span>
+          </button>
+        </div>
+
+        <div class="notification-setting">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Streak-Warnung</div>
+            <div class="notification-setting-desc">Warnung wenn Streak gefährdet ist</div>
+          </div>
+          <button class="notification-toggle active" id="notifStreakToggle" onclick="toggleNotificationSetting('streak_alert')">
+            <span class="notification-toggle-slider"></span>
+          </button>
+        </div>
+
+        <div class="notification-setting">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Achievement-Benachrichtigungen</div>
+            <div class="notification-setting-desc">Benachrichtigung bei neuen Achievements</div>
+          </div>
+          <button class="notification-toggle active" id="notifAchievementToggle" onclick="toggleNotificationSetting('achievement_notification')">
+            <span class="notification-toggle-slider"></span>
+          </button>
+        </div>
+
+        <div class="notification-setting">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Ruhezeiten</div>
+            <div class="notification-setting-desc">Keine Benachrichtigungen in dieser Zeit</div>
+          </div>
+          <button class="notification-toggle" id="notifQuietToggle" onclick="toggleNotificationSetting('quiet_hours_enabled')">
+            <span class="notification-toggle-slider"></span>
+          </button>
+        </div>
+
+        <div class="notification-setting" id="quietHoursRow" style="display: none;">
+          <div class="notification-setting-label">
+            <div class="notification-setting-title">Ruhezeit</div>
+          </div>
+          <div class="time-picker">
+            <input type="time" class="time-input" id="notifQuietStart" value="22:00" onchange="updateNotificationTime('quiet_hours_start', this.value)">
+            <span>bis</span>
+            <input type="time" class="time-input" id="notifQuietEnd" value="07:00" onchange="updateNotificationTime('quiet_hours_end', this.value)">
+          </div>
+        </div>
+
+        <!-- Coaching Style Section -->
+        <div class="profile-section-divider"></div>
+        <h3 class="profile-section-title">Coaching-Stil</h3>
+
+        <div class="form-group">
+          <label class="form-label">Wie soll die AI dich coachen?</label>
+          <select class="form-input" id="profileCoachingStyle">
+            <option value="balanced">Ausgewogen (Standard)</option>
+            <option value="supportive">Unterstützend & Einfühlsam</option>
+            <option value="challenging">Fordernd & Direkt</option>
+          </select>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+            Dieser Stil beeinflusst wie die AI mit dir kommuniziert und Feedback gibt.
+          </p>
+        </div>
+
         <button class="btn btn-primary" id="profileSaveBtn" onclick="saveProfile()">Profil speichern</button>
 
         <!-- Footer Back Button -->
@@ -4905,16 +5890,26 @@
               </div>
               <span class="quick-action-label">Erreichte Ziele</span>
             </button>
-            <button class="quick-action-btn" onclick="showProfileScreen()">
+            <button class="quick-action-btn" onclick="showHabitsScreen()">
               <div class="quick-action-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
+                  <path d="M12 20V10"/>
+                  <path d="M18 20V4"/>
+                  <path d="M6 20v-4"/>
                 </svg>
               </div>
-              <span class="quick-action-label">Mein Profil</span>
+              <span class="quick-action-label">Habits</span>
             </button>
           </div>
+        </div>
+
+        <!-- Habits Preview Card -->
+        <div class="card dashboard-card" id="habitsPreviewCard" style="display: none;">
+          <div class="dashboard-card-header">
+            <h2 class="dashboard-card-title">Heutige Habits</h2>
+            <button class="see-all-btn" onclick="showHabitsScreen()">Alle →</button>
+          </div>
+          <div id="habitsPreviewList"></div>
         </div>
 
         <!-- Today's Tasks Card -->
@@ -6137,6 +7132,9 @@
       // Gamification-Daten laden (asynchron, nicht blockierend)
       loadGamificationData();
       showScreen('dashboardScreen');
+
+      // Startup-Checks ausführen (Habits, Streak Recovery, Burnout)
+      performStartupChecks();
 
       // Onboarding für neue User anzeigen
       if (shouldShowOnboarding()) {
@@ -8610,6 +9608,928 @@
       `;
       document.body.appendChild(notification);
     }
+
+    // ============================================
+    // HABITS SYSTEM
+    // ============================================
+
+    let habitsData = {
+      habits: [],
+      logs: [],
+      today: ''
+    };
+
+    async function showHabitsScreen() {
+      showScreen('habitsScreen');
+      await loadHabits();
+    }
+
+    async function loadHabits() {
+      try {
+        const result = await apiCall('habit-update', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'get',
+            include_logs: true,
+            days_back: 7,
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) {
+          console.error('Error loading habits:', result.error);
+          return;
+        }
+
+        habitsData = result;
+        renderHabits();
+        renderHabitsPreview();
+      } catch (e) {
+        console.error('Failed to load habits:', e);
+      }
+    }
+
+    function renderHabits() {
+      const todayList = document.getElementById('todayHabitsList');
+      const allList = document.getElementById('allHabitsList');
+      const today = habitsData.today || new Date().toISOString().split('T')[0];
+
+      // Finde Logs für heute
+      const todayLogs = new Map();
+      habitsData.logs?.forEach(log => {
+        if (log.date === today) {
+          todayLogs.set(log.habit_id, log);
+        }
+      });
+
+      // Stats aktualisieren
+      let todayDone = 0;
+      const activeHabits = habitsData.habits?.filter(h => h.is_active) || [];
+      let bestStreak = 0;
+
+      activeHabits.forEach(habit => {
+        const log = todayLogs.get(habit.id);
+        if (log?.completed) todayDone++;
+        if (habit.best_streak > bestStreak) bestStreak = habit.best_streak;
+      });
+
+      document.getElementById('habitsActiveCount').textContent = activeHabits.length;
+      document.getElementById('habitsBestStreak').textContent = bestStreak;
+      document.getElementById('habitsTodayDone').textContent = `${todayDone}/${activeHabits.length}`;
+
+      // Heute-Liste rendern
+      if (!todayList) return;
+
+      if (activeHabits.length === 0) {
+        todayList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔄</div>
+            <div class="empty-state-title">Keine Habits</div>
+            <p>Erstelle deine erste Gewohnheit!</p>
+            <button class="empty-state-btn" onclick="showAddHabitModal()">+ Habit erstellen</button>
+          </div>
+        `;
+        allList.innerHTML = '';
+        return;
+      }
+
+      todayList.innerHTML = activeHabits.map(habit => {
+        const log = todayLogs.get(habit.id);
+        const isCompleted = log?.completed || false;
+
+        return `
+          <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
+            <div class="habit-icon">${habit.icon || '✨'}</div>
+            <div class="habit-info">
+              <div class="habit-title">${escapeHtml(habit.title)}</div>
+              <div class="habit-streak">
+                <span class="habit-streak-fire">🔥</span>
+                ${habit.current_streak || 0} Tage
+              </div>
+            </div>
+            <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+              ${isCompleted ? '✓' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Alle Habits Liste
+      allList.innerHTML = activeHabits.map(habit => `
+        <div class="habit-item" onclick="showHabitDetail('${habit.id}')">
+          <div class="habit-icon">${habit.icon || '✨'}</div>
+          <div class="habit-info">
+            <div class="habit-title">${escapeHtml(habit.title)}</div>
+            <div class="habit-streak">
+              Beste: ${habit.best_streak || 0} Tage | Total: ${habit.total_completions || 0}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Kalender rendern
+      renderHabitCalendar();
+    }
+
+    function renderHabitCalendar() {
+      const calendar = document.getElementById('habitCalendar');
+      if (!calendar) return;
+
+      const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      const today = new Date();
+
+      // Header
+      let html = days.map(d => `<div class="habit-calendar-header">${d}</div>`).join('');
+
+      // Letzte 7 Tage
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        const isToday = i === 0;
+
+        // Zähle Completions für diesen Tag
+        const dayLogs = habitsData.logs?.filter(l => l.date === dateStr && l.completed) || [];
+        const totalHabits = habitsData.habits?.filter(h => h.is_active).length || 1;
+        const completionRate = dayLogs.length / totalHabits;
+
+        let cssClass = 'habit-calendar-day';
+        if (completionRate >= 0.8) cssClass += ' completed';
+        if (isToday) cssClass += ' today';
+
+        html += `<div class="${cssClass}">${date.getDate()}</div>`;
+      }
+
+      calendar.innerHTML = html;
+    }
+
+    function renderHabitsPreview() {
+      const card = document.getElementById('habitsPreviewCard');
+      const list = document.getElementById('habitsPreviewList');
+      if (!card || !list) return;
+
+      const activeHabits = habitsData.habits?.filter(h => h.is_active) || [];
+      if (activeHabits.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+
+      card.style.display = 'block';
+      const today = habitsData.today || new Date().toISOString().split('T')[0];
+      const todayLogs = new Map();
+      habitsData.logs?.forEach(log => {
+        if (log.date === today) {
+          todayLogs.set(log.habit_id, log);
+        }
+      });
+
+      // Zeige nur erste 3 Habits
+      const previewHabits = activeHabits.slice(0, 3);
+      list.innerHTML = previewHabits.map(habit => {
+        const log = todayLogs.get(habit.id);
+        const isCompleted = log?.completed || false;
+
+        return `
+          <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
+            <div class="habit-icon">${habit.icon || '✨'}</div>
+            <div class="habit-info">
+              <div class="habit-title">${escapeHtml(habit.title)}</div>
+            </div>
+            <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+              ${isCompleted ? '✓' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleHabit(habitId, complete) {
+      try {
+        const result = await apiCall('habit-update', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: complete ? 'complete' : 'uncomplete',
+            habit_id: habitId,
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          return;
+        }
+
+        // UI aktualisieren
+        await loadHabits();
+
+        if (complete) {
+          showToast('+5 XP für Habit! 🔥', 'success');
+
+          // Gamification-Feedback
+          if (result.gamification) {
+            handleGamificationFeedback(result.gamification);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to toggle habit:', e);
+        showToast('Fehler beim Speichern', 'error');
+      }
+    }
+
+    function showAddHabitModal() {
+      document.getElementById('addHabitModal').style.display = 'flex';
+      document.getElementById('newHabitTitle').value = '';
+      document.getElementById('newHabitDescription').value = '';
+      document.getElementById('newHabitFrequency').value = 'daily';
+
+      // Icon-Selector reset
+      document.querySelectorAll('.habit-icon-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.icon === '✨');
+      });
+    }
+
+    function closeAddHabitModal() {
+      document.getElementById('addHabitModal').style.display = 'none';
+    }
+
+    // Icon-Selector Event
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('habit-icon-btn')) {
+        document.querySelectorAll('.habit-icon-btn').forEach(btn => btn.classList.remove('selected'));
+        e.target.classList.add('selected');
+      }
+    });
+
+    async function createHabit() {
+      const title = document.getElementById('newHabitTitle').value.trim();
+      const description = document.getElementById('newHabitDescription').value.trim();
+      const frequency = document.getElementById('newHabitFrequency').value;
+      const icon = document.querySelector('.habit-icon-btn.selected')?.dataset.icon || '✨';
+
+      if (!title) {
+        showToast('Bitte gib einen Namen ein', 'warning');
+        return;
+      }
+
+      try {
+        const result = await apiCall('habit-update', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'create',
+            title,
+            description,
+            icon,
+            frequency,
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          return;
+        }
+
+        closeAddHabitModal();
+        showToast('Habit erstellt! ✨', 'success');
+        await loadHabits();
+
+        if (result.gamification) {
+          handleGamificationFeedback(result.gamification);
+        }
+      } catch (e) {
+        console.error('Failed to create habit:', e);
+        showToast('Fehler beim Erstellen', 'error');
+      }
+    }
+
+    function showHabitDetail(habitId) {
+      // TODO: Implement habit detail view
+      showToast('Habit-Details kommen bald!', 'info');
+    }
+
+    // ============================================
+    // POMODORO TIMER SYSTEM
+    // ============================================
+
+    let pomodoroState = {
+      isRunning: false,
+      isPaused: false,
+      duration: 25 * 60, // Sekunden
+      timeRemaining: 25 * 60,
+      intervalId: null,
+      taskId: null,
+      taskName: '',
+      isBreak: false
+    };
+
+    function showPomodoroModal(taskId, taskName) {
+      pomodoroState.taskId = taskId;
+      pomodoroState.taskName = taskName || 'Aufgabe';
+      pomodoroState.timeRemaining = pomodoroState.duration;
+      pomodoroState.isRunning = false;
+      pomodoroState.isPaused = false;
+      pomodoroState.isBreak = false;
+
+      document.getElementById('pomodoroTaskName').textContent = pomodoroState.taskName;
+      document.getElementById('pomodoroPhase').textContent = 'Fokus-Zeit';
+      document.getElementById('pomodoroPhase').classList.remove('break');
+      document.getElementById('pomodoroStartBtn').textContent = '▶️ Starten';
+
+      updatePomodoroDisplay();
+      document.getElementById('pomodoroModal').style.display = 'flex';
+    }
+
+    function closePomodoroModal() {
+      stopPomodoro();
+      document.getElementById('pomodoroModal').style.display = 'none';
+    }
+
+    function setPomoDuration(minutes) {
+      if (pomodoroState.isRunning) return;
+
+      pomodoroState.duration = minutes * 60;
+      pomodoroState.timeRemaining = minutes * 60;
+
+      document.querySelectorAll('.pomodoro-duration-btn').forEach(btn => {
+        btn.classList.toggle('selected', parseInt(btn.dataset.duration) === minutes);
+      });
+
+      updatePomodoroDisplay();
+    }
+
+    function togglePomodoro() {
+      if (pomodoroState.isRunning) {
+        pausePomodoro();
+      } else {
+        startPomodoro();
+      }
+    }
+
+    function startPomodoro() {
+      pomodoroState.isRunning = true;
+      pomodoroState.isPaused = false;
+      document.getElementById('pomodoroStartBtn').textContent = '⏸️ Pause';
+
+      pomodoroState.intervalId = setInterval(() => {
+        pomodoroState.timeRemaining--;
+
+        if (pomodoroState.timeRemaining <= 0) {
+          pomodoroComplete();
+        } else {
+          updatePomodoroDisplay();
+        }
+      }, 1000);
+    }
+
+    function pausePomodoro() {
+      pomodoroState.isRunning = false;
+      pomodoroState.isPaused = true;
+      document.getElementById('pomodoroStartBtn').textContent = '▶️ Fortsetzen';
+
+      if (pomodoroState.intervalId) {
+        clearInterval(pomodoroState.intervalId);
+        pomodoroState.intervalId = null;
+      }
+    }
+
+    function stopPomodoro() {
+      pomodoroState.isRunning = false;
+      pomodoroState.isPaused = false;
+
+      if (pomodoroState.intervalId) {
+        clearInterval(pomodoroState.intervalId);
+        pomodoroState.intervalId = null;
+      }
+    }
+
+    function pomodoroComplete() {
+      stopPomodoro();
+
+      // Audio-Feedback (Browser-Notification)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(pomodoroState.isBreak ? 'Pause vorbei!' : 'Fokus-Zeit beendet! 🎉', {
+          body: pomodoroState.isBreak ? 'Zurück an die Arbeit!' : 'Zeit für eine kurze Pause.',
+          icon: 'icons/icon-192.png'
+        });
+      }
+
+      // Sound abspielen (falls verfügbar)
+      try {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onrqro4t3cXOOq7a1pJCCfnl7gYaHhIB+fH1+f4CCgoKDg4SFhYaGh4eIiImJioqLi4yMjY2Ojo+PkJCRkZKSlJSVlZaWl5eYmJmZmpqbm5ycnZ2enp+foKChoaKio6OkpKWlpqanp6ioqamqqqqrrK2tra6urq+vsLCxsbKys7O0tLW1tra3t7i4ubm6uru7vLy9vb6+v7/AwMHBwsLDw8TExcXGxsfHyMjJycrKy8vMzM3Nzs7Pz9DQ0dHS0tPT1NTV1dbW19fY2NnZ2trb29zc3d3e3t/f4ODh4eLi4+Pk5OXl5ubn5+jo6enq6uvr7Ozt7e7u7+/w8PHx8vLz8/T09fX29vf3+Pj5+fr6+/v8/P39/v7//w==');
+        audio.play().catch(() => {});
+      } catch (e) {}
+
+      if (pomodoroState.isBreak) {
+        // Pause vorbei -> Nächste Fokus-Runde
+        pomodoroState.isBreak = false;
+        pomodoroState.timeRemaining = pomodoroState.duration;
+        document.getElementById('pomodoroPhase').textContent = 'Fokus-Zeit';
+        document.getElementById('pomodoroPhase').classList.remove('break');
+        showToast('Pause vorbei! Bereit für die nächste Runde?', 'info');
+      } else {
+        // Fokus vorbei -> Pause starten
+        pomodoroState.isBreak = true;
+        pomodoroState.timeRemaining = 5 * 60; // 5 Min Pause
+        document.getElementById('pomodoroPhase').textContent = '☕ Pause';
+        document.getElementById('pomodoroPhase').classList.add('break');
+        showToast('Super! Zeit für eine Pause ☕', 'success');
+      }
+
+      document.getElementById('pomodoroStartBtn').textContent = '▶️ Starten';
+      updatePomodoroDisplay();
+    }
+
+    function updatePomodoroDisplay() {
+      const minutes = Math.floor(pomodoroState.timeRemaining / 60);
+      const seconds = pomodoroState.timeRemaining % 60;
+      document.getElementById('pomodoroTime').textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      // Ring-Fortschritt
+      const totalSeconds = pomodoroState.isBreak ? 5 * 60 : pomodoroState.duration;
+      const progress = pomodoroState.timeRemaining / totalSeconds;
+      const circumference = 283; // 2 * PI * 45
+      const offset = circumference * (1 - progress);
+      document.getElementById('pomodoroRing').style.strokeDashoffset = offset;
+    }
+
+    // Notification Permission anfragen
+    if ('Notification' in window && Notification.permission === 'default') {
+      // Anfragen wenn User Timer startet
+    }
+
+    // ============================================
+    // STREAK RECOVERY SYSTEM
+    // ============================================
+
+    let streakRecoveryData = null;
+
+    async function checkStreakRecovery() {
+      try {
+        const result = await apiCall('streak-recovery', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'check',
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) return;
+
+        streakRecoveryData = result;
+
+        // Wenn Streak verloren und Recovery verfügbar
+        if (result.streak_lost && result.can_recover && result.previous_streak > 0) {
+          showStreakRecoveryModal(result);
+        }
+
+        // Wenn aktive Recovery Challenge
+        if (result.active_recovery) {
+          updateRecoveryProgress(result.active_recovery);
+        }
+      } catch (e) {
+        console.error('Failed to check streak recovery:', e);
+      }
+    }
+
+    function showStreakRecoveryModal(data) {
+      document.getElementById('lostStreakCount').textContent = data.previous_streak;
+      document.getElementById('streakRecoveryModal').style.display = 'flex';
+    }
+
+    function closeStreakRecoveryModal() {
+      document.getElementById('streakRecoveryModal').style.display = 'none';
+    }
+
+    async function startStreakRecovery() {
+      const btn = document.getElementById('startRecoveryBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gestartet...';
+
+      try {
+        const result = await apiCall('streak-recovery', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'start',
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Challenge starten';
+          return;
+        }
+
+        closeStreakRecoveryModal();
+        showToast('Recovery Challenge gestartet! 💪', 'success');
+
+        // Zeige Comeback-Plan
+        if (result.comeback_plan) {
+          console.log('Comeback Plan:', result.comeback_plan);
+        }
+      } catch (e) {
+        console.error('Failed to start recovery:', e);
+        showToast('Fehler beim Starten', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Challenge starten';
+      }
+    }
+
+    function updateRecoveryProgress(recovery) {
+      const progressDays = document.querySelectorAll('.recovery-day');
+      progressDays.forEach((day, index) => {
+        if (index < recovery.challenge_days_completed) {
+          day.classList.add('completed');
+        } else if (index === recovery.challenge_days_completed) {
+          day.classList.add('active');
+        }
+      });
+    }
+
+    // ============================================
+    // BURNOUT DETECTION SYSTEM
+    // ============================================
+
+    async function checkBurnout() {
+      try {
+        const result = await apiCall('burnout-assessment', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'check',
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) return;
+
+        // Wenn Burnout-Risiko hoch und noch nicht in Recovery Mode
+        if (result.burnout_score >= 50 && !result.is_in_recovery_mode && result.warning) {
+          showBurnoutModal(result);
+        }
+      } catch (e) {
+        console.error('Failed to check burnout:', e);
+      }
+    }
+
+    function showBurnoutModal(data) {
+      document.getElementById('burnoutMessage').textContent = data.warning;
+      document.getElementById('burnoutCompletionRate').textContent = `${data.stats.completion_rate}%`;
+      document.getElementById('burnoutEnergy').textContent = `${data.stats.avg_energy}/5`;
+
+      // Empfehlungen rendern
+      const recsContainer = document.getElementById('burnoutRecommendations');
+      if (data.recommendations?.recommendations) {
+        recsContainer.innerHTML = data.recommendations.recommendations.map(rec => `
+          <div class="weekly-suggestion">
+            <div class="weekly-suggestion-icon">${rec.type === 'reduce' ? '📉' : rec.type === 'selfcare' ? '💆' : '🧠'}</div>
+            <div class="weekly-suggestion-text">
+              <div class="weekly-suggestion-title">${escapeHtml(rec.suggestion)}</div>
+              <div class="weekly-suggestion-why">${escapeHtml(rec.why)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('burnoutModal').style.display = 'flex';
+    }
+
+    function closeBurnoutModal() {
+      document.getElementById('burnoutModal').style.display = 'none';
+    }
+
+    async function activateRecoveryMode() {
+      try {
+        const result = await apiCall('burnout-assessment', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'activate_recovery',
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          return;
+        }
+
+        closeBurnoutModal();
+        showToast('Recovery Mode aktiviert für 7 Tage 💆', 'success');
+      } catch (e) {
+        console.error('Failed to activate recovery:', e);
+        showToast('Fehler beim Aktivieren', 'error');
+      }
+    }
+
+    // ============================================
+    // WEEKLY REVIEW SYSTEM
+    // ============================================
+
+    async function showWeeklyReviewModal() {
+      document.getElementById('weeklyReviewModal').style.display = 'flex';
+      document.getElementById('weeklyWhatWentWell').value = '';
+      document.getElementById('weeklyWhatDidntWork').value = '';
+      document.getElementById('weeklyAnalysis').style.display = 'none';
+
+      // Lade Wochendaten
+      try {
+        const result = await apiCall('weekly-reflection', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'get_data',
+            timezone_offset: userTimezoneOffset
+          })
+        });
+
+        if (result.error) return;
+
+        // Stats aktualisieren
+        document.getElementById('weeklyTasksCompleted').textContent = result.stats.completed_tasks;
+        document.getElementById('weeklyCompletionRate').textContent = `${result.stats.completion_rate}%`;
+        document.getElementById('weeklyAvgEnergy').textContent = result.stats.avg_energy ? `${result.stats.avg_energy}/5` : '--';
+      } catch (e) {
+        console.error('Failed to load weekly data:', e);
+      }
+    }
+
+    function closeWeeklyReviewModal() {
+      document.getElementById('weeklyReviewModal').style.display = 'none';
+    }
+
+    async function submitWeeklyReview() {
+      const whatWentWell = document.getElementById('weeklyWhatWentWell').value.trim();
+      const whatDidntWork = document.getElementById('weeklyWhatDidntWork').value.trim();
+
+      if (!whatWentWell && !whatDidntWork) {
+        showToast('Bitte fülle mindestens ein Feld aus', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('submitWeeklyReviewBtn');
+      btn.disabled = true;
+      btn.textContent = 'Analyse läuft...';
+
+      try {
+        const result = await apiCall('weekly-reflection', {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'submit_reflection',
+            what_went_well: whatWentWell,
+            what_didnt_work: whatDidntWork,
+            timezone_offset: userTimezoneOffset
+          }),
+          timeout: 60000
+        });
+
+        if (result.error) {
+          showToast(result.error, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Analyse starten';
+          return;
+        }
+
+        // Analyse anzeigen
+        renderWeeklyAnalysis(result.analysis);
+        document.getElementById('weeklyAnalysis').style.display = 'block';
+        btn.textContent = 'Fertig';
+
+        showToast('Analyse abgeschlossen! 📊', 'success');
+      } catch (e) {
+        console.error('Failed to submit review:', e);
+        showToast('Fehler bei der Analyse', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Analyse starten';
+      }
+    }
+
+    function renderWeeklyAnalysis(analysis) {
+      const container = document.getElementById('weeklyAnalysisContent');
+      if (!analysis) return;
+
+      let html = '';
+
+      // Positive Erkenntnisse
+      if (analysis.positive_insights?.length) {
+        html += `
+          <div class="weekly-analysis-item">
+            <h4>✨ Positives</h4>
+            <ul>${analysis.positive_insights.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>
+          </div>
+        `;
+      }
+
+      // Herausforderungen
+      if (analysis.challenges_analysis?.length) {
+        html += `
+          <div class="weekly-analysis-item">
+            <h4>🤔 Herausforderungen</h4>
+            <ul>${analysis.challenges_analysis.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+          </div>
+        `;
+      }
+
+      // Vorschläge für nächste Woche
+      if (analysis.next_week_suggestions?.length) {
+        html += '<h4 style="margin: 16px 0 8px;">💡 Vorschläge für nächste Woche</h4>';
+        html += analysis.next_week_suggestions.map(s => `
+          <div class="weekly-suggestion">
+            <div class="weekly-suggestion-icon">→</div>
+            <div class="weekly-suggestion-text">
+              <div class="weekly-suggestion-title">${escapeHtml(s.suggestion)}</div>
+              <div class="weekly-suggestion-why">${escapeHtml(s.why)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Motivation
+      if (analysis.motivation_message) {
+        html += `
+          <div class="weekly-analysis-item" style="background: var(--accent-glow); text-align: center;">
+            <p style="font-weight: 600; color: var(--accent);">"${escapeHtml(analysis.motivation_message)}"</p>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ============================================
+    // NOTIFICATION SETTINGS (Profil-Screen)
+    // ============================================
+
+    // Notification Settings werden im Profil-Screen gerendert
+    // Die Funktionen sind bereits in auth-profile integriert
+
+    // ============================================
+    // HELPER: Gamification Feedback Handler
+    // ============================================
+
+    function handleGamificationFeedback(gamification) {
+      if (!gamification) return;
+
+      // Level-Up anzeigen
+      if (gamification.level_up) {
+        showToast(`🎉 Level Up! Du bist jetzt Level ${gamification.level}!`, 'success', 4000);
+      }
+
+      // Neue Achievements
+      if (gamification.new_achievements?.length) {
+        gamification.new_achievements.forEach((ach, index) => {
+          setTimeout(() => {
+            showAchievementPopup(ach);
+          }, index * 1500);
+        });
+      }
+    }
+
+    // ============================================
+    // INTEGRATION: Prüfungen beim App-Start
+    // ============================================
+
+    // Nach loadDailyStart() aufrufen
+    function performStartupChecks() {
+      // Streak Recovery prüfen (verzögert)
+      setTimeout(() => {
+        checkStreakRecovery();
+      }, 2000);
+
+      // Burnout prüfen (verzögert)
+      setTimeout(() => {
+        checkBurnout();
+      }, 5000);
+
+      // Habits laden (für Preview)
+      setTimeout(() => {
+        loadHabits();
+      }, 1000);
+    }
+
+    // Diese Funktion wird nach dem erfolgreichen Laden aufgerufen
+    // Füge in loadDailyStart nach dem Rendern hinzu: performStartupChecks();
+
+    // ============================================
+    // TASK DETAIL: Timer-Button hinzufügen
+    // ============================================
+
+    // Überschreibe startTask für Pomodoro
+    function startTask() {
+      if (currentTaskDetail) {
+        showPomodoroModal(currentTaskDetail.id, currentTaskDetail.task_text);
+      }
+    }
+
+    // ============================================
+    // NOTIFICATION SETTINGS
+    // ============================================
+
+    let notificationPreferences = {
+      push_enabled: true,
+      email_enabled: false,
+      in_app_enabled: true,
+      checkin_reminder: true,
+      checkin_reminder_time: '08:00',
+      evening_review: true,
+      evening_review_time: '20:00',
+      streak_alert: true,
+      achievement_notification: true,
+      weekly_report: true,
+      quiet_hours_enabled: false,
+      quiet_hours_start: '22:00',
+      quiet_hours_end: '07:00'
+    };
+
+    function initNotificationSettings() {
+      // Lade gespeicherte Preferences aus dem Profil
+      const savedPrefs = localStorage.getItem('aiday_notification_prefs');
+      if (savedPrefs) {
+        try {
+          notificationPreferences = { ...notificationPreferences, ...JSON.parse(savedPrefs) };
+        } catch (e) {}
+      }
+      updateNotificationUI();
+    }
+
+    function updateNotificationUI() {
+      // Update Toggle States
+      const toggleMappings = {
+        'notifCheckinToggle': 'checkin_reminder',
+        'notifReviewToggle': 'evening_review',
+        'notifStreakToggle': 'streak_alert',
+        'notifAchievementToggle': 'achievement_notification',
+        'notifQuietToggle': 'quiet_hours_enabled'
+      };
+
+      for (const [elementId, prefKey] of Object.entries(toggleMappings)) {
+        const toggle = document.getElementById(elementId);
+        if (toggle) {
+          toggle.classList.toggle('active', notificationPreferences[prefKey]);
+        }
+      }
+
+      // Zeit-Inputs
+      const checkinTime = document.getElementById('notifCheckinTime');
+      if (checkinTime) checkinTime.value = notificationPreferences.checkin_reminder_time || '08:00';
+
+      const quietStart = document.getElementById('notifQuietStart');
+      if (quietStart) quietStart.value = notificationPreferences.quiet_hours_start || '22:00';
+
+      const quietEnd = document.getElementById('notifQuietEnd');
+      if (quietEnd) quietEnd.value = notificationPreferences.quiet_hours_end || '07:00';
+
+      // Zeige/Verstecke Zeit-Rows basierend auf Toggle-Status
+      const checkinTimeRow = document.getElementById('checkinTimeRow');
+      if (checkinTimeRow) {
+        checkinTimeRow.style.display = notificationPreferences.checkin_reminder ? 'flex' : 'none';
+      }
+
+      const quietHoursRow = document.getElementById('quietHoursRow');
+      if (quietHoursRow) {
+        quietHoursRow.style.display = notificationPreferences.quiet_hours_enabled ? 'flex' : 'none';
+      }
+    }
+
+    function toggleNotificationSetting(settingKey) {
+      notificationPreferences[settingKey] = !notificationPreferences[settingKey];
+      saveNotificationPreferences();
+      updateNotificationUI();
+      showToast('Einstellung aktualisiert', 'success', 1500);
+    }
+
+    function updateNotificationTime(settingKey, value) {
+      notificationPreferences[settingKey] = value;
+      saveNotificationPreferences();
+    }
+
+    function saveNotificationPreferences() {
+      localStorage.setItem('aiday_notification_prefs', JSON.stringify(notificationPreferences));
+      // TODO: Sync mit Backend wenn auth-profile erweitert wird
+    }
+
+    // Initialize notification settings when profile screen is shown
+    document.addEventListener('DOMContentLoaded', () => {
+      initNotificationSettings();
+    });
+
+    // ============================================
+    // COACHING STYLE
+    // ============================================
+
+    function getCoachingStyle() {
+      const select = document.getElementById('profileCoachingStyle');
+      return select ? select.value : 'balanced';
+    }
+
+    function setCoachingStyle(style) {
+      const select = document.getElementById('profileCoachingStyle');
+      if (select && style) {
+        select.value = style;
+      }
+    }
+
+    // Coaching Style wird beim Laden des Profils gesetzt (in showProfileScreen)
+    // und beim Speichern mit dem Rest des Profils gespeichert
   </script>
 </body>
 </html>
