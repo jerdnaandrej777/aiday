@@ -644,19 +644,23 @@
     }
 
     /* Energy Speech Bubble */
+    .energy-form-group {
+      position: relative;
+    }
+
     .energy-speech-bubble {
       position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #6366f1, #22d3ee);
       color: white;
-      padding: 10px 16px;
-      border-radius: 16px;
-      font-size: 13px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
       font-weight: 600;
-      white-space: nowrap;
-      box-shadow: 0 4px 20px var(--accent-glow);
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
       opacity: 0;
       pointer-events: none;
       z-index: 100;
@@ -665,15 +669,24 @@
     .energy-speech-bubble::after {
       content: '';
       position: absolute;
-      top: 100%;
+      bottom: -8px;
       left: 50%;
       transform: translateX(-50%);
       border: 8px solid transparent;
-      border-top-color: var(--secondary);
+      border-top-color: #22d3ee;
     }
 
     .energy-speech-bubble.show {
-      animation: bubblePopIn 0.3s ease forwards, bubbleFadeOut 0.3s ease 2.2s forwards;
+      opacity: 1;
+      animation: bubbleShake 0.5s ease-in-out, bubbleFadeOut 0.3s ease 2.2s forwards;
+    }
+
+    @keyframes bubbleShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
     }
 
     /* Buttons */
@@ -3038,11 +3051,11 @@
           <textarea class="form-textarea" id="plannedToday" placeholder="Was steht heute an?"></textarea>
         </div>
 
-        <div class="form-group">
+        <div class="form-group energy-form-group" id="energyFormGroup">
+          <!-- Speech Bubble - überdeckt das Label -->
+          <div class="energy-speech-bubble" id="energySpeechBubble">Bitte wähle dein Energielevel! ⚡</div>
           <label class="form-label">Wie ist dein Energielevel? (1-5)</label>
           <div class="energy-slider" id="energySlider">
-            <!-- Speech Bubble -->
-            <div class="energy-speech-bubble" id="energySpeechBubble">Bitte wähle dein Energielevel! ⚡</div>
             <button class="energy-level" data-level="1" onclick="selectEnergy(1)">1</button>
             <button class="energy-level" data-level="2" onclick="selectEnergy(2)">2</button>
             <button class="energy-level" data-level="3" onclick="selectEnergy(3)">3</button>
@@ -3919,16 +3932,17 @@
 
     // Show attention animation for energy selection
     function showEnergyAttention() {
+      const formGroup = document.getElementById('energyFormGroup');
       const slider = document.getElementById('energySlider');
       const bubble = document.getElementById('energySpeechBubble');
 
-      if (slider && bubble) {
+      if (slider && bubble && formGroup) {
         // Remove and re-add class to restart animation
         slider.classList.remove('needs-attention');
         bubble.classList.remove('show');
 
-        // Scroll to energy slider
-        slider.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Scroll to energy form group
+        formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         // Trigger animation after short delay
         setTimeout(() => {
