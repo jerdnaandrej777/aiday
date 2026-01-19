@@ -9975,8 +9975,8 @@
           showToast('+5 XP für Habit! 🔥', 'success');
 
           // Gamification-Feedback
-          if (result.gamification) {
-            handleGamificationFeedback(result.gamification);
+          if (result.data?.gamification) {
+            handleGamificationFeedback(result.data.gamification);
           }
         }
       } catch (e) {
@@ -10041,8 +10041,8 @@
         showToast('Habit erstellt! ✨', 'success');
         await loadHabits();
 
-        if (result.gamification) {
-          handleGamificationFeedback(result.gamification);
+        if (result.data?.gamification) {
+          handleGamificationFeedback(result.data.gamification);
         }
       } catch (e) {
         console.error('Failed to create habit:', e);
