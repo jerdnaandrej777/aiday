@@ -2165,41 +2165,40 @@
     /* Motivation Speech Bubble */
     .motivation-speech-bubble {
       position: absolute;
-      bottom: calc(100% + 12px);
-      left: 50%;
-      transform: translateX(-50%) scale(0.8);
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      transform: scale(0.8);
       background: linear-gradient(135deg, #06b6d4, #0891b2);
       color: white;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border-radius: 16px;
-      font-size: 13px;
-      line-height: 1.4;
-      min-width: 200px;
-      max-width: 280px;
+      font-size: 14px;
+      line-height: 1.5;
       text-align: center;
       box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3);
       opacity: 0;
       visibility: hidden;
       transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 100;
-      pointer-events: none;
+      cursor: pointer;
     }
 
-    .motivation-speech-bubble::after {
+    .motivation-speech-bubble::before {
       content: '';
       position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: -8px;
+      right: 20px;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-top: 10px solid #0891b2;
+      border-bottom: 10px solid #0891b2;
     }
 
     .motivation-speech-bubble.show {
       opacity: 1;
       visibility: visible;
-      transform: translateX(-50%) scale(1);
+      transform: scale(1);
       animation: motivationBubbleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -2208,13 +2207,13 @@
     }
 
     @keyframes motivationBubbleIn {
-      0% { opacity: 0; transform: translateX(-50%) scale(0.5) translateY(10px); }
-      100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+      0% { opacity: 0; transform: scale(0.5) translateY(-10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     @keyframes motivationBubbleOut {
-      0% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
-      100% { opacity: 0; transform: translateX(-50%) scale(0.8) translateY(-10px); visibility: hidden; }
+      0% { opacity: 1; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(0.8) translateY(-10px); visibility: hidden; }
     }
 
     .motivation-speech-bubble .quote-text {
@@ -2233,19 +2232,19 @@
       background: linear-gradient(135deg, #3b82f6, #2563eb);
       box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
     }
-    .motivation-speech-bubble.bad::after { border-top-color: #2563eb; }
+    .motivation-speech-bubble.bad::before { border-bottom-color: #2563eb; }
 
     .motivation-speech-bubble.terrible {
       background: linear-gradient(135deg, #8b5cf6, #7c3aed);
       box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
     }
-    .motivation-speech-bubble.terrible::after { border-top-color: #7c3aed; }
+    .motivation-speech-bubble.terrible::before { border-bottom-color: #7c3aed; }
 
     .motivation-speech-bubble.tasks-reminder {
       background: linear-gradient(135deg, #f59e0b, #d97706);
       box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
     }
-    .motivation-speech-bubble.tasks-reminder::after { border-top-color: #d97706; }
+    .motivation-speech-bubble.tasks-reminder::before { border-bottom-color: #d97706; }
 
     .stat-label {
       font-size: 12px;
@@ -2944,8 +2943,13 @@
     <div class="screen" id="progressScreen">
       <!-- Today's Status Card -->
       <div class="card progress-card animate-in">
-        <div class="progress-card-header">
+        <div class="progress-card-header" style="position: relative;">
           <h3>Heute</h3>
+          <!-- Motivation Speech Bubble -->
+          <div class="motivation-speech-bubble" id="motivationBubble">
+            <div class="quote-text"></div>
+            <div class="quote-author"></div>
+          </div>
           <span class="progress-date" id="progressDate"></span>
         </div>
 
@@ -2954,11 +2958,6 @@
             <div class="stat-circle" id="moodCircle">
               <!-- Speech Bubble -->
               <div class="mood-speech-bubble" id="moodSpeechBubble"></div>
-              <!-- Motivation Speech Bubble -->
-              <div class="motivation-speech-bubble" id="motivationBubble">
-                <div class="quote-text"></div>
-                <div class="quote-author"></div>
-              </div>
               <span class="stat-emoji" id="moodEmoji">😊</span>
               <!-- Animated Mood Face -->
               <div class="mood-face good" id="moodFace" onclick="onMoodFaceClick()">
@@ -3787,6 +3786,21 @@
       if (savedTime) {
         lastMotivationTime = parseInt(savedTime, 10);
       }
+
+      // Add touch/click event to hide bubble on tap
+      const bubble = document.getElementById('motivationBubble');
+      if (bubble) {
+        bubble.addEventListener('click', hideMotivationBubble);
+        bubble.addEventListener('touchstart', hideMotivationBubble, { passive: true });
+      }
+
+      // Also hide when touching anywhere on screen
+      document.addEventListener('touchstart', function(e) {
+        const bubble = document.getElementById('motivationBubble');
+        if (bubble && bubble.classList.contains('show')) {
+          hideMotivationBubble();
+        }
+      }, { passive: true });
     }
 
     function canShowMotivation() {
@@ -3798,6 +3812,8 @@
       const index = Math.floor(Math.random() * MOTIVATION_QUOTES.length);
       return MOTIVATION_QUOTES[index];
     }
+
+    let motivationHideTimeout = null;
 
     function showMotivationQuote(triggerType) {
       if (!canShowMotivation()) {
@@ -3826,15 +3842,20 @@
       }
       // neutral uses default cyan gradient
 
-      // Show with delay
+      // Clear any existing timeout
+      if (motivationHideTimeout) {
+        clearTimeout(motivationHideTimeout);
+      }
+
+      // Show with short delay
       setTimeout(() => {
         bubble.classList.add('show');
-      }, 1500);
+      }, 500);
 
-      // Hide after 8 seconds
-      setTimeout(() => {
+      // Hide after 4 seconds
+      motivationHideTimeout = setTimeout(() => {
         hideMotivationBubble();
-      }, 9500);
+      }, 4500);
 
       // Save timestamp
       lastMotivationTime = Date.now();
@@ -3844,6 +3865,12 @@
     function hideMotivationBubble() {
       const bubble = document.getElementById('motivationBubble');
       if (!bubble || !bubble.classList.contains('show')) return;
+
+      // Clear auto-hide timeout
+      if (motivationHideTimeout) {
+        clearTimeout(motivationHideTimeout);
+        motivationHideTimeout = null;
+      }
 
       bubble.classList.add('hiding');
       bubble.classList.remove('show');
@@ -5104,6 +5131,19 @@
 
       // Check for motivation quote (evening reminder for incomplete tasks)
       checkTasksForMotivation(tasks);
+
+      // Check for motivation quote based on mood
+      const todayCheckin = data.today_checkin || {};
+      if (todayCheckin.mood) {
+        checkMoodForMotivation(todayCheckin.mood);
+      }
+    }
+
+    // Debug function to reset cooldown and test motivation quotes
+    function testMotivationQuote(mood = 'bad') {
+      lastMotivationTime = 0;
+      localStorage.removeItem('aiday_last_motivation');
+      showMotivationQuote(mood);
     }
 
     async function toggleTask(taskId, completed) {
