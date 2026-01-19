@@ -2162,6 +2162,91 @@
     }
     .mood-speech-bubble.terrible::after { border-top-color: #db2777; }
 
+    /* Motivation Speech Bubble */
+    .motivation-speech-bubble {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.4;
+      min-width: 200px;
+      max-width: 280px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(6, 182, 212, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .motivation-speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #0891b2;
+    }
+
+    .motivation-speech-bubble.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) scale(1);
+      animation: motivationBubbleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .motivation-speech-bubble.hiding {
+      animation: motivationBubbleOut 0.4s ease-out forwards;
+    }
+
+    @keyframes motivationBubbleIn {
+      0% { opacity: 0; transform: translateX(-50%) scale(0.5) translateY(10px); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+    }
+
+    @keyframes motivationBubbleOut {
+      0% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) scale(0.8) translateY(-10px); visibility: hidden; }
+    }
+
+    .motivation-speech-bubble .quote-text {
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .motivation-speech-bubble .quote-author {
+      font-size: 11px;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    /* Mood-specific variants */
+    .motivation-speech-bubble.bad {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+    }
+    .motivation-speech-bubble.bad::after { border-top-color: #2563eb; }
+
+    .motivation-speech-bubble.terrible {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    }
+    .motivation-speech-bubble.terrible::after { border-top-color: #7c3aed; }
+
+    .motivation-speech-bubble.tasks-reminder {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 8px 32px rgba(245, 158, 11, 0.3);
+    }
+    .motivation-speech-bubble.tasks-reminder::after { border-top-color: #d97706; }
+
     .stat-label {
       font-size: 12px;
       color: var(--text-muted);
@@ -2869,6 +2954,11 @@
             <div class="stat-circle" id="moodCircle">
               <!-- Speech Bubble -->
               <div class="mood-speech-bubble" id="moodSpeechBubble"></div>
+              <!-- Motivation Speech Bubble -->
+              <div class="motivation-speech-bubble" id="motivationBubble">
+                <div class="quote-text"></div>
+                <div class="quote-author"></div>
+              </div>
               <span class="stat-emoji" id="moodEmoji">😊</span>
               <!-- Animated Mood Face -->
               <div class="mood-face good" id="moodFace" onclick="onMoodFaceClick()">
@@ -3522,6 +3612,9 @@
       showScreen('loadingScreen');
       loadDailyStart();
 
+      // Motivation System initialisieren
+      initMotivationSystem();
+
       // Swipe Navigation initialisieren
       initSwipeNavigation();
     })();
@@ -3627,11 +3720,172 @@
       animate();
     }
 
+    // ===== MOTIVATION QUOTES SYSTEM =====
+
+    const MOTIVATION_QUOTES = [
+      // Stoiker
+      { text: "Du hast Macht über deinen Geist, nicht über äußere Ereignisse. Erkenne das, und du wirst Stärke finden.", author: "Marc Aurel" },
+      { text: "Es ist nicht das, was dir passiert, sondern wie du darauf reagierst, was zählt.", author: "Epiktet" },
+      { text: "Wer nicht zufrieden ist mit dem, was er hat, wäre auch nicht zufrieden mit dem, was er haben möchte.", author: "Seneca" },
+      { text: "Der Schmerz, den du heute fühlst, ist die Stärke, die du morgen spürst.", author: "Marc Aurel" },
+      { text: "Beherrsche deinen Geist oder er wird dich beherrschen.", author: "Horaz" },
+      { text: "Hindernisse verschwinden nicht, aber du kannst stärker werden als sie.", author: "Marc Aurel" },
+
+      // Moderne Vordenker
+      { text: "Disziplin ist die Brücke zwischen Zielen und Erfolg.", author: "Jim Rohn" },
+      { text: "Der Unterschied zwischen einem erfolgreichen Menschen und anderen ist nicht mangelnde Stärke oder Wissen, sondern mangelnder Wille.", author: "Vince Lombardi" },
+      { text: "Motivation bringt dich in Gang. Gewohnheit bringt dich weiter.", author: "Jim Rohn" },
+      { text: "Erfolg ist die Summe kleiner Anstrengungen, die Tag für Tag wiederholt werden.", author: "Robert Collier" },
+      { text: "Tu heute etwas, wofür dein zukünftiges Ich dir danken wird.", author: "Sean Patrick Flanery" },
+      { text: "Der beste Zeitpunkt zu handeln war gestern. Der zweitbeste ist jetzt.", author: "Chinesisches Sprichwort" },
+
+      // Unternehmer & Innovatoren
+      { text: "Ob du denkst, du kannst es, oder du denkst, du kannst es nicht – du hast recht.", author: "Henry Ford" },
+      { text: "Die einzige Möglichkeit, großartige Arbeit zu leisten, ist zu lieben, was man tut.", author: "Steve Jobs" },
+      { text: "Ich habe nicht versagt. Ich habe 10.000 Wege gefunden, die nicht funktionieren.", author: "Thomas Edison" },
+      { text: "Dein wertvollster Besitz ist nicht das, was du hast, sondern wer du wirst.", author: "Jim Rohn" },
+      { text: "Perfektion ist nicht erreichbar, aber wenn wir Perfektion jagen, können wir Exzellenz erreichen.", author: "Vince Lombardi" },
+
+      // Klassiker
+      { text: "Es spielt keine Rolle, wie langsam du gehst, solange du nicht stehen bleibst.", author: "Konfuzius" },
+      { text: "Aus Steinen, die einem in den Weg gelegt werden, kann man Schönes bauen.", author: "Johann Wolfgang von Goethe" },
+      { text: "In der Mitte von Schwierigkeiten liegen die Möglichkeiten.", author: "Albert Einstein" },
+      { text: "Das Geheimnis des Vorwärtskommens ist anzufangen.", author: "Mark Twain" },
+      { text: "Es ist nie zu spät, das zu werden, was man hätte sein können.", author: "George Eliot" },
+      { text: "Der Wille öffnet die Türen zum Erfolg.", author: "Louis Pasteur" },
+
+      // Mindset & Resilienz
+      { text: "Stärke wächst nicht aus körperlicher Kraft, sondern aus unbeugsamen Willen.", author: "Mahatma Gandhi" },
+      { text: "Der größte Ruhm liegt nicht darin, niemals zu fallen, sondern jedes Mal aufzustehen.", author: "Nelson Mandela" },
+      { text: "Glaube, dass du es kannst, und du bist schon halbwegs dort.", author: "Theodore Roosevelt" },
+      { text: "Die schwierigsten Momente sind oft der Wendepunkt zum Erfolg.", author: "Winston Churchill" },
+      { text: "Du bist stärker, als du glaubst, und mutiger, als du denkst.", author: "A.A. Milne" },
+      { text: "Jeder Tag ist eine neue Chance, das Leben zu ändern, das du führst.", author: "Jordan Peterson" },
+
+      // Disziplin & Ausdauer
+      { text: "Disziplin ist die Entscheidung zwischen dem, was du jetzt willst und dem, was du am meisten willst.", author: "Augusta F. Kantra" },
+      { text: "Erfolg ist kein Zufall. Er ist harte Arbeit, Ausdauer, Lernen und Opfer.", author: "Pelé" },
+      { text: "Ein Jahr von jetzt an wirst du dir wünschen, du hättest heute angefangen.", author: "Karen Lamb" },
+      { text: "Die einzige Person, die du sein sollst, ist die Person, die du sein willst.", author: "Ralph Waldo Emerson" },
+      { text: "Kleine tägliche Verbesserungen führen langfristig zu erstaunlichen Ergebnissen.", author: "Robin Sharma" },
+      { text: "Erst wenn wir alles verlieren, sind wir frei, alles zu tun.", author: "Chuck Palahniuk" },
+
+      // Aufmunternde
+      { text: "Jeder Meister war einmal ein Anfänger. Jeder Profi war einmal ein Amateur.", author: "Robin Sharma" },
+      { text: "Deine einzige Grenze bist du selbst.", author: "Unbekannt" },
+      { text: "Auch der längste Weg beginnt mit dem ersten Schritt.", author: "Laotse" },
+      { text: "Nicht die Stärke des Körpers zählt, sondern die Stärke des Geistes.", author: "Unbekannt" },
+      { text: "Was vor uns liegt und was hinter uns liegt, ist nichts im Vergleich zu dem, was in uns liegt.", author: "Ralph Waldo Emerson" }
+    ];
+
+    let lastMotivationTime = 0;
+    const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden in Millisekunden
+
+    function initMotivationSystem() {
+      const savedTime = localStorage.getItem('aiday_last_motivation');
+      if (savedTime) {
+        lastMotivationTime = parseInt(savedTime, 10);
+      }
+    }
+
+    function canShowMotivation() {
+      const now = Date.now();
+      return (now - lastMotivationTime) >= MOTIVATION_COOLDOWN;
+    }
+
+    function getRandomQuote() {
+      const index = Math.floor(Math.random() * MOTIVATION_QUOTES.length);
+      return MOTIVATION_QUOTES[index];
+    }
+
+    function showMotivationQuote(triggerType) {
+      if (!canShowMotivation()) {
+        console.log('Motivation cooldown active, skipping quote');
+        return;
+      }
+
+      const bubble = document.getElementById('motivationBubble');
+      if (!bubble) return;
+
+      const quote = getRandomQuote();
+      const quoteTextEl = bubble.querySelector('.quote-text');
+      const quoteAuthorEl = bubble.querySelector('.quote-author');
+
+      if (quoteTextEl) quoteTextEl.textContent = `„${quote.text}"`;
+      if (quoteAuthorEl) quoteAuthorEl.textContent = `— ${quote.author}`;
+
+      // Set class based on trigger type
+      bubble.className = 'motivation-speech-bubble';
+      if (triggerType === 'bad') {
+        bubble.classList.add('bad');
+      } else if (triggerType === 'terrible') {
+        bubble.classList.add('terrible');
+      } else if (triggerType === 'tasks') {
+        bubble.classList.add('tasks-reminder');
+      }
+      // neutral uses default cyan gradient
+
+      // Show with delay
+      setTimeout(() => {
+        bubble.classList.add('show');
+      }, 1500);
+
+      // Hide after 8 seconds
+      setTimeout(() => {
+        hideMotivationBubble();
+      }, 9500);
+
+      // Save timestamp
+      lastMotivationTime = Date.now();
+      localStorage.setItem('aiday_last_motivation', lastMotivationTime.toString());
+    }
+
+    function hideMotivationBubble() {
+      const bubble = document.getElementById('motivationBubble');
+      if (!bubble || !bubble.classList.contains('show')) return;
+
+      bubble.classList.add('hiding');
+      bubble.classList.remove('show');
+
+      setTimeout(() => {
+        bubble.classList.remove('hiding');
+        bubble.className = 'motivation-speech-bubble';
+      }, 400);
+    }
+
+    function checkMoodForMotivation(mood) {
+      // Show motivation for non-positive moods (neutral, bad, terrible)
+      if (mood === 'neutral' || mood === 'bad' || mood === 'terrible') {
+        showMotivationQuote(mood);
+      }
+    }
+
+    function checkTasksForMotivation(tasks) {
+      // Only check after 18:00
+      const now = new Date();
+      const hour = now.getHours();
+      if (hour < 18) return;
+
+      // Check task completion rate
+      if (!tasks || tasks.length === 0) return;
+
+      const completedCount = tasks.filter(t => t.completed).length;
+      const completionRate = completedCount / tasks.length;
+
+      // Show motivation if less than 50% completed
+      if (completionRate < 0.5) {
+        showMotivationQuote('tasks');
+      }
+    }
+
     // ===== MOOD FACE CLICK ANIMATION =====
 
     function onMoodFaceClick() {
       const moodFace = document.getElementById('moodFace');
       if (!moodFace || moodFace.classList.contains('clicking')) return;
+
+      // Hide motivation bubble if visible
+      hideMotivationBubble();
 
       // Get current mood from class
       const moodClasses = ['great', 'good', 'neutral', 'bad', 'terrible'];
@@ -4112,6 +4366,9 @@
         if (result.success) {
           btn.textContent = 'Gespeichert!';
           showToast('Check-in erfolgreich!', 'success', 2000);
+
+          // Check if motivation quote should be shown
+          checkMoodForMotivation(checkinData.mood);
 
           // Short delay to show success
           setTimeout(() => {
@@ -4843,6 +5100,9 @@
           `;
         }).join('');
       }
+
+      // Check for motivation quote (evening reminder for incomplete tasks)
+      checkTasksForMotivation(tasks);
     }
 
     async function toggleTask(taskId, completed) {
