@@ -4016,9 +4016,10 @@
         ...options.headers
       };
 
-      // Timeout nach 30 Sekunden
+      // Timeout - Standard 60 Sekunden, kann per options.timeout überschrieben werden
+      const timeoutMs = options.timeout || 60000;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       try {
         const response = await fetch(url, {
@@ -4599,7 +4600,8 @@
           why_important: goalData.why_important,
           previous_efforts: goalData.previous_efforts,
           believed_steps: goalData.believed_steps
-        }
+        },
+        timeout: 90000 // 90 Sekunden für AI
       });
 
       btn.disabled = false;
@@ -4770,7 +4772,8 @@
 
       const result = await apiCall('/functions/v1/goals-setup', {
         method: 'POST',
-        body: { goals }
+        body: { goals },
+        timeout: 120000 // 2 Minuten für AI-Plan-Generierung
       });
 
       if (result.success) {
@@ -6043,7 +6046,8 @@
       try {
         const result = await apiCall('/functions/v1/goal-regenerate-plan', {
           method: 'POST',
-          body: { goal_id: goalId }
+          body: { goal_id: goalId },
+          timeout: 90000 // 90 Sekunden für AI-Generierung
         });
 
         if (result.success && result.plan) {
