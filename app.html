@@ -2118,25 +2118,26 @@
     /* Speech Bubble for Mood Face (Dashboard) */
     .stat-circle .mood-speech-bubble {
       position: absolute;
-      bottom: 100%;
+      bottom: calc(100% + 15px);
       left: 50%;
       transform: translateX(-50%);
       background: var(--bg-card);
       color: var(--text);
-      padding: 12px 18px;
+      padding: 14px 20px;
       border-radius: 16px;
       font-size: 13px;
       font-weight: 600;
-      white-space: nowrap;
+      white-space: normal;
       width: max-content;
-      max-width: 280px;
+      min-width: 120px;
+      max-width: 300px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       opacity: 0;
       pointer-events: none;
       z-index: 100;
-      margin-bottom: 12px;
       display: block;
       text-align: center;
+      line-height: 1.4;
     }
 
     .stat-circle .mood-speech-bubble::after {
@@ -2145,7 +2146,7 @@
       top: 100%;
       left: 50%;
       transform: translateX(-50%);
-      border: 8px solid transparent;
+      border: 10px solid transparent;
       border-top-color: var(--bg-card);
     }
 
