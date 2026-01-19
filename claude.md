@@ -177,7 +177,7 @@ aiday/
 - [x] **Automatische Update-Erkennung**
 - [x] **Offline-Banner bei Verbindungsverlust**
 
-### Frontend (app.html)
+### Frontend (app.html) - 11 Screens
 - [x] Dashboard (Hauptscreen nach Login)
 - [x] Check-in Screen
 - [x] **Review Screen (Aufgaben vom Vortag bewerten)**
@@ -185,8 +185,9 @@ aiday/
 - [x] Clarify Screen (AI-Fragen)
 - [x] Plan Screen (AI-Plan anzeigen)
 - [x] **Progress Screen (Heutige Aufgaben)**
-- [x] **Goals Overview Screen (Alle Ziele mit Klick auf Details)** ← NEU
+- [x] **Goals Overview Screen (Alle Ziele mit Klick auf Details)**
 - [x] Goal Detail Screen (Beschreibung, Plan, Meilensteine, Fortschritt)
+- [x] **Erreichte Ziele Screen** (Abgeschlossene Ziele mit Statistiken) ← NEU
 - [x] **Profile Screen (persönliche Daten)**
 - [x] **SVG-Icons statt Emojis**
 - [x] **Gradient-Buttons (Blau-Cyan, 30px border-radius)**
@@ -194,7 +195,8 @@ aiday/
 - [x] **Unified "Zurück"-Button**
 - [x] **Swipe-Navigation (links/rechts wischen)**
 - [x] **Streak-Tracking-Anzeige**
-- [x] **Klickbare "Aktive Ziele" Stat-Box → Goals Overview** ← NEU
+- [x] **Klickbare "Aktive Ziele" Stat-Box → Goals Overview**
+- [x] **"Erreichte Ziele" Button im Header** (Pokal-Icon) ← NEU
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
 - [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
@@ -670,6 +672,41 @@ Wenn von der Goals-Übersicht zum Detail navigiert wurde, blieb der Detail-Scree
 - Bei jedem API-Call prüft `daily-start` ob aktive Ziele (`status: 'in_progress'`) mit `plan_json` existieren
 - Falls für heute keine Tasks existieren, werden automatisch Tasks aus `plan_json.daily_tasks` erstellt
 - Tasks erscheinen nun jeden Tag bis das Ziel erreicht ist
+
+### 16. Aggressive Mobile-Performance-Optimierungen (start-ui.html)
+**Problem:** Selbst mit reduzierten Animationen ruckelten Login-Seiten auf Smartphones
+
+**Lösung:** Alle Animationen auf Mobile komplett deaktiviert:
+```css
+@media (max-width: 768px) {
+  .bokeh-clock, .clock-layer, .bokeh-circle, .clock-hand,
+  .pulse-ring, .wave, .light-rays, .particles, .particle {
+    display: none !important;
+    animation: none !important;
+  }
+  .orb {
+    animation: none !important;
+    filter: blur(100px);
+    opacity: 0.3;
+  }
+  .orb-3, .orb-4, .orb-5 { display: none !important; }
+}
+```
+- Nur 2 statische Orbs auf Mobile (statt 5 animierte)
+- Keine Partikel auf Mobile (`particleCount = 0`)
+- Keine Backdrop-Filter auf Mobile
+
+### 17. "Erreichte Ziele" Feature
+**Problem:** Keine Übersicht für abgeschlossene Ziele
+
+**Lösung:**
+- Neuer "Erreichte Ziele" Button im Header (ersetzt "Mein Fortschritt")
+- Pokal-Icon (Trophy SVG)
+- Neuer `achievedGoalsScreen` mit:
+  - Liste aller Ziele mit `status: 'achieved'`
+  - Statistiken: Wochen, Meilensteine, Tasks
+  - Klick auf Ziel öffnet Goal-Detail
+- Funktionen: `showAchievedGoalsScreen()`, `renderAchievedGoals()`, `showAchievedGoalDetail()`
 
 ---
 

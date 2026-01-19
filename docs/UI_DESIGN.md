@@ -627,7 +627,7 @@ Fünf langsam schwebende Orbs im Hintergrund (start-ui.html):
 
 ## Screens
 
-### app.html Screens
+### app.html Screens (11 Screens)
 
 | Screen | Beschreibung | Besondere Features |
 |--------|--------------|-------------------|
@@ -638,8 +638,9 @@ Fünf langsam schwebende Orbs im Hintergrund (start-ui.html):
 | Clarify | AI-Klarifizierungsfragen | Dynamic Questions, AI-Badge |
 | Plan | AI-Plan mit Meilensteinen | Timeline-Darstellung, Accept/Reject |
 | Progress | Heutige Aufgaben anzeigen | Task-Liste mit Checkboxen |
-| **Goals Overview (NEU)** | Übersicht aller Ziele | Klickbare Goal-Cards, Fortschrittsanzeige |
+| **Goals Overview** | Übersicht aller Ziele | Klickbare Goal-Cards, Fortschrittsanzeige |
 | **Goal Detail** | Einzelnes Ziel mit Plan | Milestones, Tasks-Liste, Fortschritt |
+| **Erreichte Ziele (NEU)** | Abgeschlossene Ziele | Statistiken (Wochen, Meilensteine, Tasks) |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten | Form mit 8 Feldern |
 
 ### Layout-Änderungen (AKTUALISIERT)
@@ -832,6 +833,82 @@ Detailansicht eines einzelnen Ziels mit vollständigem AI-Plan:
 - Roter Button am Ende der Goal Detail Ansicht
 - Bestätigungsdialog mit `confirm()` ("Möchtest du dieses Ziel wirklich löschen?")
 - Löscht Ziel, alle zugehörigen Tasks und AI-Suggestions
+
+### Erreichte Ziele Screen (NEU)
+
+Übersicht aller abgeschlossenen Ziele, erreichbar über "Erreichte Ziele" Button im Header:
+
+```html
+<div id="achievedGoalsScreen" class="screen">
+  <div class="card">
+    <button class="back-btn" onclick="showScreen('dashboardScreen')">
+      <svg>←</svg>
+    </button>
+    <h2 class="card-title">Erreichte Ziele</h2>
+    <p class="card-subtitle">Deine abgeschlossenen Ziele</p>
+  </div>
+
+  <div id="achievedGoalsList">
+    <!-- Dynamisch generierte Achievement-Cards -->
+    <div class="achieved-goal-card" onclick="showAchievedGoalDetail(idx)">
+      <div class="achieved-goal-icon">🏆</div>
+      <div class="achieved-goal-content">
+        <div class="achieved-goal-title">Ziel-Titel</div>
+        <div class="achieved-goal-stats">
+          <span>12 Wochen</span>
+          <span>4 Meilensteine</span>
+          <span>84 Tasks</span>
+        </div>
+      </div>
+      <svg class="chevron">→</svg>
+    </div>
+  </div>
+</div>
+```
+
+**CSS für Erreichte Ziele:**
+
+```css
+.achieved-goal-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.achieved-goal-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+}
+
+.achieved-goal-icon {
+  font-size: 32px;
+}
+
+.achieved-goal-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.achieved-goal-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+```
+
+**JavaScript-Funktionen:**
+- `showAchievedGoalsScreen()` - Lädt und zeigt erreichte Ziele
+- `renderAchievedGoals()` - Rendert die Liste
+- `showAchievedGoalDetail(idx)` - Zeigt Zieldetails
 
 ### Profile Screen (NEU)
 
@@ -1063,25 +1140,35 @@ Alle Dateien verwenden:
 
 ### Mobile Animation Performance (start-ui.html)
 
-Optimierungen für flüssige Animationen auf Mobile-Geräten:
+**AGGRESSIVE Optimierungen für Mobile-Geräte:**
+
+Alle komplexen Animationen werden auf Mobile komplett deaktiviert für maximale Performance:
 
 ```css
-/* GPU-Beschleunigung für animierte Elemente */
 @media (max-width: 768px) {
-  .bokeh-clock, .bokeh-circle, .orb, .particle, .pulse-ring, .wave, .clock-hand {
-    will-change: transform, opacity;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-
-  /* Reduzierter Blur für bessere Performance */
-  .clock-layer {
-    filter: blur(30px);  /* statt 80px */
-  }
-
-  /* Verstecke unnötige Elemente */
-  .clock-4, .clock-5, .orb-4, .orb-5, .light-rays {
+  /* Alle Bokeh-Clocks und komplexen Animationen komplett ausblenden */
+  .bokeh-clock, .clock-layer, .bokeh-circle, .clock-hand,
+  .pulse-ring, .wave, .light-rays, .particles, .particle {
     display: none !important;
+    animation: none !important;
+  }
+
+  /* Nur 2 statische Orbs behalten (statt 5 animierte) */
+  .orb {
+    animation: none !important;
+    filter: blur(100px);
+    opacity: 0.3;
+  }
+
+  /* Orb 3, 4, 5 ausblenden */
+  .orb-3, .orb-4, .orb-5 {
+    display: none !important;
+  }
+
+  /* Kein Backdrop-Filter auf Mobile */
+  .card, .slider-card, .form-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -1096,10 +1183,15 @@ Optimierungen für flüssige Animationen auf Mobile-Geräten:
 
 **JavaScript-Optimierungen:**
 ```javascript
-// Weniger Partikel auf Mobile
+// KEINE Partikel auf Mobile (0 statt 12)
 const isMobile = window.innerWidth <= 768;
-const particleCount = isMobile ? 12 : 35;
+const particleCount = isMobile ? 0 : 35;
 ```
+
+**Ergebnis:**
+- Nur 2 statische, verschwommene Farbflächen auf Mobile
+- Keine komplexen Animationen oder Partikel
+- Deutlich bessere Performance auf älteren Smartphones
 
 ### Optimistische UI-Updates (app.html)
 

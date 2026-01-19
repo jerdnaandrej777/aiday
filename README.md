@@ -46,9 +46,11 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Täglicher Check-in**: Stimmung, Energie, Notizen erfassen
 - **Ziel-Definition**: Intelligente AI-Klarifizierung (z.B. "Bist du angestellt oder selbstständig?")
 - **Personalisierte Pläne**: Meilensteine und tägliche Tasks basierend auf Kontext und Profil
+- **Automatische tägliche Tasks**: Tasks erscheinen jeden Tag aus dem Plan bis Ziel erreicht
 - **Task-Management**: Aufgaben abhaken, löschen, Fortschritt verfolgen
 - **Goals Overview**: Übersicht aller Ziele mit Klick auf Details
 - **Goal Detail**: Beschreibung, Plan, Meilensteine, Fortschritt (direkt aus plan_json)
+- **Erreichte Ziele**: Übersicht abgeschlossener Ziele mit Statistiken (Wochen, Meilensteine, Tasks)
 - **AI-Plan Regenerieren**: Neuen Plan für bestehendes Ziel ohne Plan generieren
 - **Optimistische UI-Updates**: Tasks werden sofort visuell aktualisiert
 
@@ -81,8 +83,11 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Kein horizontales Scrollen** - volle Bildschirmbreite
 - **Touch-optimierte Buttons** (56px Mindestgröße)
 - **Swipe-Navigation** zwischen Screens
-- **GPU-beschleunigte Animationen** für flüssige Performance
-- **Reduzierte Animationen** auf Mobile (weniger Partikel, geringerer Blur)
+- **Aggressive Performance-Optimierungen** auf Mobile:
+  - Alle Bokeh-Clocks und komplexe Animationen deaktiviert
+  - Nur 2 statische Orbs (statt 5 animierte)
+  - Keine Partikel auf Mobile
+  - Kein Backdrop-Filter auf Mobile
 - **prefers-reduced-motion Support** für Barrierefreiheit
 
 ### Technische Details
@@ -100,13 +105,13 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 #### Daily Coaching (Hauptfeatures)
 | Function | Methode | Beschreibung |
 |----------|---------|--------------|
-| `daily-start` | GET/POST | Flow-Status, lädt plan_json für Ziele |
+| `daily-start` | GET/POST | Flow-Status, lädt plan_json, **AUTO-generiert tägliche Tasks** |
 | `daily-checkin` | POST | Check-in speichern |
 | `goal-clarify` | POST | AI-Klarifizierungsfragen |
 | `goals-setup` | POST | Ziele + AI-Plan erstellen (speichert plan_json) |
 | `goal-regenerate-plan` | POST | AI-Plan für bestehendes Ziel regenerieren |
 | `goal-delete` | POST | Ziel mit allen Daten löschen |
-| `accept-plan` | POST | Plan akzeptieren, Tasks erstellen |
+| `accept-plan` | POST | Plan akzeptieren, initiale Tasks erstellen |
 | `task-update` | POST | Task abhaken/löschen |
 | `daily-review` | POST | Tagesreview |
 
@@ -333,7 +338,7 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 
 ## UI-Design
 
-### Screens in app.html (10 Screens)
+### Screens in app.html (11 Screens)
 | Screen | Beschreibung |
 |--------|--------------|
 | **Dashboard ("aiday")** | Tägliche Tasks, klickbare Stat-Boxes |
@@ -343,8 +348,9 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 | Clarify | AI-Klarifizierungsfragen beantworten |
 | Plan | AI-Plan mit Meilensteinen prüfen |
 | Progress | Heutige Aufgaben anzeigen |
-| **Goals Overview (NEU)** | Übersicht aller Ziele, klickbar → Goal Detail |
+| **Goals Overview** | Übersicht aller Ziele, klickbar → Goal Detail |
 | Goal Detail | Ziel-Details mit Plan, Meilensteinen und Tasks |
+| **Erreichte Ziele (NEU)** | Abgeschlossene Ziele mit Statistiken |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten |
 
 ### start-ui.html Features

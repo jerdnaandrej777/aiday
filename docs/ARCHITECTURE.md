@@ -21,7 +21,7 @@
 │                        FRONTEND (app.html)                       │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │              GLOBALER HEADER (auf allen Screens)         │   │
-│  │  aiday    [Mein Fortschritt]    user@email.com  Abmelden │   │
+│  │  aiday    [Erreichte Ziele 🏆]   user@email.com  Abmelden │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
 │  │Check-in │ │ Goals   │ │ Clarify │ │  Plan   │ │Dashboard│   │
@@ -73,7 +73,7 @@
 - **Networking**: Fetch API mit JWT im Authorization-Header
 - **Styling**: CSS-Variablen, Glassmorphism, SVG-Icons
 
-### Screens (10 Screens)
+### Screens (11 Screens)
 | Screen | Funktion |
 |--------|----------|
 | Dashboard ("aiday") | Übersicht, Quick Actions, Tasks, klickbare Stat-Boxes |
@@ -85,11 +85,12 @@
 | Progress | Heutige Aufgaben |
 | **Goals Overview** | Übersicht aller Ziele (klickbar → Goal Detail) |
 | Goal Detail | Ziel-Details, Meilensteine, Fortschritt |
+| **Erreichte Ziele** | Abgeschlossene Ziele mit Statistiken (NEU) |
 | Profile | Persönliche Daten |
 
-### Globaler Header (NEU)
+### Globaler Header
 - **Sichtbar auf allen Screens** (außer Loading-Screen)
-- **Inhalt**: "aiday" Logo, "Mein Fortschritt" Button, E-Mail, "Abmelden"
+- **Inhalt**: "aiday" Logo, "Erreichte Ziele" Button (Pokal-Icon), E-Mail, "Abmelden"
 - **Abstände**: 28px links/rechts für Bündigkeit mit Card-Rand
 
 ### Navigation
@@ -188,13 +189,13 @@ coach.ai_suggestions
 ### Daily Coaching Flow
 | Function | Beschreibung |
 |----------|--------------|
-| `daily-start` | Flow-Status (review/checkin/goals/dashboard), lädt plan_json |
+| `daily-start` | Flow-Status, lädt plan_json, **AUTO-generiert tägliche Tasks** |
 | `daily-checkin` | Check-in speichern |
 | `goal-clarify` | AI-Klarifizierungsfragen |
 | `goals-setup` | Ziele + AI-Plan erstellen (speichert plan_json) |
 | `goal-regenerate-plan` | AI-Plan für bestehendes Ziel regenerieren |
 | `goal-delete` | Ziel mit allen Daten löschen |
-| `accept-plan` | Plan akzeptieren, Tasks erstellen |
+| `accept-plan` | Plan akzeptieren, initiale Tasks erstellen |
 | `task-update` | Task bearbeiten |
 | `daily-review` | Tagesreview |
 
