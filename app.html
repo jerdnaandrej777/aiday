@@ -56,6 +56,14 @@
       --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
     }
 
+    /* Dark Mode: Sprechblasen behalten schwarzen Text */
+    body.dark-mode .mood-speech-bubble,
+    body.dark-mode .energy-speech-bubble,
+    body.dark-mode .dashboard-bubble,
+    body.dark-mode .motivation-speech-bubble {
+      color: #1e293b;
+    }
+
     /* System Preference Dark Mode (wird von JS überschrieben wenn manuell gesetzt) */
     @media (prefers-color-scheme: dark) {
       body:not(.light-mode) {
@@ -69,6 +77,13 @@
         --glass-border: rgba(148, 163, 184, 0.15);
         --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+      }
+      /* Sprechblasen behalten schwarzen Text bei System-Präferenz */
+      body:not(.light-mode) .mood-speech-bubble,
+      body:not(.light-mode) .energy-speech-bubble,
+      body:not(.light-mode) .dashboard-bubble,
+      body:not(.light-mode) .motivation-speech-bubble {
+        color: #1e293b;
       }
     }
 
