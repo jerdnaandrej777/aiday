@@ -40,14 +40,18 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Gamification-System** (XP, Level, Achievements)
 - **Timezone-Support** für korrekte Datumsberechnung
 - **Idempotency-Keys** verhindert doppelte Einträge
-- **Habit Tracking System** mit Streak-Berechnung pro Habit ← NEU
-- **Pomodoro Timer** (25min Fokus + 5min Pause) ← NEU
-- **Task Priorität** (High/Medium/Low mit variablen XP) ← NEU
-- **Streak Recovery** (3-Tage Comeback-Challenge, max 1x/Monat) ← NEU
-- **Weekly Deep Review** mit AI-Analyse ← NEU
-- **Burnout Detection** mit automatischer Warnung ← NEU
-- **Notification Preferences** (Quiet Hours, Reminder-Zeit) ← NEU
-- **Coaching Style Personalisierung** (supportive/challenging/balanced) ← NEU
+- **Habit Tracking System** mit Streak-Berechnung pro Habit
+- **AI-generierte Habit Benefits** - Automatische Vorteile pro Gewohnheit ← NEU
+- **Habit Detail Modal** - Klickbare Habits mit Statistiken ← NEU
+- **Pomodoro Timer** (25min Fokus + 5min Pause)
+- **Task Priorität** (High/Medium/Low mit variablen XP)
+- **Streak Recovery** (3-Tage Comeback-Challenge, max 1x/Monat)
+- **Weekly Deep Review** mit AI-Analyse
+- **Burnout Detection** mit automatischer Warnung
+- **Notification Preferences** (Quiet Hours, Reminder-Zeit)
+- **Coaching Style Personalisierung** (supportive/challenging/balanced)
+- **Dark Mode Quick Action** - 6. Button im Dashboard ← NEU
+- **Einheitliche Badges** - "X Habits" statt "X/Y" ← NEU
 
 ---
 
@@ -208,6 +212,9 @@ aiday/
   - Streak-Berechnung pro Habit (aktuell + bester)
   - +5 XP pro Habit-Completion
   - Grüne-Felder-Kalender UI
+  - **AI-generierte Benefits** pro Habit (GPT-4o-mini)
+  - **Habit Detail Modal** mit Statistiken und Vorteilen
+  - **"Neu generieren" Button** für Benefits
 - [x] **Pomodoro Timer**
   - 25min Fokus + 5min Pause (konfigurierbar)
   - Visual Countdown im Task-Detail
@@ -330,7 +337,7 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 | `daily-review` | POST | Tagesreview mit AI-Feedback | GPT-4o-mini |
 | `task-update` | POST | Task abhaken/löschen + XP vergeben | - |
 | `gamification-award` | POST | XP vergeben & Achievements prüfen | - |
-| `habit-update` | POST | Habit CRUD + Complete/Uncomplete | - |
+| `habit-update` | POST | Habit CRUD + Complete/Uncomplete + AI Benefits | GPT-4o-mini |
 | `task-adjust-ai` | POST | AI-basiertes Task-Splitting | GPT-4o-mini |
 | `streak-recovery` | POST | 3-Tage Streak Recovery Challenge | GPT-4o-mini |
 | `weekly-reflection` | POST | Weekly Deep Review mit AI-Analyse | GPT-4o-mini |
@@ -445,11 +452,15 @@ core.habits
   - user_id UUID (FK auth.users)
   - title TEXT NOT NULL
   - description TEXT
-  - frequency TEXT DEFAULT 'daily'        -- 'daily', 'weekdays', '3x_week', 'weekly'
-  - target_days INTEGER[]                 -- z.B. {1,2,3,4,5} für Mo-Fr
+  - icon TEXT DEFAULT '✨'                 -- Emoji-Icon
+  - color TEXT DEFAULT '#6366f1'           -- Hex-Farbe
+  - frequency TEXT DEFAULT 'daily'         -- 'daily', 'weekdays', '3x_week', 'weekly'
+  - target_days INTEGER[]                  -- z.B. {1,2,3,4,5} für Mo-Fr
   - xp_reward INTEGER DEFAULT 5
   - current_streak INTEGER DEFAULT 0
   - best_streak INTEGER DEFAULT 0
+  - total_completions INTEGER DEFAULT 0
+  - benefits JSONB DEFAULT '[]'            -- AI-generierte Vorteile ← NEU
   - is_active BOOLEAN DEFAULT true
   - created_at TIMESTAMPTZ
 
@@ -1506,3 +1517,220 @@ const userTimezoneOffset = new Date().getTimezoneOffset();
   // ... nutzt userTimezoneOffset
 })();
 ```
+
+### 40. AI-generierte Habit Benefits
+**Feature:** Jeder Habit bekommt automatisch AI-generierte Vorteile
+
+**Implementierung:**
+- Beim Erstellen eines Habits generiert GPT-4o-mini 4-5 spezifische Vorteile
+- Basierend auf Habit-Titel und Beschreibung
+- Neue `benefits` JSONB-Spalte in `core.habits`
+- Button "Vorteile generieren" für ältere Habits ohne Benefits
+- Button "Neu generieren" für Habits mit bestehenden Benefits
+
+**Edge Function** (`habit-update`):
+```typescript
+async function generateHabitBenefits(title: string, description?: string): Promise<string[]> {
+  const prompt = `Generiere 4-5 konkrete Vorteile für: ${title}...`;
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+  });
+  // Parse JSON und entferne Markdown Code-Blöcke
+  return benefits;
+}
+```
+
+**Migration:** `db/20260119_habit_benefits.sql`
+```sql
+ALTER TABLE core.habits
+ADD COLUMN IF NOT EXISTS benefits JSONB DEFAULT '[]';
+```
+
+### 41. Habit Detail Modal
+**Feature:** Klickbare Habits öffnen ein Detail-Modal mit Statistiken und Vorteilen
+
+**Inhalte des Modals:**
+- Habit-Icon und Titel
+- Beschreibung (falls vorhanden)
+- Statistiken: Aktuelle Streak, Beste Streak, Gesamt-Completions
+- AI-generierte Vorteile (mit "Neu generieren" Button)
+- Frequenz-Anzeige
+- Löschen-Button
+
+**Code:**
+```javascript
+function showHabitDetail(habitId) {
+  const habit = habitsData.habits?.find(h => h.id === habitId);
+  // Modal-Daten füllen
+  document.getElementById('habitDetailModal').style.display = 'flex';
+}
+```
+
+### 42. Dark Mode Quick Action Button
+**Feature:** 6. Button in Quick Actions für Dark Mode Toggle
+
+**Implementierung:**
+- Mond-Icon (🌙) im Light Mode
+- Sonnen-Icon (☀️) im Dark Mode
+- Label wechselt zwischen "Dark Mode" und "Light Mode"
+- Ruft `toggleDarkMode()` auf
+
+**Code:**
+```javascript
+function updateThemeToggleUI() {
+  const darkModeLabel = document.getElementById('darkModeLabel');
+  const darkModeIcon = document.getElementById('darkModeIcon');
+  if (isDarkMode) {
+    darkModeLabel.textContent = 'Light Mode';
+    darkModeIcon.innerHTML = '<circle cx="12" cy="12" r="5"/>...'; // Sonne
+  } else {
+    darkModeLabel.textContent = 'Dark Mode';
+    darkModeIcon.innerHTML = '<path d="M21 12.79A9..."/>'; // Mond
+  }
+}
+```
+
+### 43. Neuer Habit Button im Habits-Screen
+**Feature:** Prominenter "+ Neuer Habit" Button zwischen Stats und Habits-Liste
+
+**Position:** Zwischen "Aktive Habits/Beste Streak/Heute" Stats und "Heute zu erledigen" Block
+
+**Code:**
+```html
+<button class="btn btn-primary" onclick="showAddHabitModal()" style="width: 100%;">
+  <svg>...</svg> Neuer Habit
+</button>
+```
+
+### 44. Löschen-Button Fix (CSS)
+**Problem:** Text im Löschen-Button nicht sichtbar
+
+**Ursache:** CSS verwendete `var(--error)` die nicht definiert war
+
+**Lösung:**
+```css
+/* VORHER (falsch) */
+.btn-danger { background: var(--error); }
+
+/* NACHHER (korrekt) */
+.btn-danger { background: var(--danger); color: white; }
+```
+
+### 45. Habit Calendar Wochentage Fix
+**Problem:** Kalender zeigte statisch "So, Mo, Di, Mi, Do, Fr, Sa" unabhängig vom Datum
+
+**Lösung:** Wochentage dynamisch basierend auf den tatsächlichen Daten generieren:
+```javascript
+function renderHabitCalendar() {
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dayOfWeek = date.getDay();
+    headerHtml += `<div class="habit-calendar-header">${dayNames[dayOfWeek]}</div>`;
+  }
+}
+```
+
+### 46. Einheitliche Badges (Aufgaben/Habits)
+**Problem:** "Heutige Aufgaben" zeigte "3 Aufgaben", "Heutige Habits" zeigte "3/3"
+
+**Lösung:** Beide Badges im gleichen Format:
+- "3 Aufgaben"
+- "3 Habits"
+
+```javascript
+progressCount.textContent = `${activeHabits.length} Habits`;
+```
+
+### 47. Loading-State für Habit-Erstellung
+**Feature:** Button zeigt "⏳ Wird erstellt..." während der AI die Benefits generiert
+
+**Code:**
+```javascript
+async function createHabit() {
+  const btn = document.getElementById('createHabitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Wird erstellt...';
+
+  // API-Call...
+
+  btn.disabled = false;
+  btn.innerHTML = 'Erstellen';
+}
+```
+
+### 48. AI Benefits Markdown-Fix
+**Problem:** OpenAI gibt manchmal Markdown Code-Blöcke zurück: \`\`\`json [...] \`\`\`
+
+**Lösung:** Code-Blöcke vor dem JSON-Parsing entfernen:
+```typescript
+let jsonContent = content.trim();
+if (jsonContent.startsWith('```json')) {
+  jsonContent = jsonContent.slice(7);
+}
+if (jsonContent.endsWith('```')) {
+  jsonContent = jsonContent.slice(0, -3);
+}
+const benefits = JSON.parse(jsonContent.trim());
+```
+
+### 49. Alle Habits im Dashboard anzeigen
+**Problem:** Dashboard zeigte nur 3 Habits (`.slice(0, 3)`)
+
+**Lösung:** Begrenzung entfernt, alle Habits werden angezeigt:
+```javascript
+// VORHER
+const previewHabits = activeHabits.slice(0, 3);
+
+// NACHHER
+list.innerHTML = activeHabits.map(habit => {...}).join('');
+```
+
+### 50. XP-Anzeige Fix
+**Problem:** XP wurden nicht im Level-Block angezeigt (immer 0/100)
+
+**Ursachen:**
+1. `loadGamificationData()` las aus `profileResult.data.total_xp` statt `profileResult.data.profile.total_xp`
+2. `handleGamificationFeedback()` aktualisierte die XP-Anzeige nicht
+
+**Lösung:**
+```javascript
+// Fix 1: Korrekter Pfad zu den Profildaten
+if (profileResult.success && profileResult.data?.profile) {
+  gamificationData.total_xp = profileResult.data.profile.total_xp || 0;
+  gamificationData.level = profileResult.data.profile.level || 1;
+}
+
+// Fix 2: XP-Anzeige sofort aktualisieren
+function handleGamificationFeedback(gamification) {
+  if (gamification.total_xp !== undefined) {
+    document.getElementById('currentXp').textContent = xpInCurrentLevel;
+    document.getElementById('userLevel').textContent = gamification.level;
+    document.getElementById('xpProgress').style.width = `${progress}%`;
+  }
+}
+```
+
+### 51. Onboarding nur einmal anzeigen
+**Feature:** Onboarding erscheint nur beim ersten Login, nicht bei jedem Start
+
+**Implementierung:**
+```javascript
+function shouldShowOnboarding() {
+  return !localStorage.getItem('aiday_onboarding_completed');
+}
+
+// Nach erfolgreichem Onboarding:
+localStorage.setItem('aiday_onboarding_completed', 'true');
+```
+
+### 52. "Alle Habits" als Modal
+**Feature:** "Alle Habits" Block durch Popup-Modal ersetzt
+
+**Grund:** Vermeidet Verwirrung, da dieselben Habits in "Heute zu erledigen" und "Alle Habits" erschienen
+
+**Implementierung:**
+- Button "📋 Alle Habits verwalten" öffnet Modal
+- Modal zeigt alle Habits mit Bearbeiten/Löschen-Optionen
+- "+ Neuer Habit" Button im Modal
