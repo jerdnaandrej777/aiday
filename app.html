@@ -2700,13 +2700,13 @@
             <h1 class="app-header-title">aiday</h1>
           </div>
           <div class="header-center">
-            <button class="progress-btn" onclick="showProgressScreen()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button class="progress-btn" id="headerNavBtn" onclick="onHeaderNavClick()">
+              <svg id="headerNavIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="20" x2="12" y2="10"/>
                 <line x1="18" y1="20" x2="18" y2="4"/>
                 <line x1="6" y1="20" x2="6" y2="16"/>
               </svg>
-              Mein Fortschritt
+              <span id="headerNavText">Mein Fortschritt</span>
             </button>
           </div>
           <div class="header-right">
@@ -3659,6 +3659,49 @@
       const globalHeader = document.getElementById('globalHeader');
       if (globalHeader) {
         globalHeader.style.display = (screenId === 'loadingScreen') ? 'none' : 'block';
+      }
+
+      // Header Navigation Button aktualisieren
+      updateHeaderNavButton(screenId);
+    }
+
+    // Header Navigation Button dynamisch aktualisieren
+    function updateHeaderNavButton(screenId) {
+      const navText = document.getElementById('headerNavText');
+      const navIcon = document.getElementById('headerNavIcon');
+      if (!navText || !navIcon) return;
+
+      // Auf dem Dashboard: "Mein Fortschritt" anzeigen
+      // Auf allen anderen Screens: "Dashboard" anzeigen
+      if (screenId === 'dashboardScreen') {
+        navText.textContent = 'Mein Fortschritt';
+        navIcon.innerHTML = `
+          <line x1="12" y1="20" x2="12" y2="10"/>
+          <line x1="18" y1="20" x2="18" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="16"/>
+        `;
+      } else {
+        navText.textContent = 'Dashboard';
+        navIcon.innerHTML = `
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        `;
+      }
+    }
+
+    // Header Navigation Button Click Handler
+    function onHeaderNavClick() {
+      const activeScreen = document.querySelector('.screen.active');
+      if (!activeScreen) return;
+
+      if (activeScreen.id === 'dashboardScreen') {
+        // Vom Dashboard → Mein Fortschritt
+        showProgressScreen();
+      } else {
+        // Von allen anderen Screens → Dashboard
+        showScreen('dashboardScreen', 'back');
       }
     }
 
