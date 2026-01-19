@@ -16,8 +16,9 @@
 | `goal-clarify` | POST | AI-Klarifizierungsfragen für Ziel |
 | `goals-setup` | POST | Ziele erstellen + AI-Plan generieren (nutzt Profildaten) |
 | `accept-plan` | POST | Plan akzeptieren, Tasks erstellen |
-| `task-update` | POST | Task abhaken/löschen |
+| `task-update` | POST | Task abhaken/löschen + XP vergeben |
 | `daily-review` | POST | Tagesreview |
+| `gamification-award` | POST | XP vergeben & Achievements prüfen (NEU) |
 
 ### Auth & Profil
 | Function | Methode | Beschreibung |
@@ -152,6 +153,123 @@ await fetch(`${SUPABASE_URL}/functions/v1/auth-profile`, {
     challenges: 'Wenig Zeit'
   })
 });
+```
+
+---
+
+---
+
+## Gamification-System (NEU)
+
+### gamification-award
+XP vergeben und Achievements prüfen.
+
+**POST** `/functions/v1/gamification-award`
+
+```json
+// Request
+{
+  "action": "task_complete" | "all_tasks_complete" | "goal_achieved" | "streak_continued" | "checkin_done",
+  "metadata": {
+    "streak_days": 7,           // optional
+    "tasks_completed_today": 3,  // optional
+    "total_tasks_completed": 45, // optional
+    "goals_count": 2             // optional
+  }
+}
+
+// Response
+{
+  "xp_earned": 60,
+  "total_xp": 1240,
+  "level": 5,
+  "previous_level": 5,
+  "level_up": false,
+  "new_achievements": [
+    {
+      "code": "tasks_50",
+      "name": "Produktiv",
+      "icon": "🌟",
+      "xp_reward": 300
+    }
+  ]
+}
+```
+
+### task-update (mit Gamification)
+Task-Completion vergibt automatisch XP.
+
+**POST** `/functions/v1/task-update`
+
+```json
+// Request
+{
+  "task_id": "uuid",
+  "action": "complete" | "uncomplete" | "delete",
+  "timezone_offset": -60  // optional, für korrekte Datumsberechnung
+}
+
+// Response bei action: "complete"
+{
+  "success": true,
+  "action": "complete",
+  "completed": true,
+  "gamification": {
+    "xp_earned": 60,
+    "total_xp": 1240,
+    "level": 5,
+    "previous_level": 4,
+    "level_up": true,
+    "new_achievements": [...],
+    "all_tasks_completed": true
+  }
+}
+```
+
+### XP-Werte
+| Aktion | XP |
+|--------|-----|
+| Task erledigt | +10 |
+| Alle Tages-Tasks erledigt | +50 Bonus |
+| Streak fortgesetzt | +20 (+ bis zu 145 Bonus für längere Streaks) |
+| Ziel erreicht | +100 |
+| Check-in erledigt | +5 |
+
+### Level-Berechnung
+```javascript
+const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
+```
+
+---
+
+## Timezone-Support (NEU)
+
+Alle relevanten Endpoints akzeptieren `timezone_offset` für korrekte Datumsberechnung:
+
+```json
+// Request Body oder Header
+{
+  "timezone_offset": -60  // Minuten, z.B. -60 für UTC+1
+}
+
+// Alternativ als Header
+X-Timezone-Offset: -60
+```
+
+**Unterstützte Endpoints:** daily-start, goals-setup, task-update
+
+---
+
+## Idempotency-Keys (NEU)
+
+Für kritische Operationen (goals-setup, accept-plan) kann ein Idempotency-Key gesendet werden:
+
+```javascript
+// Header
+X-Idempotency-Key: user123-1705600000000-abc123xyz
+
+// Verhindert doppelte Einträge bei Doppelklick
+// Bei Duplikat wird cached Response zurückgegeben
 ```
 
 ---

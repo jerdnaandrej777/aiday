@@ -30,9 +30,51 @@ supabase.schema('coach').from('ai_suggestions')
 supabase.schema('notifications').from('push_tokens')
 supabase.schema('analytics').from('month_rollup')
 supabase.schema('audit').from('event_log')
+
+// Gamification (NEU)
+supabase.schema('core').from('achievements')
+supabase.schema('core').from('user_achievements')
 ```
 
 **Wichtig:** Ohne `.schema()` sucht Supabase im `public` Schema und findet die Tabellen nicht!
+
+## Shared Utilities (_shared/utils.ts) (NEU)
+
+### Timezone-Support
+```typescript
+// Korrektes Datum basierend auf User-Timezone
+export function getUserToday(timezoneOffset?: number): string {
+  const now = new Date();
+  if (timezoneOffset !== undefined && timezoneOffset !== null) {
+    const userTime = new Date(now.getTime() - (timezoneOffset * 60 * 1000));
+    return userTime.toISOString().split('T')[0];
+  }
+  return now.toISOString().split('T')[0];
+}
+
+// Timezone-Offset aus Request extrahieren
+export function extractTimezoneOffset(req: Request, body?: any): number | undefined
+```
+
+### Idempotency-Keys
+```typescript
+// Idempotency-Key aus Header extrahieren
+export function extractIdempotencyKey(req: Request): string | undefined {
+  return req.headers.get('x-idempotency-key') || undefined;
+}
+```
+
+**Verwendung in Edge Functions:**
+```typescript
+import { getUserToday, extractTimezoneOffset, extractIdempotencyKey } from '../_shared/utils.ts'
+
+// Timezone
+const timezoneOffset = extractTimezoneOffset(req, validation.data);
+const today = getUserToday(timezoneOffset);
+
+// Idempotency
+const idempotencyKey = extractIdempotencyKey(req);
+```
 
 ---
 
@@ -144,8 +186,35 @@ Pfad: `functions/v1/accept-plan`
 ### task-update
 Pfad: `functions/v1/task-update`
 - Methode: POST
-- Body: `{ "task_id": "uuid", "action": "complete|uncomplete|delete" }`
+- Body:
+```json
+{
+  "task_id": "uuid",
+  "action": "complete|uncomplete|delete",
+  "timezone_offset": -60  // optional, für korrekte Datumsberechnung
+}
+```
 - Nur heutige Tasks können bearbeitet werden
+- **NEU: Vergibt automatisch XP bei Task-Completion**
+- Response bei `action: "complete"`:
+```json
+{
+  "success": true,
+  "action": "complete",
+  "completed": true,
+  "gamification": {
+    "xp_earned": 60,
+    "total_xp": 1240,
+    "level": 5,
+    "previous_level": 4,
+    "level_up": true,
+    "new_achievements": [
+      { "code": "tasks_10", "name": "Fleißig", "icon": "⭐", "xp_reward": 100 }
+    ],
+    "all_tasks_completed": true
+  }
+}
+```
 
 ### goal-delete
 Pfad: `functions/v1/goal-delete`
@@ -205,6 +274,55 @@ Pfad: `functions/v1/daily-review`
     "note": "..."
   }]
 }
+```
+
+---
+
+## Gamification (NEU)
+
+### gamification-award
+Pfad: `functions/v1/gamification-award`
+- Methode: POST
+- Auth: required
+- Vergibt XP und prüft/vergibt Achievements
+- Body:
+```json
+{
+  "action": "task_complete|all_tasks_complete|goal_achieved|streak_continued|checkin_done",
+  "metadata": {
+    "streak_days": 7,           // optional
+    "tasks_completed_today": 3,  // optional
+    "total_tasks_completed": 45, // optional
+    "goals_count": 2             // optional
+  }
+}
+```
+- Response:
+```json
+{
+  "xp_earned": 60,
+  "total_xp": 1240,
+  "level": 5,
+  "previous_level": 5,
+  "level_up": false,
+  "new_achievements": [
+    { "code": "tasks_50", "name": "Produktiv", "icon": "🌟", "xp_reward": 300 }
+  ]
+}
+```
+
+**XP-Werte:**
+| Aktion | XP |
+|--------|-----|
+| task_complete | +10 |
+| all_tasks_complete | +50 |
+| goal_achieved | +100 |
+| streak_continued | +20 (+ Bonus für längere Streaks) |
+| checkin_done | +5 |
+
+**Level-Berechnung:**
+```javascript
+const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
 ```
 
 ---

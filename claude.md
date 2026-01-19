@@ -37,6 +37,9 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Offline-Funktionalität**
 - **Disziplin-Motivations-Feature** (Zitate bei schlechter Stimmung)
 - **Einheitliches Sprechblasen-Design** (weiß, Pfeil links)
+- **Gamification-System** (XP, Level, Achievements) ← NEU
+- **Timezone-Support** für korrekte Datumsberechnung ← NEU
+- **Idempotency-Keys** verhindert doppelte Einträge ← NEU
 
 ---
 
@@ -86,6 +89,7 @@ aiday/
 │   │   │   ├── supabase.ts       # Client Factory
 │   │   │   ├── validation.ts     # Zod Schemas
 │   │   │   ├── openai.ts         # OpenAI Integration + Prompts
+│   │   │   ├── utils.ts          # Timezone & Idempotency Utilities (NEU)
 │   │   │   └── import_map.json   # Deno Dependencies
 │   │   │
 │   │   │── # === AUTH ===
@@ -263,7 +267,8 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 | `daily-start` | GET/POST | Täglicher Flow-Status (lädt plan_json, AUTO-generiert Tasks) | - |
 | `daily-checkin` | POST | Check-in speichern | - |
 | `daily-review` | POST | Tagesreview mit AI-Feedback | GPT-4o-mini |
-| `task-update` | POST | Task abhaken/löschen | - |
+| `task-update` | POST | Task abhaken/löschen + XP vergeben | - |
+| `gamification-award` | POST | XP vergeben & Achievements prüfen | - |
 | `coach-plan` | POST | AI-Tagesplan (LEGACY) | GPT-4o-mini |
 | `coach-checkin` | POST | AI-Coaching Feedback (LEGACY) | GPT-4o-mini |
 | `auth-profile` | GET/POST | Benutzerprofil | - |
@@ -284,7 +289,7 @@ supabase.from('user_profile')
 ## Datenbank-Schema
 
 ### Schemas
-- **core**: user_profile, day_entries, goals, action_steps, daily_checkins, daily_tasks
+- **core**: user_profile, day_entries, goals, action_steps, daily_checkins, daily_tasks, achievements, user_achievements
 - **coach**: ai_suggestions
 - **notifications**: push_tokens
 - **analytics**: month_rollup (Materialized View)
@@ -297,6 +302,8 @@ supabase.from('user_profile')
 core.user_profile
   - age, job, education, family_status
   - hobbies, strengths, challenges, motivation
+  - total_xp INTEGER DEFAULT 0          -- Gamification XP
+  - level INTEGER DEFAULT 1             -- Gamification Level
 
 -- Ziele (vollständig)
 core.goals
@@ -320,6 +327,28 @@ core.daily_tasks      -- task_text, completed, goal_id, estimated_minutes
 
 -- AI
 coach.ai_suggestions  -- kind, payload_json
+```
+
+### Gamification-Tabellen (NEU)
+```sql
+-- Achievements/Badges Definition
+core.achievements
+  - id UUID PRIMARY KEY
+  - code TEXT UNIQUE NOT NULL        -- 'first_goal', 'streak_7', etc.
+  - name TEXT NOT NULL               -- 'Erster Schritt'
+  - description TEXT                 -- 'Erstelle dein erstes Ziel'
+  - icon TEXT                        -- Emoji oder SVG
+  - xp_reward INTEGER DEFAULT 0      -- XP für Achievement
+  - category TEXT DEFAULT 'general'  -- 'streak', 'tasks', 'goals', 'daily'
+  - threshold INTEGER                -- z.B. 7 für 'streak_7'
+
+-- User-Achievements (welche Badges hat der User)
+core.user_achievements
+  - id UUID PRIMARY KEY
+  - user_id UUID (FK auth.users)
+  - achievement_id UUID (FK achievements)
+  - earned_at TIMESTAMPTZ DEFAULT now()
+  - UNIQUE(user_id, achievement_id)
 ```
 
 ### daily_tasks Tabelle (vollständig)
@@ -1236,4 +1265,105 @@ BEGIN
   RETURN new;
 END;
 $$;
+```
+
+### 36. Gamification-System (XP, Level, Achievements)
+**Feature:** Vollständiges Gamification-System mit XP, Levels und Achievements
+
+**XP-Vergabe:**
+| Aktion | XP |
+|--------|-----|
+| Task erledigt | +10 |
+| Alle Tages-Tasks erledigt | +50 Bonus |
+| Streak fortgesetzt | +20 |
+| Ziel erreicht | +100 |
+| Achievement freigeschaltet | Variable |
+
+**Level-Berechnung:**
+```javascript
+const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
+// Level 1: 0-99 XP
+// Level 2: 100-399 XP
+// Level 3: 400-899 XP
+```
+
+**17 Achievements:** first_goal, first_task, streak_3/7/14/30, tasks_10/25/50/100, goal_achieved, perfect_day, early_bird, night_owl, balanced, zen_master, unstoppable
+
+**Dateien:**
+- `db/20260119_gamification.sql` - Datenbank-Schema
+- `supabase/functions/gamification-award/index.ts` - XP/Achievement-Vergabe
+- `supabase/functions/task-update/index.ts` - Automatische XP bei Task-Completion
+- `app.html` - UI (Level-Badge, XP-Bar, Achievement-Popup)
+
+### 37. Timezone-Support
+**Problem:** `new Date().toISOString().split('T')[0]` gibt UTC zurück, nicht User-Timezone
+
+**Lösung:** User-Timezone aus Browser verwenden
+
+**Neue Utility-Funktionen** (`_shared/utils.ts`):
+```typescript
+// Korrekte Datumsberechnung mit User-Timezone
+export function getUserToday(timezoneOffset?: number): string {
+  const now = new Date();
+  if (timezoneOffset !== undefined) {
+    const userTime = new Date(now.getTime() - (timezoneOffset * 60 * 1000));
+    return userTime.toISOString().split('T')[0];
+  }
+  return now.toISOString().split('T')[0];
+}
+
+// Timezone-Offset aus Request extrahieren
+export function extractTimezoneOffset(req: Request, body?: any): number | undefined
+```
+
+**Frontend:**
+```javascript
+const userTimezoneOffset = new Date().getTimezoneOffset();
+// Bei API-Calls automatisch mitgesendet
+```
+
+**Geänderte Edge Functions:** daily-start, goals-setup, task-update
+
+### 38. Idempotency-Keys
+**Problem:** Doppelklick auf "Plan erstellen" → doppelte Einträge
+
+**Lösung:** Idempotency-Key Header verhindert Duplikate
+
+**Neue Utility-Funktion** (`_shared/utils.ts`):
+```typescript
+export function extractIdempotencyKey(req: Request): string | undefined {
+  return req.headers.get('x-idempotency-key') || undefined;
+}
+```
+
+**Frontend:**
+```javascript
+function generateIdempotencyKey() {
+  return `${currentUser?.id || 'anon'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// Bei goals-setup:
+await apiCall('goals-setup', {
+  headers: { 'X-Idempotency-Key': generateIdempotencyKey() },
+  body: { goals }
+});
+```
+
+**Backend prüft** ob Goal mit gleichem idempotency_key bereits existiert und gibt cached zurück.
+
+**Migration:** `db/20260119_add_idempotency_key.sql`
+
+### 39. userTimezoneOffset Initialization Error
+**Problem:** `Cannot access 'userTimezoneOffset' before initialization` - JavaScript-Fehler
+
+**Ursache:** Variable wurde nach der init() IIFE deklariert, die sofort ausgeführt wird
+
+**Lösung:** `userTimezoneOffset` vor die init() Funktion verschieben:
+```javascript
+// RICHTIG - Vor init()
+const userTimezoneOffset = new Date().getTimezoneOffset();
+
+;(async function init() {
+  // ... nutzt userTimezoneOffset
+})();
 ```

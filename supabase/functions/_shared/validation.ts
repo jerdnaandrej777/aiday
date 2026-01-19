@@ -2,6 +2,70 @@
 
 import { z } from 'https://esm.sh/zod@3'
 
+// ============================================
+// Input Sanitization Helpers
+// ============================================
+
+// Entfernt potentiell gefährliche Zeichen und HTML-Tags
+export function sanitizeString(input: string): string {
+  return input
+    .trim()
+    // Entferne HTML-Tags
+    .replace(/<[^>]*>/g, '')
+    // Entferne Script-Inhalte
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    // Normalisiere Whitespace
+    .replace(/\s+/g, ' ')
+}
+
+// Prüft auf potentiell gefährliche Muster
+const dangerousPatterns = [
+  /<script/i,
+  /javascript:/i,
+  /on\w+=/i,  // onclick=, onerror=, etc.
+  /data:/i,
+  /vbscript:/i
+]
+
+export function containsDangerousContent(input: string): boolean {
+  return dangerousPatterns.some(pattern => pattern.test(input))
+}
+
+// Zod Transform für automatische Sanitization
+const sanitizedString = (maxLength: number) =>
+  z.string()
+    .max(maxLength, `Text darf maximal ${maxLength} Zeichen haben`)
+    .transform(sanitizeString)
+    .refine(val => !containsDangerousContent(val), 'Ungültige Zeichen im Text')
+
+// ============================================
+// Constants für Längen-Limits
+// ============================================
+
+export const INPUT_LIMITS = {
+  // Kurze Texte
+  TITLE: 200,
+  CATEGORY: 50,
+  NAME: 100,
+
+  // Mittlere Texte
+  NOTE: 500,
+  DESCRIPTION: 1000,
+
+  // Lange Texte
+  LONG_TEXT: 2000,
+  ESSAY: 5000,
+
+  // Arrays
+  MAX_GOALS: 10,
+  MAX_BLOCKERS: 10,
+  MAX_STEPS: 20
+}
+
+// ============================================
+// Schemas
+// ============================================
+
 // Date format: YYYY-MM-DD
 export const DateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD format')
 
@@ -11,10 +75,13 @@ export const MonthSchema = z.string().regex(/^\d{4}-\d{2}$/, 'Month must be YYYY
 // Goal Schema
 export const GoalSchema = z.object({
   id: z.string().uuid().optional(),
-  title: z.string().min(1, 'Title is required'),
-  category: z.string().optional(),
+  title: z.string()
+    .min(1, 'Titel ist erforderlich')
+    .max(INPUT_LIMITS.TITLE, `Titel darf maximal ${INPUT_LIMITS.TITLE} Zeichen haben`)
+    .transform(sanitizeString),
+  category: z.string().max(INPUT_LIMITS.CATEGORY).transform(sanitizeString).optional(),
   status: z.enum(['open', 'achieved', 'not_achieved']).optional(),
-  note: z.string().optional(),
+  note: z.string().max(INPUT_LIMITS.NOTE).transform(sanitizeString).optional(),
 })
 
 // Coach Plan Request
@@ -69,30 +136,38 @@ export const DailyCheckinRequestSchema = z.object({
 
 // Goal with Details (for setup)
 export const GoalWithDetailsSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
-  category: z.string().max(50).optional(),
-  why_important: z.string().max(500).optional(),
-  previous_efforts: z.string().max(500).optional(),
-  believed_steps: z.string().max(2000).optional(), // Extended for clarification answers
-  clarification_answers: z.record(z.string()).optional(), // Key-value pairs from clarification
+  title: z.string()
+    .min(1, 'Titel ist erforderlich')
+    .max(INPUT_LIMITS.TITLE, `Titel darf maximal ${INPUT_LIMITS.TITLE} Zeichen haben`)
+    .transform(sanitizeString)
+    .refine(val => !containsDangerousContent(val), 'Ungültige Zeichen im Titel'),
+  category: z.string().max(INPUT_LIMITS.CATEGORY).transform(sanitizeString).optional(),
+  why_important: z.string().max(INPUT_LIMITS.NOTE).transform(sanitizeString).optional(),
+  previous_efforts: z.string().max(INPUT_LIMITS.NOTE).transform(sanitizeString).optional(),
+  believed_steps: z.string().max(INPUT_LIMITS.LONG_TEXT).transform(sanitizeString).optional(),
+  clarification_answers: z.record(
+    z.string().max(INPUT_LIMITS.DESCRIPTION).transform(sanitizeString)
+  ).optional(),
 })
 
-// Goals Setup Request (5 main goals)
+// Goals Setup Request
 export const GoalsSetupRequestSchema = z.object({
-  goals: z.array(GoalWithDetailsSchema).min(1).max(5),
+  goals: z.array(GoalWithDetailsSchema).min(1).max(INPUT_LIMITS.MAX_GOALS),
 })
 
 // Task Review Item
 export const TaskReviewSchema = z.object({
   task_id: z.string().uuid(),
   completed: z.boolean(),
-  blockers: z.array(z.string()).optional(),
-  note: z.string().max(500).optional(),
+  blockers: z.array(
+    z.string().max(INPUT_LIMITS.NOTE).transform(sanitizeString)
+  ).max(INPUT_LIMITS.MAX_BLOCKERS).optional(),
+  note: z.string().max(INPUT_LIMITS.NOTE).transform(sanitizeString).optional(),
 })
 
 // Daily Review Request
 export const DailyReviewRequestSchema = z.object({
-  reviews: z.array(TaskReviewSchema).min(1),
+  reviews: z.array(TaskReviewSchema).min(1).max(INPUT_LIMITS.MAX_STEPS),
 })
 
 // Type exports

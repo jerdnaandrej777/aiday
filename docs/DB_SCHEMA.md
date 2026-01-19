@@ -7,7 +7,7 @@ Hinweis: Die vollständige Definition steht in `db/001_init.sql`, `db/002_auth.s
 ---
 
 ## Schemas
-- **core**: Benutzerprofile, Tageseinträge, Ziele, Tasks
+- **core**: Benutzerprofile, Tageseinträge, Ziele, Tasks, Achievements, User-Achievements
 - **coach**: AI-Vorschläge
 - **notifications**: Push-Tokens
 - **analytics**: Monatsstatistiken (Materialized View)
@@ -35,7 +35,7 @@ CREATE TABLE core.user_profile (
   constraints_json JSONB,
   quiet_hours JSONB,
 
-  -- Persönliche Daten (NEU)
+  -- Persönliche Daten
   age INTEGER,                    -- Alter des Benutzers
   job TEXT,                       -- Beruf
   education TEXT,                 -- Bildungsabschluss
@@ -44,6 +44,10 @@ CREATE TABLE core.user_profile (
   strengths TEXT,                 -- Persönliche Stärken
   challenges TEXT,                -- Größte Herausforderungen
   motivation TEXT,                -- Lebensmotto / Antrieb
+
+  -- Gamification (NEU)
+  total_xp INTEGER DEFAULT 0,     -- Gesamte XP
+  level INTEGER DEFAULT 1,        -- Aktuelles Level
 
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -239,6 +243,56 @@ CREATE TABLE audit.event_log (
 );
 ```
 
+### core.achievements (NEU - Gamification)
+Verfügbare Achievements/Badges.
+
+```sql
+CREATE TABLE core.achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code TEXT UNIQUE NOT NULL,        -- 'first_goal', 'streak_7', etc.
+  name TEXT NOT NULL,               -- 'Erster Schritt'
+  description TEXT,                 -- 'Erstelle dein erstes Ziel'
+  icon TEXT,                        -- Emoji oder SVG
+  xp_reward INTEGER DEFAULT 0,      -- XP für Achievement
+  category TEXT DEFAULT 'general',  -- 'streak', 'tasks', 'goals', 'daily'
+  threshold INTEGER                 -- z.B. 7 für 'streak_7'
+);
+```
+
+**17 vordefinierte Achievements:**
+| Code | Name | Kategorie | XP |
+|------|------|-----------|-----|
+| first_goal | Erster Schritt | goals | 50 |
+| first_task | Macher | tasks | 25 |
+| streak_3 | Dranbleiber | streak | 100 |
+| streak_7 | Wochenkämpfer | streak | 250 |
+| streak_14 | Zweiwochenmeister | streak | 500 |
+| streak_30 | Monatslegende | streak | 1000 |
+| tasks_10 | Fleißig | tasks | 100 |
+| tasks_25 | Produktiv | tasks | 200 |
+| tasks_50 | Effizient | tasks | 300 |
+| tasks_100 | Unstoppbar | tasks | 500 |
+| goal_achieved | Zielerreicher | goals | 200 |
+| perfect_day | Perfekter Tag | daily | 75 |
+| early_bird | Frühaufsteher | daily | 50 |
+| night_owl | Nachteule | daily | 50 |
+| balanced | Ausgeglichen | general | 150 |
+| zen_master | Zen-Meister | general | 300 |
+| unstoppable | Unaufhaltbar | general | 500 |
+
+### core.user_achievements (NEU - Gamification)
+Verdiente Achievements pro User.
+
+```sql
+CREATE TABLE core.user_achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  achievement_id UUID NOT NULL REFERENCES core.achievements(id),
+  earned_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, achievement_id)
+);
+```
+
 ---
 
 ## Migrationen
@@ -253,7 +307,10 @@ CREATE TABLE audit.event_log (
 | `supabase/migrations/20260118234500_add_plan_json_to_goals.sql` | **NEU:** plan_json Spalte für goals |
 | `supabase/migrations/20260118235600_migrate_plans_to_goals.sql` | **NEU:** Bestehende Pläne migrieren |
 | `supabase/migrations/20260119001000_fix_ai_suggestions_kind.sql` | **NEU:** CHECK Constraint erweitern |
-| `db/20260119_increase_goals_limit.sql` | **NEU:** Ziel-Limit von 10 auf 10.000 erhöht |
+| `db/20260119_increase_goals_limit.sql` | Ziel-Limit von 10 auf 10.000 erhöht |
+| `db/20260119_fix_task_race_condition.sql` | **NEU:** Unique Constraint für Tasks (Race Condition Fix) |
+| `db/20260119_add_idempotency_key.sql` | **NEU:** Idempotency-Key Spalte für Goals |
+| `db/20260119_gamification.sql` | **NEU:** Gamification-Schema (XP, Level, Achievements) |
 
 ### Bekannte Schema-Probleme & Fixes
 

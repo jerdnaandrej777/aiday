@@ -7,6 +7,7 @@ import { createSupabaseClient, getAuthUser, extractToken } from '../_shared/supa
 import { GoalsSetupRequestSchema } from '../_shared/validation.ts'
 import { getOpenAIClient, GOALS_ANALYSIS_SYSTEM_PROMPT } from '../_shared/openai.ts'
 import { getUserToday, extractTimezoneOffset, extractIdempotencyKey } from '../_shared/utils.ts'
+import { checkRateLimit, logApiCall, getRateLimitConfig, rateLimitErrorResponse } from '../_shared/rate-limit.ts'
 
 interface Milestone {
   week: number
@@ -49,6 +50,18 @@ Deno.serve(async (req) => {
       return errorResponse(authResult.error || 'Unauthorized', 401)
     }
 
+    const userId = authResult.user.id
+
+    // Rate Limiting Check
+    const token = extractToken(req)!
+    const supabaseForRateLimit = createSupabaseClient(token)
+    const rateLimitConfig = getRateLimitConfig('goals-setup', userId)
+    const rateLimitResult = await checkRateLimit(supabaseForRateLimit, rateLimitConfig)
+
+    if (!rateLimitResult.allowed) {
+      return rateLimitErrorResponse(rateLimitResult)
+    }
+
     let body: unknown
     try {
       body = await req.json()
@@ -63,9 +76,11 @@ Deno.serve(async (req) => {
 
     const { goals } = validation.data
 
-    const token = extractToken(req)!
-    const supabase = createSupabaseClient(token)
-    const userId = authResult.user.id
+    // Supabase Client wiederverwenden (wurde für Rate-Limiting bereits erstellt)
+    const supabase = supabaseForRateLimit
+
+    // API-Aufruf loggen für Rate-Limiting Tracking
+    await logApiCall(supabase, userId, 'goals-setup', true, { goals_count: goals.length })
 
     // Timezone-Support
     const timezoneOffset = extractTimezoneOffset(req, validation.data)

@@ -42,6 +42,36 @@
       --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
     }
 
+    /* Dark Mode Theme */
+    body.dark-mode {
+      --bg-light: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-dark: rgba(255, 255, 255, 0.05);
+      --bg-card-hover: rgba(255, 255, 255, 0.08);
+      --bg-input: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --glass-border: rgba(148, 163, 184, 0.15);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* System Preference Dark Mode (wird von JS überschrieben wenn manuell gesetzt) */
+    @media (prefers-color-scheme: dark) {
+      body:not(.light-mode) {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --bg-card-dark: rgba(255, 255, 255, 0.05);
+        --bg-card-hover: rgba(255, 255, 255, 0.08);
+        --bg-input: #334155;
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+        --glass-border: rgba(148, 163, 184, 0.15);
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+      }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       height: 100%;
@@ -548,6 +578,178 @@
       resize: vertical;
     }
 
+    /* Profile Section Divider */
+    .profile-section-divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: 24px 0;
+    }
+
+    .profile-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      position: relative;
+      width: 56px;
+      height: 28px;
+      background: var(--bg-input);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      padding: 0;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .theme-toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: var(--bg-card);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    body.dark-mode .theme-toggle-slider {
+      transform: translateX(28px);
+    }
+
+    .theme-toggle-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s;
+    }
+
+    .theme-toggle-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .light-icon {
+      left: 6px;
+      color: var(--warning);
+    }
+
+    .dark-icon {
+      right: 6px;
+      color: var(--accent);
+    }
+
+    body:not(.dark-mode) .dark-icon {
+      opacity: 0.4;
+    }
+
+    body.dark-mode .light-icon {
+      opacity: 0.4;
+    }
+
+    .theme-toggle-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      min-width: 50px;
+    }
+
+    /* Profile Completion Ring */
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .profile-header-text {
+      flex: 1;
+    }
+
+    .profile-header-text .card-title {
+      margin-bottom: 4px;
+    }
+
+    .profile-header-text .card-subtitle {
+      margin-bottom: 0;
+    }
+
+    .profile-completion-ring {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      flex-shrink: 0;
+      cursor: help;
+    }
+
+    .profile-completion-ring svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+
+    .profile-ring-bg {
+      stroke: var(--bg-input);
+    }
+
+    .profile-ring-fill {
+      stroke: var(--accent);
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.5s ease;
+    }
+
+    .profile-ring-fill.complete {
+      stroke: var(--success);
+    }
+
+    .profile-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .profile-completion-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: var(--bg-input);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+      transition: opacity 0.3s;
+    }
+
+    .profile-completion-hint.hidden {
+      display: none;
+    }
+
     /* Mood Selector */
     .mood-selector {
       display: flex;
@@ -902,6 +1104,32 @@
       padding: 0 4px;
       cursor: pointer;
       flex-shrink: 0;
+    }
+
+    /* Task Meta Info (Dauer, beste Zeit) in Liste */
+    .task-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .task-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .task-item.completed .task-meta {
+      opacity: 0.5;
     }
 
     /* Task Detail Screen */
@@ -1362,6 +1590,591 @@
       justify-content: center;
       min-height: 100vh;
       padding: 0 !important;
+    }
+
+    /* Onboarding Modal */
+    .onboarding-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .onboarding-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .onboarding-modal {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .onboarding-skip {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .onboarding-skip:hover {
+      color: var(--text);
+    }
+
+    .onboarding-slides {
+      position: relative;
+      min-height: 280px;
+    }
+
+    .onboarding-slide {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .onboarding-slide.active {
+      display: block;
+    }
+
+    .onboarding-icon {
+      margin-bottom: 24px;
+    }
+
+    .onboarding-icon svg {
+      filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+    }
+
+    .onboarding-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .onboarding-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    .onboarding-text strong {
+      color: var(--text);
+    }
+
+    .onboarding-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 24px 0;
+    }
+
+    .onboarding-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--bg-input);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .onboarding-dot.active {
+      background: var(--accent);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .onboarding-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+    }
+
+    .onboarding-prev,
+    .onboarding-next {
+      flex: 1;
+      padding: 14px 24px;
+    }
+
+    /* Weekly Report Modal */
+    .weekly-report-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .weekly-report-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .weekly-report-modal {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.4s ease;
+    }
+
+    .weekly-report-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
+    .weekly-report-close:hover {
+      color: var(--text);
+    }
+
+    .weekly-report-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .weekly-report-icon {
+      margin-bottom: 16px;
+    }
+
+    .weekly-report-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .weekly-report-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .weekly-report-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .weekly-stat {
+      background: var(--bg-input);
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .weekly-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .weekly-stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .weekly-stat-bar {
+      height: 6px;
+      background: var(--glass-border);
+      border-radius: 3px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .weekly-stat-bar-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .weekly-report-message {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1));
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .weekly-report-btn {
+      width: 100%;
+    }
+
+    /* Achievements Info Modal */
+    .achievements-info-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .achievements-info-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .achievements-info-modal {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 28px 20px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.4s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .achievements-info-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px 8px;
+      line-height: 1;
+    }
+
+    .achievements-info-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .achievements-info-icon {
+      margin-bottom: 12px;
+    }
+
+    .achievements-info-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .achievements-info-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .xp-info-section,
+    .achievements-info-section,
+    .level-info-section {
+      margin-bottom: 20px;
+    }
+
+    .xp-info-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .xp-info-table {
+      background: var(--bg-input);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .xp-info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .xp-info-row:last-child {
+      border-bottom: none;
+    }
+
+    .xp-info-row.highlight {
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .xp-info-action {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .xp-info-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .achievements-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .achievement-info-item {
+      background: var(--bg-input);
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .achievement-info-icon {
+      display: block;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .achievement-info-name {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .achievement-info-desc {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .level-info-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .level-info-examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .level-info-examples span {
+      background: var(--bg-input);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .achievements-info-btn {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* Goal Tags */
+    .goal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .goal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: default;
+    }
+
+    .goal-tag.tag-blue { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
+    .goal-tag.tag-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .goal-tag.tag-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .goal-tag.tag-yellow { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .goal-tag.tag-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .goal-tag.tag-cyan { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+
+    .goal-tag-remove {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.6;
+    }
+
+    .goal-tag-remove:hover {
+      opacity: 1;
+    }
+
+    /* Tag Filter Buttons */
+    .tag-filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--bg-input);
+      border-radius: 12px;
+    }
+
+    .tag-filter-btn {
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--glass-border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-filter-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .tag-filter-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    /* Tag Input für Goal-Detail */
+    .tag-input-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      background: var(--bg-input);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .tag-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .tag-add-btn {
+      padding: 8px 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-add-btn:hover {
+      background: var(--gradient-primary-hover);
+    }
+
+    .tag-color-select {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tag-color-option {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-color-option:hover,
+    .tag-color-option.selected {
+      border-color: var(--text);
+      transform: scale(1.1);
+    }
+
+    .tag-color-option.color-blue { background: #6366f1; }
+    .tag-color-option.color-green { background: #10b981; }
+    .tag-color-option.color-red { background: #ef4444; }
+    .tag-color-option.color-yellow { background: #f59e0b; }
+    .tag-color-option.color-purple { background: #a855f7; }
+    .tag-color-option.color-cyan { background: #22d3ee; }
+
+    /* Gamification Info Button */
+    .gamification-info-btn {
+      background: transparent;
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .gamification-info-btn:hover {
+      background: var(--bg-input);
+      color: var(--accent);
+      border-color: var(--accent);
     }
 
     /* Blocker Input */
@@ -2645,6 +3458,10 @@
       opacity: 0.7;
     }
 
+    .progress-task-item.completed .task-meta {
+      opacity: 0.5;
+    }
+
     /* Progress Goals List */
     .progress-goals-list {
       display: flex;
@@ -3087,6 +3904,27 @@
       to { opacity: 0; transform: translateY(-20px); }
     }
 
+    .toast-action {
+      background: transparent;
+      border: 1px solid currentColor;
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      pointer-events: auto;
+      margin-left: 8px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .toast-action:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     /* Confetti Canvas */
     .confetti-canvas {
       position: fixed;
@@ -3268,7 +4106,10 @@
             </svg>
             <span>Level <span id="userLevel">1</span></span>
           </div>
-          <span class="xp-text"><span id="currentXp">0</span> / <span id="nextLevelXp">100</span> XP</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="xp-text"><span id="currentXp">0</span> / <span id="nextLevelXp">100</span> XP</span>
+            <button class="gamification-info-btn" onclick="showAchievementsInfo()" title="Wie funktioniert das?">?</button>
+          </div>
         </div>
         <div class="xp-bar-container">
           <div class="xp-bar-progress" id="xpBarProgress" style="width: 0%"></div>
@@ -3397,11 +4238,250 @@
       </div>
     </div>
 
+    <!-- Onboarding Modal -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+      <div class="onboarding-modal">
+        <button class="onboarding-skip" onclick="skipOnboarding()">Überspringen</button>
+
+        <div class="onboarding-slides" id="onboardingSlides">
+          <!-- Slide 1: Dein täglicher Flow -->
+          <div class="onboarding-slide active" data-slide="0">
+            <div class="onboarding-icon">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+            </div>
+            <h2 class="onboarding-title">Dein täglicher Flow</h2>
+            <p class="onboarding-text">
+              <strong>1. Check-in</strong> - Starte mit deiner Stimmung & Energie<br>
+              <strong>2. Ziel setzen</strong> - Was möchtest du heute erreichen?<br>
+              <strong>3. Plan folgen</strong> - Die AI erstellt deinen Aktionsplan
+            </p>
+          </div>
+
+          <!-- Slide 2: Gamification -->
+          <div class="onboarding-slide" data-slide="1">
+            <div class="onboarding-icon">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.5">
+                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+              </svg>
+            </div>
+            <h2 class="onboarding-title">Level up mit Gamification</h2>
+            <p class="onboarding-text">
+              <strong>+10 XP</strong> für jede erledigte Aufgabe<br>
+              <strong>+50 XP</strong> Bonus wenn alle Tasks erledigt<br>
+              <strong>Achievements</strong> für Streaks & Meilensteine<br>
+              Steige Level auf und sammle Badges!
+            </p>
+          </div>
+
+          <!-- Slide 3: Profil -->
+          <div class="onboarding-slide" data-slide="2">
+            <div class="onboarding-icon">
+              <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--accent-2)" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <h2 class="onboarding-title">Personalisiere deine AI</h2>
+            <p class="onboarding-text">
+              Fülle dein Profil aus für <strong>bessere Empfehlungen</strong>.<br><br>
+              Je mehr die AI über dich weiß (Beruf, Hobbys, Ziele),<br>
+              desto relevanter werden deine täglichen Aufgaben!
+            </p>
+          </div>
+        </div>
+
+        <div class="onboarding-dots" id="onboardingDots">
+          <span class="onboarding-dot active" data-dot="0"></span>
+          <span class="onboarding-dot" data-dot="1"></span>
+          <span class="onboarding-dot" data-dot="2"></span>
+        </div>
+
+        <div class="onboarding-actions">
+          <button class="btn btn-secondary onboarding-prev" id="onboardingPrev" onclick="prevOnboardingSlide()" style="visibility: hidden;">Zurück</button>
+          <button class="btn btn-primary onboarding-next" id="onboardingNext" onclick="nextOnboardingSlide()">Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Info Modal -->
+    <div class="achievements-info-overlay" id="achievementsInfoOverlay">
+      <div class="achievements-info-modal">
+        <button class="achievements-info-close" onclick="hideAchievementsInfo()">&times;</button>
+
+        <div class="achievements-info-header">
+          <div class="achievements-info-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.5">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <h2 class="achievements-info-title">Level & Achievements</h2>
+          <p class="achievements-info-subtitle">So funktioniert das Gamification-System</p>
+        </div>
+
+        <div class="xp-info-section">
+          <h3 class="xp-info-title">XP verdienen</h3>
+          <div class="xp-info-table">
+            <div class="xp-info-row">
+              <span class="xp-info-action">Aufgabe erledigt</span>
+              <span class="xp-info-value">+10 XP</span>
+            </div>
+            <div class="xp-info-row">
+              <span class="xp-info-action">Alle Tagesaufgaben erledigt</span>
+              <span class="xp-info-value">+50 XP</span>
+            </div>
+            <div class="xp-info-row">
+              <span class="xp-info-action">Streak fortgesetzt</span>
+              <span class="xp-info-value">+20 XP</span>
+            </div>
+            <div class="xp-info-row highlight">
+              <span class="xp-info-action">Ziel erreicht</span>
+              <span class="xp-info-value">+100 XP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="achievements-info-section">
+          <h3 class="xp-info-title">Achievements</h3>
+          <div class="achievements-info-grid" id="achievementsInfoGrid">
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">🎯</span>
+              <span class="achievement-info-name">Erster Schritt</span>
+              <span class="achievement-info-desc">Erstelle dein erstes Ziel</span>
+            </div>
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">✅</span>
+              <span class="achievement-info-name">Macher</span>
+              <span class="achievement-info-desc">Erledige deine erste Aufgabe</span>
+            </div>
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">🔥</span>
+              <span class="achievement-info-name">3-Tage-Streak</span>
+              <span class="achievement-info-desc">3 Tage in Folge aktiv</span>
+            </div>
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">💪</span>
+              <span class="achievement-info-name">Wochenkämpfer</span>
+              <span class="achievement-info-desc">7 Tage Streak</span>
+            </div>
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">⭐</span>
+              <span class="achievement-info-name">Fleißig</span>
+              <span class="achievement-info-desc">10 Aufgaben erledigt</span>
+            </div>
+            <div class="achievement-info-item">
+              <span class="achievement-info-icon">🌈</span>
+              <span class="achievement-info-name">Perfekter Tag</span>
+              <span class="achievement-info-desc">Alle Tagesaufgaben erledigt</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="level-info-section">
+          <h3 class="xp-info-title">Level-System</h3>
+          <p class="level-info-text">
+            Dein Level steigt basierend auf deiner gesammelten XP.<br>
+            <strong>Formel:</strong> Level = √(XP / 100) + 1
+          </p>
+          <div class="level-info-examples">
+            <span>Level 2: 100 XP</span>
+            <span>Level 3: 400 XP</span>
+            <span>Level 5: 1.600 XP</span>
+            <span>Level 10: 8.100 XP</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary achievements-info-btn" onclick="hideAchievementsInfo()">
+          Verstanden!
+        </button>
+      </div>
+    </div>
+
+    <!-- Weekly Report Modal -->
+    <div class="weekly-report-overlay" id="weeklyReportOverlay">
+      <div class="weekly-report-modal">
+        <button class="weekly-report-close" onclick="hideWeeklyReport()">&times;</button>
+
+        <div class="weekly-report-header">
+          <div class="weekly-report-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h2 class="weekly-report-title">Deine Woche</h2>
+          <p class="weekly-report-subtitle" id="weeklyReportDateRange">Diese Woche</p>
+        </div>
+
+        <div class="weekly-report-stats">
+          <div class="weekly-stat">
+            <div class="weekly-stat-value" id="weeklyTasksCompleted">0/0</div>
+            <div class="weekly-stat-label">Aufgaben erledigt</div>
+            <div class="weekly-stat-bar">
+              <div class="weekly-stat-bar-fill" id="weeklyTasksBar" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="weekly-stat">
+            <div class="weekly-stat-value" id="weeklyStreak">0 Tage</div>
+            <div class="weekly-stat-label">Aktuelle Streak</div>
+          </div>
+
+          <div class="weekly-stat">
+            <div class="weekly-stat-value" id="weeklyXP">+0 XP</div>
+            <div class="weekly-stat-label">Diese Woche verdient</div>
+          </div>
+
+          <div class="weekly-stat">
+            <div class="weekly-stat-value" id="weeklyMood">-</div>
+            <div class="weekly-stat-label">Durchschnittliche Stimmung</div>
+          </div>
+        </div>
+
+        <div class="weekly-report-message" id="weeklyReportMessage">
+          Weiter so! Du bist auf dem richtigen Weg.
+        </div>
+
+        <button class="btn btn-primary weekly-report-btn" onclick="hideWeeklyReport()">
+          Weiter machen!
+        </button>
+      </div>
+    </div>
+
     <!-- Profile Screen -->
     <div class="screen" id="profileScreen">
       <div class="card">
-        <h2 class="card-title">Mein Profil</h2>
-        <p class="card-subtitle">Persönliche Daten helfen der AI, bessere Empfehlungen zu geben (optional)</p>
+        <div class="profile-header">
+          <div class="profile-header-text">
+            <h2 class="card-title">Mein Profil</h2>
+            <p class="card-subtitle">Persönliche Daten helfen der AI, bessere Empfehlungen zu geben</p>
+          </div>
+          <div class="profile-completion-ring" id="profileCompletionRing" title="Profil-Vollständigkeit">
+            <svg viewBox="0 0 36 36">
+              <path class="profile-ring-bg"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke-width="3"
+              />
+              <path class="profile-ring-fill" id="profileRingFill"
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke-width="3"
+                stroke-dasharray="0, 100"
+              />
+            </svg>
+            <span class="profile-ring-text" id="profileRingText">0%</span>
+          </div>
+        </div>
+        <p class="profile-completion-hint" id="profileCompletionHint">Vervollständige dein Profil für bessere Empfehlungen</p>
 
         <div class="form-group">
           <label class="form-label">Alter</label>
@@ -3458,6 +4538,38 @@
         <div class="form-group">
           <label class="form-label">Lebensmotto / Was dich antreibt</label>
           <textarea class="form-textarea" id="profileMotivation" placeholder="z.B. Familie, Freiheit, Erfolg, Wissen..."></textarea>
+        </div>
+
+        <!-- Appearance Section -->
+        <div class="profile-section-divider"></div>
+        <h3 class="profile-section-title">Darstellung</h3>
+
+        <div class="form-group theme-toggle-group">
+          <label class="form-label">Dark Mode</label>
+          <div class="theme-toggle-container">
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleDarkMode()">
+              <span class="theme-toggle-icon light-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/>
+                  <line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              </span>
+              <span class="theme-toggle-icon dark-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              </span>
+              <span class="theme-toggle-slider"></span>
+            </button>
+            <span class="theme-toggle-label" id="themeToggleLabel">Hell</span>
+          </div>
         </div>
 
         <button class="btn btn-primary" id="profileSaveBtn" onclick="saveProfile()">Profil speichern</button>
@@ -3845,6 +4957,63 @@
     // Timezone-Offset für API-Calls (muss vor init definiert sein)
     const userTimezoneOffset = new Date().getTimezoneOffset();
 
+    // ============================================
+    // Dark Mode System
+    // ============================================
+    function initTheme() {
+      const savedTheme = localStorage.getItem('aiday_theme');
+
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('light-mode');
+      } else if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        document.body.classList.remove('dark-mode');
+      }
+      // Wenn kein savedTheme, wird die System-Präferenz per CSS respektiert
+
+      updateThemeToggleUI();
+    }
+
+    function toggleDarkMode() {
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      const prefersSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (isDarkMode) {
+        // War dunkel -> jetzt hell
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        localStorage.setItem('aiday_theme', 'light');
+      } else {
+        // War hell -> jetzt dunkel
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('light-mode');
+        localStorage.setItem('aiday_theme', 'dark');
+      }
+
+      updateThemeToggleUI();
+      showToast(document.body.classList.contains('dark-mode') ? 'Dark Mode aktiviert' : 'Light Mode aktiviert', 'info', 1500);
+    }
+
+    function updateThemeToggleUI() {
+      const isDarkMode = document.body.classList.contains('dark-mode') ||
+        (!document.body.classList.contains('light-mode') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      const label = document.getElementById('themeToggleLabel');
+      if (label) {
+        label.textContent = isDarkMode ? 'Dunkel' : 'Hell';
+      }
+
+      // Slider-Position wird per CSS gesteuert (body.dark-mode .theme-toggle-slider)
+      // Aber wir müssen die Klasse auch bei System-Präferenz anwenden
+      if (!localStorage.getItem('aiday_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+      }
+    }
+
+    // Theme beim Laden initialisieren (vor allem anderen)
+    initTheme();
+
     // Auth Check
     (function init() {
       const token = localStorage.getItem('aiday_token');
@@ -3886,11 +5055,210 @@
       window.location.href = 'start-ui.html';
     }
 
+    // ===== ONBOARDING SYSTEM =====
+
+    let currentOnboardingSlide = 0;
+    const totalOnboardingSlides = 3;
+
+    function shouldShowOnboarding() {
+      // Prüfe ob Onboarding schon gesehen wurde
+      return !localStorage.getItem('aiday_onboarding_completed');
+    }
+
+    function showOnboarding() {
+      const overlay = document.getElementById('onboardingOverlay');
+      if (overlay) {
+        overlay.classList.add('show');
+        currentOnboardingSlide = 0;
+        updateOnboardingSlide();
+      }
+    }
+
+    function hideOnboarding() {
+      const overlay = document.getElementById('onboardingOverlay');
+      if (overlay) {
+        overlay.classList.remove('show');
+      }
+    }
+
+    function skipOnboarding() {
+      localStorage.setItem('aiday_onboarding_completed', 'true');
+      hideOnboarding();
+    }
+
+    function nextOnboardingSlide() {
+      if (currentOnboardingSlide < totalOnboardingSlides - 1) {
+        currentOnboardingSlide++;
+        updateOnboardingSlide();
+      } else {
+        // Letzte Slide - Onboarding abschließen
+        localStorage.setItem('aiday_onboarding_completed', 'true');
+        hideOnboarding();
+        showToast('Willkommen bei AIDAY! Los geht\'s!', 'success', 3000);
+      }
+    }
+
+    function prevOnboardingSlide() {
+      if (currentOnboardingSlide > 0) {
+        currentOnboardingSlide--;
+        updateOnboardingSlide();
+      }
+    }
+
+    function goToOnboardingSlide(index) {
+      currentOnboardingSlide = index;
+      updateOnboardingSlide();
+    }
+
+    function updateOnboardingSlide() {
+      // Slides aktualisieren
+      const slides = document.querySelectorAll('.onboarding-slide');
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentOnboardingSlide);
+      });
+
+      // Dots aktualisieren
+      const dots = document.querySelectorAll('.onboarding-dot');
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentOnboardingSlide);
+      });
+
+      // Button-Text aktualisieren
+      const prevBtn = document.getElementById('onboardingPrev');
+      const nextBtn = document.getElementById('onboardingNext');
+
+      if (prevBtn) {
+        prevBtn.style.visibility = currentOnboardingSlide === 0 ? 'hidden' : 'visible';
+      }
+
+      if (nextBtn) {
+        nextBtn.textContent = currentOnboardingSlide === totalOnboardingSlides - 1 ? 'Los geht\'s!' : 'Weiter';
+      }
+    }
+
+    // Dot-Klick-Handler
+    document.addEventListener('DOMContentLoaded', () => {
+      const dots = document.querySelectorAll('.onboarding-dot');
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => goToOnboardingSlide(i));
+      });
+    });
+
+    // ===== ACHIEVEMENTS INFO MODAL =====
+
+    function showAchievementsInfo() {
+      const overlay = document.getElementById('achievementsInfoOverlay');
+      if (overlay) {
+        overlay.classList.add('show');
+      }
+    }
+
+    function hideAchievementsInfo() {
+      const overlay = document.getElementById('achievementsInfoOverlay');
+      if (overlay) {
+        overlay.classList.remove('show');
+      }
+    }
+
+    // ===== WEEKLY REPORT SYSTEM =====
+
+    function shouldShowWeeklyReport() {
+      // Zeige Report am Sonntag oder wenn eine Woche seit dem letzten Report vergangen ist
+      const lastShown = localStorage.getItem('aiday_weekly_report_last');
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 = Sonntag
+
+      if (!lastShown) {
+        // Noch nie gezeigt - nur am Sonntag anzeigen
+        return dayOfWeek === 0;
+      }
+
+      const lastDate = new Date(lastShown);
+      const daysSinceLastReport = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+
+      // Zeige am Sonntag wenn mindestens 6 Tage vergangen sind
+      return dayOfWeek === 0 && daysSinceLastReport >= 6;
+    }
+
+    function showWeeklyReport() {
+      const overlay = document.getElementById('weeklyReportOverlay');
+      if (overlay) {
+        calculateWeeklyStats();
+        overlay.classList.add('show');
+      }
+    }
+
+    function hideWeeklyReport() {
+      const overlay = document.getElementById('weeklyReportOverlay');
+      if (overlay) {
+        overlay.classList.remove('show');
+        localStorage.setItem('aiday_weekly_report_last', new Date().toISOString());
+      }
+    }
+
+    function calculateWeeklyStats() {
+      // Berechne Statistiken aus den verfügbaren Daten
+      const data = appData?.data || {};
+      const tasks = data.today_tasks || [];
+      const streak = data.streak || 0;
+
+      // Tasks diese Woche (vereinfachte Berechnung aus heute)
+      const completedTasks = tasks.filter(t => t.completed).length;
+      const totalTasks = tasks.length;
+      const taskPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+      // Geschätzte Wochenwerte (basierend auf Streak und heutigen Daten)
+      const weeklyTasks = totalTasks * Math.min(7, streak + 1);
+      const weeklyCompleted = completedTasks * Math.min(7, streak);
+
+      // XP diese Woche (Schätzung)
+      const weeklyXP = completedTasks * 10 * Math.min(7, streak + 1);
+
+      // Datum-Range
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay());
+      const dateRange = `${weekStart.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })} - ${today.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}`;
+
+      // UI aktualisieren
+      document.getElementById('weeklyReportDateRange').textContent = dateRange;
+      document.getElementById('weeklyTasksCompleted').textContent = `${weeklyCompleted}/${weeklyTasks || '-'}`;
+      document.getElementById('weeklyTasksBar').style.width = `${taskPercent}%`;
+      document.getElementById('weeklyStreak').textContent = `${streak} Tag${streak !== 1 ? 'e' : ''}`;
+      document.getElementById('weeklyXP').textContent = `+${weeklyXP} XP`;
+
+      // Stimmung (aus Check-in wenn vorhanden)
+      const moodLabels = { great: 'Super', good: 'Gut', neutral: 'Okay', bad: 'Mäßig', terrible: 'Schwierig' };
+      const todayCheckin = data.today_checkin;
+      const moodText = todayCheckin?.mood ? moodLabels[todayCheckin.mood] || '-' : '-';
+      document.getElementById('weeklyMood').textContent = moodText;
+
+      // Motivierende Nachricht
+      let message = '';
+      if (taskPercent >= 80) {
+        message = 'Fantastische Woche! Du hast fast alles geschafft. Weiter so!';
+      } else if (taskPercent >= 60) {
+        message = 'Gute Arbeit! Du bist auf einem tollen Weg.';
+      } else if (taskPercent >= 40) {
+        message = 'Nicht schlecht! Jede erledigte Aufgabe zählt.';
+      } else if (streak > 0) {
+        message = `Deine ${streak}-Tage-Streak zeigt deinen Willen. Mach weiter!`;
+      } else {
+        message = 'Jede Woche ist ein Neustart. Du schaffst das!';
+      }
+      document.getElementById('weeklyReportMessage').textContent = message;
+    }
+
+    // Manueller Trigger für den Weekly Report (z.B. über Button)
+    function triggerWeeklyReport() {
+      showWeeklyReport();
+    }
+
     // ===== TOAST NOTIFICATIONS =====
 
-    function showToast(message, type = 'info', duration = 3000) {
+    function showToast(message, type = 'info', duration = 3000, actionBtn = null) {
       const container = document.getElementById('toastContainer');
-      if (!container) return;
+      if (!container) return null;
 
       const icons = {
         success: '✓',
@@ -3901,19 +5269,35 @@
 
       const toast = document.createElement('div');
       toast.className = `toast toast-${type}`;
+
+      let actionHtml = '';
+      if (actionBtn) {
+        actionHtml = `<button class="toast-action" onclick="this.closest('.toast').dataset.actionClicked='true'; (${actionBtn.callback.toString()})()">
+          ${actionBtn.label}
+        </button>`;
+      }
+
       toast.innerHTML = `
         <span class="toast-icon">${icons[type] || icons.info}</span>
         <span class="toast-message">${message}</span>
+        ${actionHtml}
       `;
 
       container.appendChild(toast);
 
       // Auto-remove after duration
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         toast.classList.add('toast-out');
         setTimeout(() => toast.remove(), 300);
       }, duration);
+
+      // Return toast element for potential programmatic control
+      toast.dataset.timeoutId = timeoutId;
+      return toast;
     }
+
+    // Pending deletion tracker for Undo functionality
+    const pendingDeletions = new Map();
 
     // ===== GAMIFICATION FUNCTIONS =====
 
@@ -4740,6 +6124,15 @@
       // Gamification-Daten laden (asynchron, nicht blockierend)
       loadGamificationData();
       showScreen('dashboardScreen');
+
+      // Onboarding für neue User anzeigen
+      if (shouldShowOnboarding()) {
+        setTimeout(() => showOnboarding(), 500);
+      }
+      // Weekly Report am Sonntag anzeigen
+      else if (shouldShowWeeklyReport()) {
+        setTimeout(() => showWeeklyReport(), 1000);
+      }
     }
 
     // Mood Selection
@@ -5508,13 +6901,24 @@
           </div>
         `;
       } else {
-        tasksEl.innerHTML = tasks.map(task => `
+        tasksEl.innerHTML = tasks.map(task => {
+          const details = task.task_details || {};
+          const timeIcon = {'morgens': '🌅', 'mittags': '☀️', 'abends': '🌙'}[details.best_time] || '';
+          const timeLabel = details.best_time ? details.best_time.charAt(0).toUpperCase() + details.best_time.slice(1) : '';
+          const duration = task.estimated_minutes || 15;
+          return `
           <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" onclick="showTaskDetail('${task.id}')">
             <div class="task-checkbox">${task.completed ? '✓' : ''}</div>
-            <div class="task-text">${task.task_text}</div>
+            <div class="task-content">
+              <div class="task-text">${task.task_text}</div>
+              <div class="task-meta">
+                <span class="task-meta-item">⏱️ ${duration} Min</span>
+                ${timeIcon ? `<span class="task-meta-item">${timeIcon} ${timeLabel}</span>` : ''}
+              </div>
+            </div>
             <div class="task-arrow">›</div>
           </div>
-        `).join('');
+        `}).join('');
       }
 
       // Goals with Progress
@@ -5942,38 +7346,77 @@
       }
     }
 
-    async function deleteTask(taskId) {
-      if (!confirm('Aufgabe wirklich löschen?')) return;
+    async function deleteTask(taskId, skipUndo = false) {
+      const UNDO_TIMEOUT = 8000; // 8 Sekunden für Undo
 
-      // Optimistic update - hide task
+      // Task-Element finden
       const taskEl = document.querySelector(`[data-task-id="${taskId}"]`);
+      const taskText = taskEl?.querySelector('.task-text, .progress-task-text')?.textContent || 'Aufgabe';
+
+      // Visuell ausblenden
       if (taskEl) {
-        taskEl.style.opacity = '0.5';
+        taskEl.style.transition = 'all 0.3s';
+        taskEl.style.transform = 'translateX(100%)';
+        taskEl.style.opacity = '0';
         taskEl.style.pointerEvents = 'none';
+        taskEl.dataset.deleted = 'true';
       }
 
-      const result = await apiCall('/functions/v1/task-update', {
-        method: 'POST',
-        body: { task_id: taskId, action: 'delete' }
+      // Pending-Deletion tracken
+      const deletionId = `del_${taskId}_${Date.now()}`;
+      const deleteTimeout = setTimeout(async () => {
+        // Hard-Delete nach Timeout
+        pendingDeletions.delete(deletionId);
+        const result = await apiCall('/functions/v1/task-update', {
+          method: 'POST',
+          body: { task_id: taskId, action: 'delete' }
+        });
+
+        if (result.success && taskEl) {
+          taskEl.remove();
+        } else if (!result.success) {
+          // Bei Fehler wiederherstellen
+          undoDeleteTask(taskId, taskEl);
+          showToast('Fehler beim Löschen', 'error');
+        }
+      }, UNDO_TIMEOUT);
+
+      pendingDeletions.set(deletionId, {
+        taskId,
+        taskEl,
+        timeoutId: deleteTimeout,
+        taskText
       });
 
-      if (result.success) {
-        // Remove from DOM
-        if (taskEl) {
-          taskEl.style.transition = 'all 0.3s';
-          taskEl.style.transform = 'translateX(100%)';
-          taskEl.style.opacity = '0';
-          setTimeout(() => taskEl.remove(), 300);
-        }
-        showToast('Aufgabe gelöscht', 'info', 2000);
-      } else {
-        // Revert on error
-        if (taskEl) {
-          taskEl.style.opacity = '1';
-          taskEl.style.pointerEvents = 'auto';
-        }
-        showToast('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'), 'error');
+      // Undo-Toast anzeigen
+      if (!skipUndo) {
+        showToast('Aufgabe gelöscht', 'info', UNDO_TIMEOUT, {
+          label: 'Rückgängig',
+          callback: () => {
+            undoDeleteTask(taskId, taskEl, deletionId);
+          }
+        });
       }
+    }
+
+    function undoDeleteTask(taskId, taskEl, deletionId) {
+      // Deletion abbrechen
+      if (deletionId && pendingDeletions.has(deletionId)) {
+        const deletion = pendingDeletions.get(deletionId);
+        clearTimeout(deletion.timeoutId);
+        pendingDeletions.delete(deletionId);
+      }
+
+      // Task visuell wiederherstellen
+      if (taskEl) {
+        taskEl.style.transition = 'all 0.3s';
+        taskEl.style.transform = 'translateX(0)';
+        taskEl.style.opacity = '1';
+        taskEl.style.pointerEvents = 'auto';
+        delete taskEl.dataset.deleted;
+      }
+
+      showToast('Aufgabe wiederhergestellt', 'success', 2000);
     }
 
     function editGoals() {
@@ -5987,6 +7430,7 @@
     function showProfileScreen() {
       previousScreen = document.querySelector('.screen.active')?.id || 'dashboardScreen';
       loadProfile();
+      updateThemeToggleUI();
       showScreen('profileScreen', 'forward');
     }
 
@@ -6009,6 +7453,87 @@
         document.getElementById('profileStrengths').value = profile.strengths || '';
         document.getElementById('profileChallenges').value = profile.challenges || '';
         document.getElementById('profileMotivation').value = profile.motivation || '';
+
+        // Profil-Vollständigkeit berechnen
+        updateProfileCompletion();
+      }
+
+      // Event-Listener für Echtzeit-Update der Vollständigkeit
+      const profileFields = ['profileAge', 'profileJob', 'profileEducation', 'profileFamily',
+                            'profileHobbies', 'profileStrengths', 'profileChallenges', 'profileMotivation'];
+      profileFields.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+          el.removeEventListener('input', updateProfileCompletion);
+          el.removeEventListener('change', updateProfileCompletion);
+          el.addEventListener('input', updateProfileCompletion);
+          el.addEventListener('change', updateProfileCompletion);
+        }
+      });
+    }
+
+    function updateProfileCompletion() {
+      const fields = [
+        { id: 'profileAge', weight: 1 },
+        { id: 'profileJob', weight: 1.5 },
+        { id: 'profileEducation', weight: 1 },
+        { id: 'profileFamily', weight: 1 },
+        { id: 'profileHobbies', weight: 1.5 },
+        { id: 'profileStrengths', weight: 1.5 },
+        { id: 'profileChallenges', weight: 1.5 },
+        { id: 'profileMotivation', weight: 1 }
+      ];
+
+      let filled = 0;
+      let total = 0;
+      let emptyFields = [];
+
+      fields.forEach(field => {
+        total += field.weight;
+        const el = document.getElementById(field.id);
+        const value = el?.value?.trim();
+        if (value && value !== '') {
+          filled += field.weight;
+        } else {
+          emptyFields.push(field.id);
+        }
+      });
+
+      const percent = Math.round((filled / total) * 100);
+
+      // Ring aktualisieren
+      const ringFill = document.getElementById('profileRingFill');
+      const ringText = document.getElementById('profileRingText');
+      const hint = document.getElementById('profileCompletionHint');
+
+      if (ringFill) {
+        ringFill.style.strokeDasharray = `${percent}, 100`;
+        if (percent === 100) {
+          ringFill.classList.add('complete');
+        } else {
+          ringFill.classList.remove('complete');
+        }
+      }
+
+      if (ringText) {
+        ringText.textContent = `${percent}%`;
+      }
+
+      if (hint) {
+        if (percent === 100) {
+          hint.textContent = 'Profil vollständig - Die AI kann dich optimal unterstützen!';
+          hint.classList.add('complete');
+        } else if (percent >= 75) {
+          hint.textContent = 'Fast geschafft! Noch wenige Felder für optimale Empfehlungen.';
+          hint.classList.remove('complete');
+        } else if (percent >= 50) {
+          hint.textContent = 'Gut! Je mehr du ausfüllst, desto besser die Empfehlungen.';
+          hint.classList.remove('complete');
+        } else {
+          hint.textContent = 'Vervollständige dein Profil für bessere Empfehlungen';
+          hint.classList.remove('complete');
+        }
+        hint.classList.remove('hidden');
       }
     }
 
@@ -6254,14 +7779,142 @@
           </div>
         `;
       } else {
-        tasksContainer.innerHTML = tasks.map(task => `
+        tasksContainer.innerHTML = tasks.map(task => {
+          const details = task.task_details || {};
+          const timeIcon = {'morgens': '🌅', 'mittags': '☀️', 'abends': '🌙'}[details.best_time] || '';
+          const timeLabel = details.best_time ? details.best_time.charAt(0).toUpperCase() + details.best_time.slice(1) : '';
+          const duration = task.estimated_minutes || 15;
+          return `
           <div class="progress-task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" onclick="showTaskDetail('${task.id}')">
             <div class="progress-task-checkbox">${task.completed ? '✓' : ''}</div>
-            <div class="progress-task-text">${task.task_text}</div>
+            <div class="task-content">
+              <div class="progress-task-text">${task.task_text}</div>
+              <div class="task-meta">
+                <span class="task-meta-item">⏱️ ${duration} Min</span>
+                ${timeIcon ? `<span class="task-meta-item">${timeIcon} ${timeLabel}</span>` : ''}
+              </div>
+            </div>
             <div class="task-arrow">›</div>
           </div>
-        `).join('');
+        `}).join('');
       }
+    }
+
+    // ===== TAG SYSTEM =====
+
+    // Verfügbare Tag-Farben
+    const tagColors = ['blue', 'green', 'red', 'yellow', 'purple', 'cyan'];
+    let selectedTagColor = 'blue';
+    let activeTagFilter = null;
+
+    // Tag zu einem Goal hinzufügen (Frontend-only, API-Integration später)
+    async function addTagToGoal(goalId, tagName, color = 'blue') {
+      if (!tagName || tagName.trim().length === 0) return;
+
+      tagName = tagName.trim().toLowerCase().slice(0, 30);
+
+      // Optimistic UI Update
+      const goal = goalsOverviewData.find(g => g.id === goalId);
+      if (goal) {
+        if (!goal.tags) goal.tags = [];
+        if (goal.tags.length >= 5) {
+          showToast('Maximum 5 Tags pro Ziel erlaubt', 'warning');
+          return;
+        }
+        if (goal.tags.some(t => t.tag === tagName)) {
+          showToast('Tag existiert bereits', 'info');
+          return;
+        }
+        goal.tags.push({ tag: tagName, color });
+        renderGoalsOverview();
+        showToast(`Tag "${tagName}" hinzugefügt`, 'success', 1500);
+      }
+
+      // TODO: API-Call zum Speichern
+      // await apiCall('/functions/v1/goal-tags', { method: 'POST', body: { goal_id: goalId, tag: tagName, color } });
+    }
+
+    // Tag von einem Goal entfernen
+    async function removeTagFromGoal(goalId, tagName) {
+      const goal = goalsOverviewData.find(g => g.id === goalId);
+      if (goal && goal.tags) {
+        goal.tags = goal.tags.filter(t => t.tag !== tagName);
+        renderGoalsOverview();
+        showToast('Tag entfernt', 'info', 1500);
+      }
+
+      // TODO: API-Call zum Löschen
+    }
+
+    // Filter Goals nach Tag
+    function filterByTag(tag) {
+      if (activeTagFilter === tag) {
+        activeTagFilter = null;
+      } else {
+        activeTagFilter = tag;
+      }
+      renderGoalsOverview();
+    }
+
+    // Alle verwendeten Tags sammeln
+    function getAllUsedTags() {
+      const tags = new Map();
+      (goalsOverviewData || []).forEach(goal => {
+        (goal.tags || []).forEach(t => {
+          if (!tags.has(t.tag)) {
+            tags.set(t.tag, { tag: t.tag, color: t.color, count: 1 });
+          } else {
+            tags.get(t.tag).count++;
+          }
+        });
+      });
+      return Array.from(tags.values()).sort((a, b) => b.count - a.count);
+    }
+
+    // Tag-Filter UI rendern
+    function renderTagFilters() {
+      const usedTags = getAllUsedTags();
+      if (usedTags.length === 0) return '';
+
+      const filterButtons = usedTags.map(t => `
+        <button class="tag-filter-btn ${activeTagFilter === t.tag ? 'active' : ''}"
+                onclick="filterByTag('${t.tag}')">
+          #${t.tag} (${t.count})
+        </button>
+      `).join('');
+
+      return `
+        <div class="tag-filter-container">
+          <button class="tag-filter-btn ${!activeTagFilter ? 'active' : ''}"
+                  onclick="filterByTag(null)">
+            Alle
+          </button>
+          ${filterButtons}
+        </div>
+      `;
+    }
+
+    // Tags für ein Goal als HTML rendern
+    function renderGoalTags(goal, editable = false) {
+      const tags = goal.tags || [];
+      if (tags.length === 0 && !editable) return '';
+
+      const tagsHtml = tags.map(t => `
+        <span class="goal-tag tag-${t.color}">
+          #${t.tag}
+          ${editable ? `<button class="goal-tag-remove" onclick="event.stopPropagation(); removeTagFromGoal('${goal.id}', '${t.tag}')">&times;</button>` : ''}
+        </span>
+      `).join('');
+
+      return `<div class="goal-tags">${tagsHtml}</div>`;
+    }
+
+    // Tag-Farbe auswählen
+    function selectTagColor(color) {
+      selectedTagColor = color;
+      document.querySelectorAll('.tag-color-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.color === color);
+      });
     }
 
     // Goals Overview Functions
@@ -6314,7 +7967,20 @@
         return;
       }
 
-      container.innerHTML = goalsOverviewData.map((goal, idx) => {
+      // Tag-Filter rendern
+      const tagFiltersHtml = renderTagFilters();
+
+      // Goals filtern wenn ein Tag ausgewählt ist
+      let filteredGoals = goalsOverviewData;
+      if (activeTagFilter) {
+        filteredGoals = goalsOverviewData.filter(g =>
+          (g.tags || []).some(t => t.tag === activeTagFilter)
+        );
+      }
+
+      // Index im Original-Array statt im gefilterten Array verwenden
+      const goalsHtml = filteredGoals.map((goal) => {
+        const idx = goalsOverviewData.indexOf(goal);
         const progress = goal.progress_percent || 0;
         const daysLeft = goal.days_left;
         const targetDate = goal.target_date
@@ -6354,9 +8020,13 @@
             <div class="goal-overview-progress">
               <div class="goal-overview-progress-fill" style="width: ${progress}%"></div>
             </div>
+            ${renderGoalTags(goal)}
           </div>
         `;
       }).join('');
+
+      // Alles zusammenfügen
+      container.innerHTML = tagFiltersHtml + goalsHtml;
     }
 
     // Make function globally available for onclick

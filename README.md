@@ -53,6 +53,7 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Erreichte Ziele**: Übersicht abgeschlossener Ziele mit Statistiken (Wochen, Meilensteine, Tasks)
 - **AI-Plan Regenerieren**: Neuen Plan für bestehendes Ziel ohne Plan generieren
 - **Optimistische UI-Updates**: Tasks werden sofort visuell aktualisiert
+- **Gamification-System** (NEU): XP, Level, Achievements für Motivation
 
 ### Profil-System (NEU)
 - **Persönliche Daten**: Alter, Beruf, Bildung, Familienstand
@@ -112,8 +113,9 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 | `goal-regenerate-plan` | POST | AI-Plan für bestehendes Ziel regenerieren |
 | `goal-delete` | POST | Ziel mit allen Daten löschen |
 | `accept-plan` | POST | Plan akzeptieren, initiale Tasks erstellen |
-| `task-update` | POST | Task abhaken/löschen |
+| `task-update` | POST | Task abhaken/löschen + XP vergeben |
 | `daily-review` | POST | Tagesreview |
+| `gamification-award` | POST | XP vergeben & Achievements prüfen (NEU) |
 
 #### Auth & Profil
 | Function | Methode | Beschreibung |
@@ -245,6 +247,7 @@ aiday/
 │   │   │   ├── supabase.ts       # Client Factory
 │   │   │   ├── validation.ts     # Zod Schemas
 │   │   │   ├── openai.ts         # OpenAI Integration + Prompts
+│   │   │   ├── utils.ts          # Timezone & Idempotency Utilities (NEU)
 │   │   │   └── import_map.json   # Deno Dependencies
 │   │   │
 │   │   ├── # Daily Coaching Flow
@@ -444,6 +447,7 @@ supabase functions deploy daily-start --no-verify-jwt
 supabase functions deploy daily-checkin --no-verify-jwt
 supabase functions deploy daily-review --no-verify-jwt
 supabase functions deploy task-update --no-verify-jwt
+supabase functions deploy gamification-award --no-verify-jwt
 supabase functions deploy auth-profile --no-verify-jwt
 supabase functions deploy auth-onboarding --no-verify-jwt
 ```
