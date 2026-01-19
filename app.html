@@ -9626,7 +9626,7 @@
 
     async function loadHabits() {
       try {
-        const result = await apiCall('habit-update', {
+        const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
           body: JSON.stringify({
             action: 'get',
@@ -9805,7 +9805,7 @@
 
     async function toggleHabit(habitId, complete) {
       try {
-        const result = await apiCall('habit-update', {
+        const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
           body: JSON.stringify({
             action: complete ? 'complete' : 'uncomplete',
@@ -9872,7 +9872,7 @@
       }
 
       try {
-        const result = await apiCall('habit-update', {
+        const result = await apiCall('/functions/v1/habit-update', {
           method: 'POST',
           body: JSON.stringify({
             action: 'create',
@@ -10066,7 +10066,7 @@
 
     async function checkStreakRecovery() {
       try {
-        const result = await apiCall('streak-recovery', {
+        const result = await apiCall('/functions/v1/streak-recovery', {
           method: 'POST',
           body: JSON.stringify({
             action: 'check',
@@ -10107,7 +10107,7 @@
       btn.textContent = 'Wird gestartet...';
 
       try {
-        const result = await apiCall('streak-recovery', {
+        const result = await apiCall('/functions/v1/streak-recovery', {
           method: 'POST',
           body: JSON.stringify({
             action: 'start',
@@ -10154,7 +10154,7 @@
 
     async function checkBurnout() {
       try {
-        const result = await apiCall('burnout-assessment', {
+        const result = await apiCall('/functions/v1/burnout-assessment', {
           method: 'POST',
           body: JSON.stringify({
             action: 'check',
@@ -10201,7 +10201,7 @@
 
     async function activateRecoveryMode() {
       try {
-        const result = await apiCall('burnout-assessment', {
+        const result = await apiCall('/functions/v1/burnout-assessment', {
           method: 'POST',
           body: JSON.stringify({
             action: 'activate_recovery',
@@ -10234,7 +10234,7 @@
 
       // Lade Wochendaten
       try {
-        const result = await apiCall('weekly-reflection', {
+        const result = await apiCall('/functions/v1/weekly-reflection', {
           method: 'POST',
           body: JSON.stringify({
             action: 'get_data',
@@ -10271,7 +10271,7 @@
       btn.textContent = 'Analyse läuft...';
 
       try {
-        const result = await apiCall('weekly-reflection', {
+        const result = await apiCall('/functions/v1/weekly-reflection', {
           method: 'POST',
           body: JSON.stringify({
             action: 'submit_reflection',
