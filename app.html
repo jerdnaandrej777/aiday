@@ -1748,6 +1748,7 @@
       flex-direction: column;
       align-items: center;
       flex: 1;
+      position: relative;
     }
 
     .stat-circle {
@@ -2116,9 +2117,9 @@
     .heart-3 { animation-delay: 0.4s; }
 
     /* Speech Bubble for Mood Face (Dashboard) - wie Check-in Style */
-    .stat-circle .mood-speech-bubble {
+    .stat-circle-container .mood-speech-bubble {
       position: absolute;
-      bottom: calc(100% + 20px);
+      top: -60px;
       left: 50%;
       transform: translateX(-50%);
       background: white;
@@ -2141,7 +2142,7 @@
       line-height: 1.4;
     }
 
-    .stat-circle .mood-speech-bubble::after {
+    .stat-circle-container .mood-speech-bubble::after {
       content: '';
       position: absolute;
       top: 100%;
@@ -2152,7 +2153,7 @@
       filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.05));
     }
 
-    .stat-circle .mood-speech-bubble.show {
+    .stat-circle-container .mood-speech-bubble.show {
       animation: bubblePopIn 0.3s ease forwards, bubbleFadeOut 0.3s ease 1.7s forwards;
     }
 
