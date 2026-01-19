@@ -4904,6 +4904,16 @@
         <div id="progressTodayTasks" class="progress-tasks-list"></div>
       </div>
 
+      <!-- Habits Preview Card -->
+      <div class="card progress-card animate-in" style="animation-delay: 0.25s;" id="progressHabitsCard">
+        <div class="progress-card-header">
+          <h3>Heutige Habits</h3>
+          <span class="tasks-count" id="progressHabitsCount">0/0</span>
+        </div>
+        <div id="progressHabitsList" class="habits-list"></div>
+        <button class="see-all-btn" onclick="showHabitsScreen()" style="margin-top: 12px;">Alle Habits →</button>
+      </div>
+
       <!-- Footer Back Button -->
       <div class="card" style="margin-top: 20px;">
         <button class="footer-back-btn" onclick="closeProgressScreen()">
@@ -9708,6 +9718,9 @@
       const allList = document.getElementById('allHabitsList');
       const today = habitsData.today || new Date().toISOString().split('T')[0];
 
+      console.log('todayList element:', todayList);
+      console.log('allList element:', allList);
+
       // Finde Logs für heute
       const todayLogs = new Map();
       habitsData.logs?.forEach(log => {
@@ -9716,10 +9729,12 @@
         }
       });
 
-      // Stats aktualisieren
+      // Stats aktualisieren - verwende habits direkt (bereits gefiltert)
       let todayDone = 0;
-      const activeHabits = habitsData.habits?.filter(h => h.is_active) || [];
+      const activeHabits = habitsData.habits || [];
       let bestStreak = 0;
+
+      console.log('activeHabits:', activeHabits);
 
       activeHabits.forEach(habit => {
         const log = todayLogs.get(habit.id);
@@ -9727,12 +9742,20 @@
         if (habit.best_streak > bestStreak) bestStreak = habit.best_streak;
       });
 
-      document.getElementById('habitsActiveCount').textContent = activeHabits.length;
-      document.getElementById('habitsBestStreak').textContent = bestStreak;
-      document.getElementById('habitsTodayDone').textContent = `${todayDone}/${activeHabits.length}`;
+      // Stats aktualisieren (optional elements)
+      const activeCountEl = document.getElementById('habitsActiveCount');
+      const bestStreakEl = document.getElementById('habitsBestStreak');
+      const todayDoneEl = document.getElementById('habitsTodayDone');
+
+      if (activeCountEl) activeCountEl.textContent = activeHabits.length;
+      if (bestStreakEl) bestStreakEl.textContent = bestStreak;
+      if (todayDoneEl) todayDoneEl.textContent = `${todayDone}/${activeHabits.length}`;
 
       // Heute-Liste rendern
-      if (!todayList) return;
+      if (!todayList || !allList) {
+        console.log('Lists not found, skipping render');
+        return;
+      }
 
       if (activeHabits.length === 0) {
         todayList.innerHTML = `
@@ -9747,7 +9770,7 @@
         return;
       }
 
-      todayList.innerHTML = activeHabits.map(habit => {
+      const todayHtml = activeHabits.map(habit => {
         const log = todayLogs.get(habit.id);
         const isCompleted = log?.completed || false;
 
@@ -9768,9 +9791,12 @@
         `;
       }).join('');
 
+      console.log('todayHtml:', todayHtml);
+      todayList.innerHTML = todayHtml;
+
       // Alle Habits Liste
-      allList.innerHTML = activeHabits.map(habit => `
-        <div class="habit-item" onclick="showHabitDetail('${habit.id}')">
+      const allHtml = activeHabits.map(habit => `
+        <div class="habit-item" onclick="toggleHabit('${habit.id}', true)">
           <div class="habit-icon">${habit.icon || '✨'}</div>
           <div class="habit-info">
             <div class="habit-title">${escapeHtml(habit.title)}</div>
@@ -9780,6 +9806,9 @@
           </div>
         </div>
       `).join('');
+
+      console.log('allHtml:', allHtml);
+      allList.innerHTML = allHtml;
 
       // Kalender rendern
       renderHabitCalendar();
@@ -9818,17 +9847,16 @@
     }
 
     function renderHabitsPreview() {
+      // Dashboard Preview
       const card = document.getElementById('habitsPreviewCard');
       const list = document.getElementById('habitsPreviewList');
-      if (!card || !list) return;
 
-      const activeHabits = habitsData.habits?.filter(h => h.is_active) || [];
-      if (activeHabits.length === 0) {
-        card.style.display = 'none';
-        return;
-      }
+      // Progress Screen Preview
+      const progressCard = document.getElementById('progressHabitsCard');
+      const progressList = document.getElementById('progressHabitsList');
+      const progressCount = document.getElementById('progressHabitsCount');
 
-      card.style.display = 'block';
+      const activeHabits = habitsData.habits || [];
       const today = habitsData.today || new Date().toISOString().split('T')[0];
       const todayLogs = new Map();
       habitsData.logs?.forEach(log => {
@@ -9837,24 +9865,72 @@
         }
       });
 
-      // Zeige nur erste 3 Habits
-      const previewHabits = activeHabits.slice(0, 3);
-      list.innerHTML = previewHabits.map(habit => {
+      // Zähle erledigte Habits
+      let todayDone = 0;
+      activeHabits.forEach(habit => {
         const log = todayLogs.get(habit.id);
-        const isCompleted = log?.completed || false;
+        if (log?.completed) todayDone++;
+      });
 
-        return `
-          <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
-            <div class="habit-icon">${habit.icon || '✨'}</div>
-            <div class="habit-info">
-              <div class="habit-title">${escapeHtml(habit.title)}</div>
+      // Dashboard Preview
+      if (card && list) {
+        if (activeHabits.length === 0) {
+          card.style.display = 'none';
+        } else {
+          card.style.display = 'block';
+          const previewHabits = activeHabits.slice(0, 3);
+          list.innerHTML = previewHabits.map(habit => {
+            const log = todayLogs.get(habit.id);
+            const isCompleted = log?.completed || false;
+
+            return `
+              <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
+                <div class="habit-icon">${habit.icon || '✨'}</div>
+                <div class="habit-info">
+                  <div class="habit-title">${escapeHtml(habit.title)}</div>
+                </div>
+                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+                  ${isCompleted ? '✓' : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      // Progress Screen Preview
+      if (progressCard && progressList) {
+        if (progressCount) {
+          progressCount.textContent = `${todayDone}/${activeHabits.length}`;
+        }
+
+        if (activeHabits.length === 0) {
+          progressList.innerHTML = `
+            <div class="empty-state" style="padding: 20px;">
+              <p style="color: var(--text-muted);">Noch keine Habits erstellt</p>
+              <button class="empty-state-btn" onclick="showHabitsScreen()">Habits erstellen</button>
             </div>
-            <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
-              ${isCompleted ? '✓' : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        } else {
+          progressList.innerHTML = activeHabits.map(habit => {
+            const log = todayLogs.get(habit.id);
+            const isCompleted = log?.completed || false;
+
+            return `
+              <div class="habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleHabit('${habit.id}', ${!isCompleted})">
+                <div class="habit-icon">${habit.icon || '✨'}</div>
+                <div class="habit-info">
+                  <div class="habit-title">${escapeHtml(habit.title)}</div>
+                  <div class="habit-streak">🔥 ${habit.current_streak || 0} Tage</div>
+                </div>
+                <div class="habit-checkbox ${isCompleted ? 'checked' : ''}">
+                  ${isCompleted ? '✓' : ''}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
     }
 
     async function toggleHabit(habitId, complete) {
