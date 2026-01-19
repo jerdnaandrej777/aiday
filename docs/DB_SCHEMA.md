@@ -65,7 +65,7 @@ CREATE TABLE core.day_entries (
 ```
 
 ### core.goals
-Ziele mit Details für AI-Analyse.
+Ziele mit Details für AI-Analyse und integriertem Plan.
 
 ```sql
 CREATE TABLE core.goals (
@@ -83,12 +83,40 @@ CREATE TABLE core.goals (
 
   -- Status & Planung
   is_longterm BOOLEAN DEFAULT false,  -- TRUE für Hauptziele
-  target_date DATE,                   -- Zieldatum
+  target_date DATE,                   -- Zieldatum (automatisch aus AI-Plan)
   status TEXT DEFAULT 'open',         -- 'open', 'in_progress', 'achieved', 'not_achieved'
+
+  -- AI-Plan (NEU)
+  plan_json JSONB,                    -- Direkt gespeicherter AI-Plan
 
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+```
+
+**plan_json Struktur:**
+```json
+{
+  "duration_weeks": 12,
+  "target_date": "2024-04-15",
+  "success_metric": "Messbares Erfolgskriterium",
+  "analysis": "AI-Analyse des Ziels",
+  "motivation": "Motivierende Nachricht",
+  "milestones": [
+    { "week": 4, "target": "Zwischenziel", "metric": "Messbar" }
+  ],
+  "daily_tasks": [
+    {
+      "task": "Aufgabentext",
+      "duration_minutes": 30,
+      "frequency": "daily",
+      "best_time": "morgens",
+      "steps": ["Schritt 1", "Schritt 2"],
+      "why": "Warum wichtig"
+    }
+  ],
+  "weekly_tasks": ["Wöchentliche Aufgabe"]
+}
 ```
 
 ### core.daily_checkins
@@ -142,23 +170,43 @@ ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 15;
 ```
 
 ### coach.ai_suggestions
-Gespeicherte AI-Vorschläge.
+Gespeicherte AI-Vorschläge und History.
 
 ```sql
 CREATE TABLE coach.ai_suggestions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id),
+  goal_id UUID REFERENCES core.goals(id),  -- Optional: Verknüpfung zum Ziel
 
-  kind TEXT NOT NULL,             -- 'goals_setup', 'plan_accepted', 'goal_clarify', etc.
+  kind TEXT NOT NULL,             -- Erlaubte Werte (CHECK Constraint)
   payload_json JSONB NOT NULL,    -- Plan, Meilensteine, etc.
 
   model TEXT,                     -- Verwendetes AI-Modell
   tokens_in INTEGER DEFAULT 0,    -- Input-Tokens
   tokens_out INTEGER DEFAULT 0,   -- Output-Tokens
 
-  created_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+
+  CONSTRAINT ai_suggestions_kind_check CHECK (kind IN (
+    'plan',
+    'checkin',
+    'nudge',
+    'goals_setup',
+    'plan_accepted',
+    'plan_regenerated'
+  ))
 );
 ```
+
+**Kind-Werte:**
+| Kind | Beschreibung |
+|------|--------------|
+| `plan` | Legacy: AI-Tagesplan |
+| `checkin` | Legacy: AI-Check-in Feedback |
+| `nudge` | Push-Notification Vorschlag |
+| `goals_setup` | Initiale Ziel-Erstellung mit Plan |
+| `plan_accepted` | Akzeptierter Plan |
+| `plan_regenerated` | Neu generierter Plan für bestehendes Ziel |
 
 ### notifications.push_tokens
 Geräte-Tokens für Push-Notifications.
@@ -202,6 +250,9 @@ CREATE TABLE audit.event_log (
 | `db/003_daily_coaching.sql` | Daily Coaching Tabellen + Goals-Erweiterungen |
 | `db/fix_goals_schema.sql` | **FIX:** Fehlende Spalten (target_date, is_longterm, etc.) |
 | `supabase/migrations/20240103000000_profile_personal.sql` | Persönliche Profildaten |
+| `supabase/migrations/20260118234500_add_plan_json_to_goals.sql` | **NEU:** plan_json Spalte für goals |
+| `supabase/migrations/20260118235600_migrate_plans_to_goals.sql` | **NEU:** Bestehende Pläne migrieren |
+| `supabase/migrations/20260119001000_fix_ai_suggestions_kind.sql` | **NEU:** CHECK Constraint erweitern |
 
 ### Bekannte Schema-Probleme & Fixes
 

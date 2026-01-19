@@ -36,11 +36,11 @@ Deno.serve(async (req) => {
 
     const checkinDone = !!todayCheckin
 
-    // 2. Prüfe ob Langzeit-Ziele existieren (mindestens 1)
+    // 2. Prüfe ob Langzeit-Ziele existieren (mit plan_json)
     const { data: longtermGoals, count: goalsCount } = await supabase
       .schema('core')
       .from('goals')
-      .select('id, title, target_date, status, created_at', { count: 'exact' })
+      .select('id, title, target_date, status, created_at, plan_json', { count: 'exact' })
       .eq('user_id', userId)
       .eq('is_longterm', true)
 
@@ -52,6 +52,21 @@ Deno.serve(async (req) => {
       .eq('user_id', userId)
       .eq('kind', 'plan_accepted')
       .order('created_at', { ascending: false })
+
+    // 2c. Hole auch ursprüngliche AI-Pläne (für nicht-akzeptierte Ziele)
+    const { data: setupPlans, error: setupError } = await supabase
+      .schema('coach')
+      .from('ai_suggestions')
+      .select('payload_json, created_at')
+      .eq('user_id', userId)
+      .eq('kind', 'goals_setup')
+      .order('created_at', { ascending: false })
+
+    console.log('Setup plans loaded:', {
+      count: setupPlans?.length || 0,
+      error: setupError,
+      firstPlan: setupPlans?.[0]?.payload_json
+    })
 
     const hasGoals = (goalsCount || 0) >= 1
 
@@ -111,6 +126,8 @@ Deno.serve(async (req) => {
 
     // 6. Kombiniere Goals mit ihren Plänen
     const plansMap = new Map<string, any>()
+
+    // Zuerst: Akzeptierte Pläne (haben Priorität)
     if (acceptedPlans) {
       for (const ap of acceptedPlans) {
         const payload = ap.payload_json as any
@@ -123,9 +140,36 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Dann: Ursprüngliche Setup-Pläne (Fallback für nicht-akzeptierte Ziele)
+    if (setupPlans) {
+      for (const sp of setupPlans) {
+        const payload = sp.payload_json as any
+        if (payload?.plans && Array.isArray(payload.plans)) {
+          // goals_setup speichert mehrere Pläne in einem Array
+          for (const plan of payload.plans) {
+            if (plan?.goal_id && !plansMap.has(plan.goal_id)) {
+              // Struktur: { goal_id, analysis, duration_weeks, milestones, daily_tasks, ... }
+              plansMap.set(plan.goal_id, {
+                duration_weeks: plan.duration_weeks,
+                target_date: plan.target_date,
+                milestones: plan.milestones || [],
+                daily_tasks: plan.daily_tasks || [],
+                weekly_tasks: plan.weekly_tasks || [],
+                success_metric: plan.success_metric || '',
+                analysis: plan.analysis || '',
+                motivation: plan.motivation || ''
+              })
+            }
+          }
+        }
+      }
+    }
+
     const goalsWithProgress = (longtermGoals || []).map(goal => {
-      const plan = plansMap.get(goal.id)
-      const targetDate = goal.target_date ? new Date(goal.target_date) : null
+      // Priorität: 1. plan_json am Goal, 2. akzeptierter Plan, 3. setup Plan
+      const plan = goal.plan_json || plansMap.get(goal.id) || null
+      console.log(`Goal ${goal.id} (${goal.title}): plan source = ${goal.plan_json ? 'plan_json' : plansMap.has(goal.id) ? 'plansMap' : 'none'}`)
+      const targetDate = goal.target_date ? new Date(goal.target_date) : (plan?.target_date ? new Date(plan.target_date) : null)
       const createdDate = new Date(goal.created_at)
       const todayDate = new Date(today)
 

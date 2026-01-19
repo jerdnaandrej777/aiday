@@ -100,6 +100,7 @@ aiday/
 │   │   ├── accept-plan/          # POST - Plan akzeptieren & Tasks erstellen
 │   │   ├── daily-review/         # POST - Tagesreview
 │   │   ├── task-update/          # POST - Task aktualisieren/löschen
+│   │   ├── goal-delete/          # POST - Ziel löschen (mit Bestätigung)
 │   │   │
 │   │   │── # === LEGACY ===
 │   │   ├── coach-plan/           # POST - AI Tagesplan (alt)
@@ -152,6 +153,7 @@ aiday/
 - [x] **Personalisierte Aktionspläne basierend auf Benutzerprofil**
 - [x] Automatische Task-Generierung
 - [x] Task-Management (Abhaken, Löschen)
+- [x] **Ziel-Löschung mit Bestätigungsdialog**
 - [x] Fortschritts-Dashboard mit Statistiken
 - [x] Streak-Berechnung
 
@@ -161,6 +163,10 @@ aiday/
 - [x] Spezifische Tasks statt generischer Phrasen
 - [x] Meilenstein-Planung mit Zeitrahmen
 - [x] **Personalisierung basierend auf Alter, Beruf, Hobbys etc.**
+- [x] **Detaillierte tägliche Aufgaben mit:**
+  - Beste Tageszeit (🌅 Morgens, ☀️ Mittags, 🌙 Abends)
+  - Schritt-für-Schritt Anleitung (3-5 konkrete Schritte)
+  - Erklärung warum die Aufgabe wichtig ist
 
 ### PWA-Features (NEU)
 - [x] **Installierbar auf Homescreen** (Android, iOS, Desktop)
@@ -232,15 +238,17 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 
 | Function | Methode | Beschreibung | AI |
 |----------|---------|--------------|-----|
-| `goals-setup` | POST | Ziele + AI-Plan erstellen | GPT-4o-mini |
+| `goals-setup` | POST | Ziele + AI-Plan erstellen (speichert plan_json in goals) | GPT-4o-mini |
 | `goal-clarify` | POST | AI-Klarifizierungsfragen | GPT-4o-mini |
+| `goal-regenerate-plan` | POST | AI-Plan für bestehendes Ziel regenerieren | GPT-4o-mini |
+| `goal-delete` | POST | Ziel mit allen zugehörigen Daten löschen | - |
 | `accept-plan` | POST | Plan akzeptieren & Tasks erstellen | - |
-| `daily-start` | GET/POST | Täglicher Flow-Status | - |
+| `daily-start` | GET/POST | Täglicher Flow-Status (lädt plan_json) | - |
 | `daily-checkin` | POST | Check-in speichern | - |
 | `daily-review` | POST | Tagesreview mit AI-Feedback | GPT-4o-mini |
 | `task-update` | POST | Task abhaken/löschen | - |
-| `coach-plan` | POST | AI-Tagesplan | GPT-4o-mini |
-| `coach-checkin` | POST | AI-Coaching Feedback | GPT-4o-mini |
+| `coach-plan` | POST | AI-Tagesplan (LEGACY) | GPT-4o-mini |
+| `coach-checkin` | POST | AI-Coaching Feedback (LEGACY) | GPT-4o-mini |
 | `auth-profile` | GET/POST | Benutzerprofil | - |
 | `auth-onboarding` | POST | Profil einrichten | - |
 
@@ -286,6 +294,7 @@ core.goals
   - believed_steps TEXT         -- Eigene Ideen
   - is_longterm BOOLEAN         -- Langzeit-Ziel Flag
   - target_date DATE            -- Zieldatum
+  - plan_json JSONB             -- AI-generierter Plan (NEU)
   - created_at TIMESTAMPTZ
 
 -- Daily Coaching
@@ -617,6 +626,40 @@ Wenn von der Goals-Übersicht zum Detail navigiert wurde, blieb der Detail-Scree
 **Problem:** GPU-Optimierungen (`will-change`, `backface-visibility: hidden`, `translateZ(0)`) verursachten Blink-Effekte
 
 **Lösung:** Diese Eigenschaften von `.bokeh-circle`, `.particle`, `.clock-layer` entfernt
+
+### 11. Plan-Daten nicht im Ziel-Detail angezeigt
+**Problem:** AI-Pläne wurden nur in `ai_suggestions` gespeichert, aber nicht mit dem Ziel verknüpft
+
+**Lösung:**
+- Neue `plan_json` Spalte in `core.goals` Tabelle
+- `goals-setup` speichert Plan direkt im Ziel
+- `daily-start` lädt `plan_json` für Zieldetails
+- Migration für bestehende Pläne erstellt (`20260118235600_migrate_plans_to_goals.sql`)
+
+### 12. AI-Plan für bestehendes Ziel regenerieren
+**Problem:** Ziele ohne Plan konnten keinen neuen Plan erhalten
+
+**Lösung:**
+- Neue Edge Function `goal-regenerate-plan`
+- Button "AI-Plan generieren" im Goal-Detail wenn kein Plan existiert
+- CHECK Constraint für `ai_suggestions.kind` erweitert (`20260119001000_fix_ai_suggestions_kind.sql`)
+
+### 13. Task-Checkbox erscheint nicht sofort
+**Problem:** `querySelector` findet nur das erste Element, aber Tasks sind auf mehreren Screens
+
+**Lösung:**
+- `querySelectorAll` statt `querySelector` in `toggleTask()`
+- Alle Task-Elemente mit gleicher ID werden gleichzeitig aktualisiert
+
+### 14. Ruckelige Animationen auf Mobile (start-ui.html)
+**Problem:** Login-Animationen liefen auf Smartphones ruckelig
+
+**Lösung:**
+- GPU-Beschleunigung mit `will-change`, `translateZ(0)`, `backface-visibility: hidden`
+- Reduzierte Blur-Werte auf Mobile (30px statt 80px)
+- Weniger Partikel auf Mobile (12 statt 35)
+- `prefers-reduced-motion` Support
+- Verstecke unnötige Elemente auf Mobile (.clock-4, .clock-5, .orb-4, .orb-5)
 
 ---
 

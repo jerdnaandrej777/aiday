@@ -1122,6 +1122,97 @@
       color: var(--text-muted);
     }
 
+    /* Detailed Task Item (for Plan Screen) */
+    .daily-task-item-detailed {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .daily-task-item-detailed .task-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .daily-task-item-detailed .task-icon {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      background: var(--success);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .daily-task-item-detailed .task-info {
+      flex: 1;
+    }
+
+    .daily-task-item-detailed .task-name {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .daily-task-item-detailed .task-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .daily-task-item-detailed .task-time {
+      color: var(--accent);
+    }
+
+    .daily-task-item-detailed .task-why {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .daily-task-item-detailed .task-why strong {
+      color: var(--accent);
+    }
+
+    .daily-task-item-detailed .task-steps {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .daily-task-item-detailed .task-steps-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .daily-task-item-detailed .task-steps-list {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
+    .daily-task-item-detailed .task-steps-list li {
+      margin-bottom: 4px;
+    }
+
+    .daily-task-item-detailed .task-steps-list li::marker {
+      color: var(--success);
+    }
+
     /* Progress Bar */
     .progress-container {
       margin: 16px 0;
@@ -1831,6 +1922,158 @@
       height: 48px;
     }
 
+    /* Achieved Goals Screen */
+    .achieved-goals-header {
+      text-align: center;
+    }
+
+    .achieved-trophy-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: #fbbf24;
+    }
+
+    .achieved-goal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .achieved-goal-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--success);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .achieved-goal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .achieved-goal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .achieved-goal-badge {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .achieved-goal-badge svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .achieved-goal-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .achieved-stat {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+    }
+
+    .achieved-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .achieved-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .achieved-goal-plan {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .achieved-plan-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .achieved-plan-tasks {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .achieved-plan-task {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .achieved-plan-task svg {
+      width: 14px;
+      height: 14px;
+      color: var(--success);
+    }
+
+    .achieved-empty {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .achieved-empty-icon {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .achieved-empty-icon svg {
+      width: 64px;
+      height: 64px;
+      color: var(--text-muted);
+    }
+
+    .achieved-empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .achieved-empty-text {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
     .progress-goal-fill::after {
       content: '';
       position: absolute;
@@ -2323,6 +2566,39 @@
       </div>
     </div>
 
+    <!-- Achieved Goals Screen -->
+    <div class="screen" id="achievedGoalsScreen">
+      <div class="card">
+        <div class="achieved-goals-header">
+          <div class="achieved-trophy-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Erreichte Ziele</h2>
+          <p class="card-subtitle">Deine erfolgreich abgeschlossenen Ziele</p>
+        </div>
+      </div>
+
+      <div id="achievedGoalsList"></div>
+
+      <div class="card" style="margin-top: 20px;">
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="showScreen('dashboardScreen')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück zum Dashboard
+        </button>
+      </div>
+    </div>
+
     <!-- AI Plan Screen -->
     <div class="screen" id="planScreen">
       <div class="card">
@@ -2396,15 +2672,18 @@
               </div>
               <span class="quick-action-label">Neues Ziel</span>
             </button>
-            <button class="quick-action-btn" onclick="showProgressScreen()">
+            <button class="quick-action-btn" onclick="showAchievedGoalsScreen()">
               <div class="quick-action-icon">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="20" x2="12" y2="10"/>
-                  <line x1="18" y1="20" x2="18" y2="4"/>
-                  <line x1="6" y1="20" x2="6" y2="16"/>
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                  <path d="M4 22h16"/>
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
                 </svg>
               </div>
-              <span class="quick-action-label">Fortschritt</span>
+              <span class="quick-action-label">Erreichte Ziele</span>
             </button>
             <button class="quick-action-btn" onclick="showProfileScreen()">
               <div class="quick-action-icon">
@@ -3274,12 +3553,26 @@
           <div class="plan-section">
             <div class="plan-section-title">Deine täglichen Aufgaben:</div>
             ${plan.daily_tasks.map(t => `
-              <div class="daily-task-item">
-                <div class="task-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <div class="task-info">
-                  <div class="task-name">${t.task}</div>
-                  <div class="task-duration">${t.duration_minutes} Min. | ${t.frequency === 'daily' ? 'Täglich' : t.frequency}</div>
+              <div class="daily-task-item-detailed">
+                <div class="task-header">
+                  <div class="task-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="task-info">
+                    <div class="task-name">${t.task}</div>
+                    <div class="task-meta">
+                      <span class="task-duration">${t.duration_minutes} Min.</span>
+                      <span class="task-time">${t.best_time ? (t.best_time === 'morgens' ? '🌅 Morgens' : t.best_time === 'mittags' ? '☀️ Mittags' : t.best_time === 'abends' ? '🌙 Abends' : '⏰ Flexibel') : ''}</span>
+                    </div>
+                  </div>
                 </div>
+                ${t.why ? `<div class="task-why"><strong>Warum:</strong> ${t.why}</div>` : ''}
+                ${t.steps?.length ? `
+                <div class="task-steps">
+                  <div class="task-steps-title">So geht's:</div>
+                  <ol class="task-steps-list">
+                    ${t.steps.map(step => `<li>${step}</li>`).join('')}
+                  </ol>
+                </div>
+                ` : ''}
               </div>
             `).join('')}
           </div>
@@ -3521,13 +3814,16 @@
     }
 
     async function toggleTask(taskId, completed) {
-      // Optimistic update
-      const taskEl = document.querySelector(`[data-task-id="${taskId}"]`);
-      if (taskEl) {
+      // Optimistic update - Alle Task-Elemente (Dashboard + Progress-Screen)
+      const taskElements = document.querySelectorAll(`[data-task-id="${taskId}"]`);
+      taskElements.forEach(taskEl => {
         taskEl.classList.toggle('completed', completed);
-        const checkbox = taskEl.querySelector('.task-checkbox');
+        const checkbox = taskEl.querySelector('.task-checkbox, .progress-task-checkbox');
         if (checkbox) checkbox.textContent = completed ? '✓' : '';
-      }
+      });
+
+      // Optimistic update - Progress Indicators
+      updateTaskProgress(completed ? 1 : -1);
 
       // API call to update
       const action = completed ? 'complete' : 'uncomplete';
@@ -3537,13 +3833,50 @@
       });
 
       if (!result.success) {
-        // Revert on error
-        if (taskEl) {
+        // Revert on error - Alle Elemente zurücksetzen
+        taskElements.forEach(taskEl => {
           taskEl.classList.toggle('completed', !completed);
-          const checkbox = taskEl.querySelector('.task-checkbox');
-          if (checkbox) checkbox.textContent = !completed ? '✓' : '';
-        }
+          const checkbox = taskEl.querySelector('.task-checkbox, .progress-task-checkbox');
+          if (checkbox) checkbox.textContent = completed ? '' : '✓';
+        });
+        // Revert progress
+        updateTaskProgress(completed ? -1 : 1);
         console.error('Failed to update task:', result.error);
+      }
+    }
+
+    // Aktualisiert alle Fortschrittsanzeigen für Tasks
+    function updateTaskProgress(delta) {
+      // Hole aktuelle Werte aus dem DOM
+      const tasksValueEl = document.getElementById('tasksValue');
+      const tasksPercentEl = document.getElementById('tasksPercent');
+      const tasksRingEl = document.getElementById('tasksRing');
+      const tasksCompletedEl = document.getElementById('tasksCompletedValue');
+      const tasksBadgeEl = document.getElementById('tasksBadge');
+
+      if (!tasksValueEl) return;
+
+      // Parse aktuelle Werte "X/Y"
+      const currentValue = tasksValueEl.textContent || '0/0';
+      const [completedStr, totalStr] = currentValue.split('/');
+      let completed = parseInt(completedStr) || 0;
+      const total = parseInt(totalStr) || 0;
+
+      // Aktualisiere
+      completed = Math.max(0, Math.min(total, completed + delta));
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      const offset = 283 - (283 * percent / 100);
+
+      // Update DOM
+      if (tasksValueEl) tasksValueEl.textContent = `${completed}/${total}`;
+      if (tasksPercentEl) tasksPercentEl.textContent = `${percent}%`;
+      if (tasksRingEl) tasksRingEl.style.strokeDashoffset = offset;
+      if (tasksCompletedEl) tasksCompletedEl.textContent = completed;
+      if (tasksBadgeEl) tasksBadgeEl.textContent = `${completed}/${total}`;
+
+      // Animation für den Ring
+      if (tasksRingEl) {
+        tasksRingEl.style.transition = 'stroke-dashoffset 0.5s ease-out';
       }
     }
 
@@ -3948,6 +4281,140 @@
       showScreen(goalsOverviewPreviousScreen, 'back');
     }
 
+    // Achieved Goals Functions
+    let achievedGoalsData = [];
+
+    async function showAchievedGoalsScreen() {
+      showScreen('achievedGoalsScreen', 'forward');
+
+      // Load goals data
+      const result = await apiCall('/functions/v1/daily-start', { method: 'POST' });
+
+      if (result.success) {
+        // Filter for achieved goals only (status === 'achieved')
+        const allGoals = result.data.data?.longterm_goals || [];
+        achievedGoalsData = allGoals.filter(g => g.status === 'achieved');
+        renderAchievedGoals();
+      } else {
+        achievedGoalsData = [];
+        renderAchievedGoals();
+      }
+    }
+
+    function renderAchievedGoals() {
+      const container = document.getElementById('achievedGoalsList');
+      window.achievedGoalsData = achievedGoalsData;
+
+      if (achievedGoalsData.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="achieved-empty">
+              <div class="achieved-empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                  <path d="M4 22h16"/>
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                </svg>
+              </div>
+              <div class="achieved-empty-title">Noch keine erreichten Ziele</div>
+              <div class="achieved-empty-text">Sobald du ein Ziel erreichst, erscheint es hier mit allen Details.</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = achievedGoalsData.map((goal, idx) => {
+        const plan = goal.plan_json || {};
+        const durationWeeks = plan.duration_weeks || 0;
+        const dailyTasks = plan.daily_tasks || [];
+        const milestones = plan.milestones || [];
+
+        // Calculate time spent (from created_at to updated_at or now)
+        const createdDate = new Date(goal.created_at);
+        const completedDate = goal.updated_at ? new Date(goal.updated_at) : new Date();
+        const daysTaken = Math.ceil((completedDate - createdDate) / (1000 * 60 * 60 * 24));
+        const weeksTaken = Math.ceil(daysTaken / 7);
+
+        // Format dates
+        const completedFormatted = completedDate.toLocaleDateString('de-DE', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+
+        // Get first 3 daily tasks for preview
+        const taskPreview = dailyTasks.slice(0, 3);
+
+        return `
+          <div class="achieved-goal-card" onclick="showAchievedGoalDetail(${idx})">
+            <div class="achieved-goal-header">
+              <div class="achieved-goal-title">${goal.title}</div>
+              <div class="achieved-goal-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                Erreicht
+              </div>
+            </div>
+
+            <div class="achieved-goal-stats">
+              <div class="achieved-stat">
+                <div class="achieved-stat-value">${weeksTaken}</div>
+                <div class="achieved-stat-label">Wochen</div>
+              </div>
+              <div class="achieved-stat">
+                <div class="achieved-stat-value">${milestones.length}</div>
+                <div class="achieved-stat-label">Meilensteine</div>
+              </div>
+              <div class="achieved-stat">
+                <div class="achieved-stat-value">${dailyTasks.length}</div>
+                <div class="achieved-stat-label">Aufgaben</div>
+              </div>
+            </div>
+
+            ${taskPreview.length > 0 ? `
+              <div class="achieved-goal-plan">
+                <div class="achieved-plan-title">Tägliche Aufgaben</div>
+                <div class="achieved-plan-tasks">
+                  ${taskPreview.map(task => `
+                    <div class="achieved-plan-task">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M20 6L9 17l-5-5"/>
+                      </svg>
+                      ${typeof task === 'string' ? task : task.task}
+                    </div>
+                  `).join('')}
+                  ${dailyTasks.length > 3 ? `
+                    <div class="achieved-plan-task" style="color: var(--text-muted);">
+                      +${dailyTasks.length - 3} weitere Aufgaben
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            ` : ''}
+
+            <div style="margin-top: 12px; font-size: 12px; color: var(--text-muted);">
+              Erreicht am ${completedFormatted}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showAchievedGoalDetail(idx) {
+      const goal = window.achievedGoalsData[idx];
+      if (!goal) return;
+
+      // Use existing goal detail screen to show the achieved goal
+      currentGoalDetail = goal;
+      goalDetailPreviousScreen = 'achievedGoalsScreen';
+      showGoalDetail(idx, window.achievedGoalsData);
+    }
+
     // Goal Detail Functions
     let goalDetailPreviousScreen = 'dashboardScreen';
 
@@ -3970,6 +4437,57 @@
       }
     }
 
+    async function regeneratePlan(goalId) {
+      const btn = document.querySelector('.btn-generate-plan');
+      if (!btn) return;
+
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generiere Plan...';
+      btn.style.opacity = '0.7';
+
+      try {
+        const result = await apiCall('/functions/v1/goal-regenerate-plan', {
+          method: 'POST',
+          body: { goal_id: goalId }
+        });
+
+        if (result.success && result.plan) {
+          btn.innerHTML = '✓ Plan erstellt!';
+          btn.style.background = 'var(--success, #10b981)';
+
+          // Update currentGoalDetail with the new plan
+          if (currentGoalDetail) {
+            currentGoalDetail.plan = result.plan;
+            currentGoalDetail.target_date = result.plan.target_date;
+          }
+
+          // Reload goal detail to show the new plan
+          setTimeout(() => {
+            loadDailyStart().then(() => {
+              // Find the updated goal and show details
+              const updatedGoals = appData?.data?.longterm_goals || [];
+              const updatedGoal = updatedGoals.find(g => g.id === goalId);
+              if (updatedGoal) {
+                showGoalDetail(updatedGoal);
+              }
+            });
+          }, 1000);
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+          btn.style.opacity = '1';
+          alert('Fehler: ' + (result.error || 'Plan konnte nicht generiert werden'));
+        }
+      } catch (error) {
+        console.error('Regenerate plan error:', error);
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        btn.style.opacity = '1';
+        alert('Fehler beim Generieren des Plans: ' + error.message);
+      }
+    }
+
     async function deleteGoal(goalId) {
       const btn = document.querySelector('.btn-delete-goal');
       const originalHTML = btn.innerHTML;
@@ -3979,7 +4497,7 @@
       try {
         const result = await apiCall('/functions/v1/goal-delete', {
           method: 'POST',
-          body: JSON.stringify({ goal_id: goalId })
+          body: { goal_id: goalId }
         });
 
         if (result.success) {
@@ -4125,17 +4643,33 @@
 
       // Daily Tasks
       const dailyTasks = plan?.daily_tasks || [];
+      const hasPlan = plan && (dailyTasks.length > 0 || milestones.length > 0);
+
       if (dailyTasks.length > 0) {
         document.getElementById('goalDetailTasks').innerHTML = `
           <div class="goal-detail-section">
             <div class="goal-detail-section-title">Tägliche Aufgaben</div>
             ${dailyTasks.map((t, idx) => `
-              <div class="step-item">
-                <div class="step-number">${idx + 1}</div>
-                <div class="step-content">
-                  <div class="step-text">${t.task}</div>
-                  <div class="step-meta">${t.duration_minutes} Min. | ${t.frequency === 'daily' ? 'Täglich' : t.frequency}</div>
+              <div class="daily-task-item-detailed">
+                <div class="task-header">
+                  <div class="task-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="task-info">
+                    <div class="task-name">${t.task}</div>
+                    <div class="task-meta">
+                      <span class="task-duration">${t.duration_minutes} Min.</span>
+                      <span class="task-time">${t.best_time ? (t.best_time === 'morgens' ? '🌅 Morgens' : t.best_time === 'mittags' ? '☀️ Mittags' : t.best_time === 'abends' ? '🌙 Abends' : '⏰ Flexibel') : ''}</span>
+                    </div>
+                  </div>
                 </div>
+                ${t.why ? `<div class="task-why"><strong>Warum:</strong> ${t.why}</div>` : ''}
+                ${t.steps?.length ? `
+                <div class="task-steps">
+                  <div class="task-steps-title">So geht's:</div>
+                  <ol class="task-steps-list">
+                    ${t.steps.map(step => `<li>${step}</li>`).join('')}
+                  </ol>
+                </div>
+                ` : ''}
               </div>
             `).join('')}
           </div>
@@ -4160,6 +4694,17 @@
           <div class="goal-detail-section">
             <div class="goal-detail-section-title">Tägliche Aufgaben</div>
             <p style="color: var(--text-muted); font-size: 14px;">Keine Aufgaben definiert.</p>
+            ${!hasPlan ? `
+              <button class="btn-generate-plan" onclick="regeneratePlan('${goalData.id}')" style="margin-top: 16px; width: 100%; padding: 14px 20px; background: linear-gradient(135deg, var(--accent), #22d3ee); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                  <line x1="9" y1="9" x2="9.01" y2="9"/>
+                  <line x1="15" y1="9" x2="15.01" y2="9"/>
+                </svg>
+                AI-Plan generieren
+              </button>
+            ` : ''}
           </div>
         `;
       }

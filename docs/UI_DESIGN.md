@@ -757,7 +757,7 @@ Bewertung der Aufgaben vom Vortag:
 
 ### Goal Detail Screen
 
-Detailansicht eines einzelnen Ziels:
+Detailansicht eines einzelnen Ziels mit vollständigem AI-Plan:
 
 ```html
 <div id="goalDetailScreen" class="screen">
@@ -778,7 +778,12 @@ Detailansicht eines einzelnen Ziels:
     </div>
   </div>
 
-  <!-- Meilensteine -->
+  <!-- AI-Plan Regenerieren Button (wenn kein Plan existiert) -->
+  <button class="btn btn-primary" onclick="regeneratePlan(goalId)">
+    <svg>🤖</svg> AI-Plan generieren
+  </button>
+
+  <!-- Meilensteine (aus plan_json) -->
   <div class="milestones-section">
     <h3>Meilensteine</h3>
     <div class="milestone-list">
@@ -793,19 +798,40 @@ Detailansicht eines einzelnen Ziels:
     </div>
   </div>
 
-  <!-- Heutige Tasks für dieses Ziel -->
+  <!-- Tägliche Aufgaben (aus plan_json.daily_tasks) -->
   <div class="goal-tasks-section">
-    <h3>Heutige Aufgaben</h3>
-    <div id="goal-today-tasks">
-      <!-- Task-Liste -->
+    <h3>Tägliche Aufgaben</h3>
+    <div id="goalDetailTasks">
+      <!-- Detaillierte Task-Items mit:
+        - Aufgabenname + Dauer (duration_minutes)
+        - Beste Tageszeit (best_time: 🌅/☀️/🌙)
+        - "Warum"-Erklärung (why)
+        - Schritt-für-Schritt Anleitung (steps[])
+      -->
     </div>
   </div>
+
+  <!-- Ziel löschen Button -->
+  <button class="btn-delete-goal" onclick="confirmDeleteGoal()">
+    <svg>🗑️</svg> Ziel löschen
+  </button>
 
   <button class="footer-back-btn" onclick="navigateBack()">
     <svg>←</svg> Zurück
   </button>
 </div>
 ```
+
+**Features:**
+- Plan-Daten werden direkt aus `goals.plan_json` geladen
+- "AI-Plan generieren" Button erscheint nur wenn kein Plan existiert
+- Ruft `goal-regenerate-plan` Edge Function auf
+- Zeigt Meilensteine, tägliche und wöchentliche Aufgaben
+
+**Löschfunktion:**
+- Roter Button am Ende der Goal Detail Ansicht
+- Bestätigungsdialog mit `confirm()` ("Möchtest du dieses Ziel wirklich löschen?")
+- Löscht Ziel, alle zugehörigen Tasks und AI-Suggestions
 
 ### Profile Screen (NEU)
 
@@ -1034,6 +1060,76 @@ Alle Dateien verwenden:
 ---
 
 ## Mobile-Optimierung
+
+### Mobile Animation Performance (start-ui.html)
+
+Optimierungen für flüssige Animationen auf Mobile-Geräten:
+
+```css
+/* GPU-Beschleunigung für animierte Elemente */
+@media (max-width: 768px) {
+  .bokeh-clock, .bokeh-circle, .orb, .particle, .pulse-ring, .wave, .clock-hand {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Reduzierter Blur für bessere Performance */
+  .clock-layer {
+    filter: blur(30px);  /* statt 80px */
+  }
+
+  /* Verstecke unnötige Elemente */
+  .clock-4, .clock-5, .orb-4, .orb-5, .light-rays {
+    display: none !important;
+  }
+}
+
+/* prefers-reduced-motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .bokeh-clock, .bokeh-circle, .orb, .particle, .pulse-ring, .wave, .clock-hand {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+```
+
+**JavaScript-Optimierungen:**
+```javascript
+// Weniger Partikel auf Mobile
+const isMobile = window.innerWidth <= 768;
+const particleCount = isMobile ? 12 : 35;
+```
+
+### Optimistische UI-Updates (app.html)
+
+Tasks werden sofort visuell aktualisiert, bevor die API antwortet:
+
+```javascript
+async function toggleTask(taskId, completed) {
+  // Alle Elemente mit gleicher ID aktualisieren (Dashboard + Progress-Screen)
+  const taskElements = document.querySelectorAll(`[data-task-id="${taskId}"]`);
+  taskElements.forEach(taskEl => {
+    taskEl.classList.toggle('completed', completed);
+    const checkbox = taskEl.querySelector('.task-checkbox, .progress-task-checkbox');
+    if (checkbox) checkbox.textContent = completed ? '✓' : '';
+  });
+
+  // Fortschrittsanzeigen sofort aktualisieren
+  updateTaskProgress(completed ? 1 : -1);
+
+  // API-Call im Hintergrund
+  const result = await apiCall('/functions/v1/task-update', {...});
+
+  // Bei Fehler: Änderungen rückgängig machen
+  if (!result.success) {
+    taskElements.forEach(taskEl => {
+      taskEl.classList.toggle('completed', !completed);
+      // ...
+    });
+  }
+}
+```
 
 ### Horizontales Scrollen verhindern
 

@@ -42,6 +42,7 @@ supabase.schema('audit').from('event_log')
 Pfad: `functions/v1/daily-start`
 - Methode: GET/POST
 - Auth: required
+- **NEU: Lädt `plan_json` für jedes Ziel für Detailansicht**
 - Response:
 ```json
 {
@@ -51,7 +52,15 @@ Pfad: `functions/v1/daily-start`
     "has_goals": true,
     "pending_review": [],
     "today_tasks": [...],
-    "longterm_goals": [...],
+    "longterm_goals": [
+      {
+        "id": "uuid",
+        "title": "Ziel-Titel",
+        "status": "in_progress",
+        "target_date": "2024-04-15",
+        "plan_json": { ... }  // NEU: Vollständiger AI-Plan
+      }
+    ],
     "streak": 5
   }
 }
@@ -100,9 +109,14 @@ Pfad: `functions/v1/goals-setup`
   }]
 }
 ```
-- **NEU: Lädt automatisch Profildaten für AI-Personalisierung**
-- AI generiert Plan mit Meilensteinen und täglichen Tasks
+- **Lädt automatisch Profildaten für AI-Personalisierung**
+- AI generiert Plan mit Meilensteinen und **detaillierten** täglichen Tasks
+- **NEU: Speichert Plan direkt in `goals.plan_json`**
 - Response enthält `requires_acceptance: true`
+- **Detaillierte Tasks** beinhalten:
+  - `best_time`: Beste Tageszeit (morgens/mittags/abends/flexibel)
+  - `steps[]`: Schritt-für-Schritt Anleitung (3-5 Schritte)
+  - `why`: Erklärung warum die Aufgabe wichtig ist
 
 ### accept-plan
 Pfad: `functions/v1/accept-plan`
@@ -127,6 +141,51 @@ Pfad: `functions/v1/task-update`
 - Methode: POST
 - Body: `{ "task_id": "uuid", "action": "complete|uncomplete|delete" }`
 - Nur heutige Tasks können bearbeitet werden
+
+### goal-delete
+Pfad: `functions/v1/goal-delete`
+- Methode: POST
+- Auth: required
+- Body: `{ "goal_id": "uuid" }`
+- Löscht ein Ziel und alle zugehörigen Daten:
+  - Tägliche Tasks (`daily_tasks`)
+  - AI-Suggestions (`ai_suggestions`)
+  - Das Ziel selbst (`goals`)
+- Response:
+```json
+{
+  "success": true,
+  "message": "Ziel erfolgreich gelöscht",
+  "deleted_goal": "Ziel-Titel"
+}
+```
+
+### goal-regenerate-plan
+Pfad: `functions/v1/goal-regenerate-plan`
+- Methode: POST
+- Auth: required
+- Body: `{ "goal_id": "uuid" }`
+- Generiert einen neuen AI-Plan für ein bestehendes Ziel ohne Plan
+- Lädt Benutzerprofil für Personalisierung
+- Speichert Plan direkt in `goals.plan_json`
+- Speichert History in `ai_suggestions` mit `kind: 'plan_regenerated'`
+- Response:
+```json
+{
+  "success": true,
+  "goal_id": "uuid",
+  "plan": {
+    "duration_weeks": 12,
+    "target_date": "2024-04-15",
+    "milestones": [...],
+    "daily_tasks": [...],
+    "weekly_tasks": [...],
+    "success_metric": "...",
+    "analysis": "...",
+    "motivation": "..."
+  }
+}
+```
 
 ### daily-review
 Pfad: `functions/v1/daily-review`

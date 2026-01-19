@@ -17,6 +17,9 @@ interface DailyTask {
   task: string
   duration_minutes: number
   frequency: string // "daily", "weekdays", "3x_week"
+  best_time: string // "morgens", "mittags", "abends", "flexibel"
+  steps: string[] // Schritt-für-Schritt Anleitung
+  why: string // Warum diese Aufgabe wichtig ist
 }
 
 interface GoalPlan {
@@ -175,10 +178,14 @@ ${goalsContext}
 
 Heutiges Datum: ${today}
 
-WICHTIG:
+WICHTIG - ERSTELLE SEHR DETAILLIERTE TÄGLICHE AUFGABEN:
 - Berechne einen REALISTISCHEN Zeitrahmen basierend auf den Details
 - Erstelle MESSBARE Meilensteine (alle 2-4 Wochen)
-- Definiere KONKRETE tägliche Aufgaben (keine vagen Phrasen!)
+- Für JEDE tägliche Aufgabe:
+  * KONKRETE Beschreibung (keine vagen Phrasen wie "arbeite an X")
+  * BESTE TAGESZEIT wann sie ausgeführt werden soll (morgens/mittags/abends)
+  * SCHRITT-FÜR-SCHRITT Anleitung (3-5 konkrete Schritte)
+  * WARUM diese Aufgabe wichtig für das Ziel ist
 - Berücksichtige die Angaben des Nutzers für realistische Planung
 
 Antworte im JSON-Format:
@@ -195,8 +202,18 @@ Antworte im JSON-Format:
         {"week": 12, "target": "Endziel erreicht", "metric": "-10kg"}
       ],
       "daily_tasks": [
-        {"task": "Konkrete tägliche Aufgabe 1", "duration_minutes": 10, "frequency": "daily"},
-        {"task": "Konkrete tägliche Aufgabe 2", "duration_minutes": 15, "frequency": "daily"}
+        {
+          "task": "Konkrete tägliche Aufgabe mit klarem Ergebnis",
+          "duration_minutes": 15,
+          "frequency": "daily",
+          "best_time": "morgens",
+          "steps": [
+            "Schritt 1: Bereite X vor",
+            "Schritt 2: Führe Y aus",
+            "Schritt 3: Dokumentiere Z"
+          ],
+          "why": "Diese Aufgabe ist wichtig weil..."
+        }
       ],
       "weekly_tasks": [
         "Wöchentliche Aufgabe 1 (z.B. 'Wiege dich jeden Sonntag')",
@@ -265,8 +282,32 @@ Antworte im JSON-Format:
               { week: 24, target: 'Ziel erreicht', metric: '100%' }
             ],
             daily_tasks: [
-              { task: 'Kontaktiere 3 potenzielle Kunden', duration_minutes: 30, frequency: 'daily' },
-              { task: 'Arbeite 1 Stunde an deinem Angebot/Produkt', duration_minutes: 60, frequency: 'daily' }
+              {
+                task: 'Kontaktiere 3 potenzielle Kunden',
+                duration_minutes: 30,
+                frequency: 'daily',
+                best_time: 'morgens',
+                steps: [
+                  'Öffne deine Kundenliste oder LinkedIn',
+                  'Wähle 3 Kontakte aus, die zu deinem Angebot passen',
+                  'Schreibe eine persönliche Nachricht (nicht kopiert!)',
+                  'Notiere dir die Reaktionen in deiner Liste'
+                ],
+                why: 'Regelmäßige Akquise ist der Schlüssel zu stetigem Umsatzwachstum'
+              },
+              {
+                task: 'Arbeite 1 Stunde an deinem Angebot/Produkt',
+                duration_minutes: 60,
+                frequency: 'daily',
+                best_time: 'mittags',
+                steps: [
+                  'Wähle einen Aspekt deines Angebots zur Verbesserung',
+                  'Recherchiere Best Practices oder Konkurrenz',
+                  'Implementiere eine konkrete Verbesserung',
+                  'Teste oder dokumentiere die Änderung'
+                ],
+                why: 'Ein starkes Angebot verkauft sich leichter und rechtfertigt höhere Preise'
+              }
             ],
             weekly_tasks: ['Analysiere deine Verkaufszahlen', 'Plane die nächste Woche'],
             motivation: 'Jeder erfolgreiche Verkauf beginnt mit einem Gespräch!',
@@ -285,9 +326,45 @@ Antworte im JSON-Format:
               { week: 12, target: 'Ziel erreicht', metric: '-10kg' }
             ],
             daily_tasks: [
-              { task: 'Trinke 2 Liter Wasser', duration_minutes: 5, frequency: 'daily' },
-              { task: 'Ersetze eine Mahlzeit durch Gemüse/Salat', duration_minutes: 15, frequency: 'daily' },
-              { task: '15 Minuten Bewegung (Spaziergang)', duration_minutes: 15, frequency: 'daily' }
+              {
+                task: 'Trinke 2 Liter Wasser',
+                duration_minutes: 5,
+                frequency: 'daily',
+                best_time: 'morgens',
+                steps: [
+                  'Stelle dir abends eine Flasche Wasser bereit',
+                  'Trinke direkt nach dem Aufstehen ein Glas',
+                  'Fülle die Flasche immer wieder auf',
+                  'Nutze eine App oder Markierungen als Erinnerung'
+                ],
+                why: 'Wasser kurbelt den Stoffwechsel an und reduziert Hungergefühl'
+              },
+              {
+                task: 'Ersetze eine Mahlzeit durch Gemüse/Salat',
+                duration_minutes: 15,
+                frequency: 'daily',
+                best_time: 'mittags',
+                steps: [
+                  'Bereite am Vorabend Gemüse vor (waschen, schneiden)',
+                  'Wähle eine Proteinquelle (Ei, Hühnchen, Hülsenfrüchte)',
+                  'Mische einen bunten Salat mit Dressing',
+                  'Iss langsam und genieße jeden Bissen'
+                ],
+                why: 'Gemüse hat wenig Kalorien, viele Nährstoffe und macht satt'
+              },
+              {
+                task: '15 Minuten Bewegung (Spaziergang)',
+                duration_minutes: 15,
+                frequency: 'daily',
+                best_time: 'abends',
+                steps: [
+                  'Ziehe bequeme Schuhe an',
+                  'Gehe nach draußen (auch bei schlechtem Wetter)',
+                  'Wähle eine Route ohne Ablenkungen',
+                  'Steigere das Tempo in der Mitte für 5 Minuten'
+                ],
+                why: 'Bewegung verbrennt Kalorien und verbessert die Stimmung'
+              }
             ],
             weekly_tasks: ['Wiege dich am Sonntagmorgen', 'Plane Mahlzeiten für die Woche'],
             motivation: 'Dein Körper wird es dir danken - ein Tag nach dem anderen!',
@@ -305,7 +382,19 @@ Antworte im JSON-Format:
               { week: 12, target: 'Ziel erreicht', metric: '100%' }
             ],
             daily_tasks: [
-              { task: 'Arbeite 30 Minuten an deinem Ziel', duration_minutes: 30, frequency: 'daily' }
+              {
+                task: 'Arbeite 30 Minuten fokussiert an deinem Ziel',
+                duration_minutes: 30,
+                frequency: 'daily',
+                best_time: 'morgens',
+                steps: [
+                  'Schalte alle Ablenkungen aus (Handy auf stumm)',
+                  'Definiere ein konkretes Mini-Ziel für diese Session',
+                  'Arbeite 25 Minuten ohne Unterbrechung',
+                  'Mache 5 Minuten Pause und reflektiere'
+                ],
+                why: 'Tägliche fokussierte Arbeit führt zu konstantem Fortschritt'
+              }
             ],
             weekly_tasks: ['Reflektiere deinen Fortschritt', 'Plane die nächste Woche'],
             motivation: 'Du hast dich entschieden anzufangen - das ist der wichtigste Schritt!',
@@ -315,7 +404,34 @@ Antworte im JSON-Format:
       })
     }
 
-    // 5. Speichere AI-Suggestion (aber noch keine Tasks - User muss erst akzeptieren)
+    // 5. Speichere Plan direkt am Goal (plan_json Spalte)
+    for (const plan of aiPlans) {
+      if (plan.goal_id) {
+        const { error: updateError } = await supabase
+          .schema('core')
+          .from('goals')
+          .update({
+            plan_json: {
+              duration_weeks: plan.duration_weeks,
+              target_date: plan.target_date,
+              milestones: plan.milestones,
+              daily_tasks: plan.daily_tasks,
+              weekly_tasks: plan.weekly_tasks,
+              success_metric: plan.success_metric,
+              analysis: plan.analysis,
+              motivation: plan.motivation
+            }
+          })
+          .eq('id', plan.goal_id)
+          .eq('user_id', userId)
+
+        if (updateError) {
+          console.error('Error saving plan to goal:', updateError)
+        }
+      }
+    }
+
+    // 6. Speichere AI-Suggestion (für Audit/History)
     await supabase
       .schema('coach')
       .from('ai_suggestions')

@@ -48,7 +48,9 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Personalisierte Pläne**: Meilensteine und tägliche Tasks basierend auf Kontext und Profil
 - **Task-Management**: Aufgaben abhaken, löschen, Fortschritt verfolgen
 - **Goals Overview**: Übersicht aller Ziele mit Klick auf Details
-- **Goal Detail**: Beschreibung, Plan, Meilensteine, Fortschritt
+- **Goal Detail**: Beschreibung, Plan, Meilensteine, Fortschritt (direkt aus plan_json)
+- **AI-Plan Regenerieren**: Neuen Plan für bestehendes Ziel ohne Plan generieren
+- **Optimistische UI-Updates**: Tasks werden sofort visuell aktualisiert
 
 ### Profil-System (NEU)
 - **Persönliche Daten**: Alter, Beruf, Bildung, Familienstand
@@ -79,6 +81,9 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Kein horizontales Scrollen** - volle Bildschirmbreite
 - **Touch-optimierte Buttons** (56px Mindestgröße)
 - **Swipe-Navigation** zwischen Screens
+- **GPU-beschleunigte Animationen** für flüssige Performance
+- **Reduzierte Animationen** auf Mobile (weniger Partikel, geringerer Blur)
+- **prefers-reduced-motion Support** für Barrierefreiheit
 
 ### Technische Details
 ```javascript
@@ -95,10 +100,12 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 #### Daily Coaching (Hauptfeatures)
 | Function | Methode | Beschreibung |
 |----------|---------|--------------|
-| `daily-start` | GET/POST | Flow-Status (step: review/checkin/goals/dashboard) |
+| `daily-start` | GET/POST | Flow-Status, lädt plan_json für Ziele |
 | `daily-checkin` | POST | Check-in speichern |
 | `goal-clarify` | POST | AI-Klarifizierungsfragen |
-| `goals-setup` | POST | Ziele + AI-Plan erstellen (nutzt Profildaten) |
+| `goals-setup` | POST | Ziele + AI-Plan erstellen (speichert plan_json) |
+| `goal-regenerate-plan` | POST | AI-Plan für bestehendes Ziel regenerieren |
+| `goal-delete` | POST | Ziel mit allen Daten löschen |
 | `accept-plan` | POST | Plan akzeptieren, Tasks erstellen |
 | `task-update` | POST | Task abhaken/löschen |
 | `daily-review` | POST | Tagesreview |
@@ -424,6 +431,8 @@ supabase secrets set OPENAI_API_KEY=sk-...
 # Functions deployen
 supabase functions deploy goals-setup --no-verify-jwt
 supabase functions deploy goal-clarify --no-verify-jwt
+supabase functions deploy goal-regenerate-plan --no-verify-jwt
+supabase functions deploy goal-delete --no-verify-jwt
 supabase functions deploy accept-plan --no-verify-jwt
 supabase functions deploy daily-start --no-verify-jwt
 supabase functions deploy daily-checkin --no-verify-jwt

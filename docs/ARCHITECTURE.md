@@ -159,15 +159,21 @@ core.user_profile
   - age, job, education, family_status
   - hobbies, strengths, challenges, motivation
 
--- Ziele
+-- Ziele (mit integriertem AI-Plan)
 core.goals
   - is_longterm, target_date, status
   - why_important, previous_efforts, believed_steps
+  - plan_json (JSONB)  -- NEU: Direkt gespeicherter AI-Plan
 
 -- Tägliche Tasks
 core.daily_tasks
   - task_text, completed, goal_id
   - ai_generated, estimated_minutes
+
+-- AI-History
+coach.ai_suggestions
+  - kind: 'goals_setup', 'plan_accepted', 'plan_regenerated', etc.
+  - goal_id (optional), payload_json
 ```
 
 ### Policies
@@ -182,10 +188,12 @@ core.daily_tasks
 ### Daily Coaching Flow
 | Function | Beschreibung |
 |----------|--------------|
-| `daily-start` | Flow-Status (review/checkin/goals/dashboard) |
+| `daily-start` | Flow-Status (review/checkin/goals/dashboard), lädt plan_json |
 | `daily-checkin` | Check-in speichern |
 | `goal-clarify` | AI-Klarifizierungsfragen |
-| `goals-setup` | Ziele + AI-Plan erstellen |
+| `goals-setup` | Ziele + AI-Plan erstellen (speichert plan_json) |
+| `goal-regenerate-plan` | AI-Plan für bestehendes Ziel regenerieren |
+| `goal-delete` | Ziel mit allen Daten löschen |
 | `accept-plan` | Plan akzeptieren, Tasks erstellen |
 | `task-update` | Task bearbeiten |
 | `daily-review` | Tagesreview |

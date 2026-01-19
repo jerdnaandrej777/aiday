@@ -19,10 +19,15 @@ const RequestSchema = z.object({
     daily_tasks: z.array(z.object({
       task: z.string(),
       duration_minutes: z.number(),
-      frequency: z.string()
+      frequency: z.string(),
+      best_time: z.string().optional(), // morgens, mittags, abends, flexibel
+      steps: z.array(z.string()).optional(), // Schritt-für-Schritt Anleitung
+      why: z.string().optional() // Warum diese Aufgabe wichtig ist
     })),
     weekly_tasks: z.array(z.string()).optional(),
-    success_metric: z.string().optional()
+    success_metric: z.string().optional(),
+    analysis: z.string().optional(),
+    motivation: z.string().optional()
   })
 })
 

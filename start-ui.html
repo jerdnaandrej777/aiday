@@ -1257,6 +1257,92 @@
         font-size: 14px;
       }
     }
+
+    /* ========== MOBILE PERFORMANCE OPTIMIERUNG ========== */
+    @media (max-width: 768px) {
+      /* AGGRESSIV: Verstecke ALLE aufwändigen Animationen auf Mobile */
+      .bokeh-clock,
+      .clock-layer,
+      .bokeh-circle,
+      .clock-hand,
+      .pulse-ring,
+      .wave,
+      .light-rays,
+      .particles,
+      .particle {
+        display: none !important;
+        animation: none !important;
+      }
+
+      /* Nur 2 einfache Orbs behalten */
+      .orb {
+        animation: none !important;
+        filter: blur(100px);
+        opacity: 0.3;
+      }
+
+      .orb-3,
+      .orb-4,
+      .orb-5 {
+        display: none !important;
+      }
+
+      /* Einfacher statischer Hintergrund-Gradient */
+      .bg-effects {
+        background: radial-gradient(ellipse at 30% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                    radial-gradient(ellipse at 70% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
+      }
+
+      /* Grid-Pattern vereinfachen */
+      .grid-pattern {
+        opacity: 0.3;
+        background-size: 60px 60px;
+      }
+
+      /* Deaktiviere backdrop-filter auf Mobile */
+      .icon-circle,
+      .btn-secondary,
+      .btn-next,
+      .card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      /* Slide-Animationen vereinfachen */
+      .slide {
+        transition: opacity 0.2s ease !important;
+        transform: none !important;
+      }
+
+      .slide.active {
+        transform: none !important;
+      }
+    }
+
+    /* Für Nutzer die reduzierte Bewegung bevorzugen */
+    @media (prefers-reduced-motion: reduce) {
+      .bokeh-clock,
+      .bokeh-circle,
+      .orb,
+      .particle,
+      .pulse-ring,
+      .wave,
+      .clock-hand,
+      .icon-glow,
+      .icon-circle,
+      .light-rays {
+        animation: none !important;
+      }
+
+      .slide {
+        transition: opacity 0.3s ease;
+        transform: none !important;
+      }
+
+      .slide.active {
+        transform: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1505,9 +1591,10 @@
     createClockMarkers('clockMarkers2');
     createClockMarkers('clockMarkers3');
 
-    // Create floating particles
+    // Create floating particles (NUR auf Desktop für Performance)
     const particlesContainer = document.getElementById('particles');
-    const particleCount = 35;
+    const isMobile = window.innerWidth <= 768;
+    const particleCount = isMobile ? 0 : 35;  // Keine Partikel auf Mobile!
 
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
@@ -1521,16 +1608,17 @@
       particlesContainer.appendChild(particle);
     }
 
-    // Create light rays
+    // Create light rays (nur auf Desktop)
     const lightRays = document.getElementById('lightRays');
-    const rayCount = 16;
-
-    for (let i = 0; i < rayCount; i++) {
-      const ray = document.createElement('div');
-      ray.className = 'light-ray';
-      ray.style.transform = `rotate(${i * (360 / rayCount)}deg)`;
-      ray.style.opacity = (i % 2 === 0) ? 0.8 : 0.4;
-      lightRays.appendChild(ray);
+    if (!isMobile && lightRays) {
+      const rayCount = 16;
+      for (let i = 0; i < rayCount; i++) {
+        const ray = document.createElement('div');
+        ray.className = 'light-ray';
+        ray.style.transform = `rotate(${i * (360 / rayCount)}deg)`;
+        ray.style.opacity = (i % 2 === 0) ? 0.8 : 0.4;
+        lightRays.appendChild(ray);
+      }
     }
 
     // Slide navigation
