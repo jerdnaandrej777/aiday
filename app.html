@@ -9684,12 +9684,12 @@
           }
         });
 
-        if (result.error) {
+        if (result.error || !result.data) {
           console.error('Error loading habits:', result.error);
           return;
         }
 
-        habitsData = result;
+        habitsData = result.data;
         renderHabits();
         renderHabitsPreview();
       } catch (e) {
