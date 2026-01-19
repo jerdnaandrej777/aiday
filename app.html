@@ -827,18 +827,6 @@
       transition: all 0.3s;
       font-size: 12px;
       color: white;
-      cursor: pointer;
-      /* Größere Klickfläche für Touch */
-      position: relative;
-    }
-
-    .task-checkbox::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      left: -8px;
-      right: -8px;
-      bottom: -8px;
     }
 
     .task-item.completed .task-checkbox {
@@ -2339,17 +2327,6 @@
       justify-content: center;
       transition: all 0.3s;
       flex-shrink: 0;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .progress-task-checkbox::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      left: -8px;
-      right: -8px;
-      bottom: -8px;
     }
 
     .progress-task-item.completed .progress-task-checkbox {
@@ -4766,10 +4743,10 @@
         `;
       } else {
         tasksEl.innerHTML = tasks.map(task => `
-          <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-            <div class="task-checkbox" onclick="event.stopPropagation(); toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
-            <div class="task-text" onclick="showTaskDetail('${task.id}')">${task.task_text}</div>
-            <div class="task-arrow" onclick="showTaskDetail('${task.id}')">›</div>
+          <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" onclick="showTaskDetail('${task.id}')">
+            <div class="task-checkbox">${task.completed ? '✓' : ''}</div>
+            <div class="task-text">${task.task_text}</div>
+            <div class="task-arrow">›</div>
           </div>
         `).join('');
       }
@@ -5353,10 +5330,10 @@
         `;
       } else {
         tasksContainer.innerHTML = tasks.map(task => `
-          <div class="progress-task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-            <div class="progress-task-checkbox" onclick="event.stopPropagation(); toggleTask('${task.id}', ${!task.completed})">${task.completed ? '✓' : ''}</div>
-            <div class="progress-task-text" onclick="showTaskDetail('${task.id}')">${task.task_text}</div>
-            <div class="task-arrow" onclick="showTaskDetail('${task.id}')">›</div>
+          <div class="progress-task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}" onclick="showTaskDetail('${task.id}')">
+            <div class="progress-task-checkbox">${task.completed ? '✓' : ''}</div>
+            <div class="progress-task-text">${task.task_text}</div>
+            <div class="task-arrow">›</div>
           </div>
         `).join('');
       }
