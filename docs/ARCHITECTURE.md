@@ -96,8 +96,23 @@
 ### Navigation
 - **Swipe-Navigation**: Nach rechts wischen = zurück, nach links wischen = vorwärts
 - **Zurück-Buttons**: Innerhalb der Cards am unteren Rand
-- **Header**: Global sichtbar mit Gradient-Button für "Mein Fortschritt"
+- **Dynamischer Header-Button**:
+  - Auf Dashboard: "Mein Fortschritt" → Progress Screen
+  - Auf anderen Screens: "Dashboard" → zurück zum Dashboard
 - **Klickbare Stat-Boxes**: "Aktive Ziele" → Goals Overview Screen
+
+### Interaktive UI-Elemente
+- **Animiertes Mood Face**: SVG-basiertes Gesicht im "Heute"-Block
+  - 5 Expressionen basierend auf Check-in Stimmung (great/good/neutral/bad/terrible)
+  - Animationen: Blinzeln, Lächeln, Wangen-Pulsieren, Tränen
+  - Klickbar mit mood-spezifischen Animationen (Tanzen, Zunge, Umarmung etc.)
+  - Speech Bubble mit aufmunternden Nachrichten
+- **Energielevel-Validierung**:
+  - Wellenförmige Puls-Animation statt Fehlermeldung
+  - Sprechblase über dem Label
+  - Auto-Scroll zum Energy-Slider
+- **Toast Notifications**: Ersetzen alle alert() Dialoge
+- **Confetti-Animation**: Bei Erledigung aller täglichen Aufgaben
 
 ### Design-System
 - **Farbpalette**: Blau (#6366f1) + Cyan (#22d3ee) Gradient
@@ -105,7 +120,8 @@
 - **Header**: Abgerundete untere Ecken (24px), 28px seitliches Padding
 - **Glassmorphism**: Transparente Cards mit backdrop-filter
 - **SVG-Icons**: Konsistente Stroke-based Icons
-- **Animationen**: Slide-Animationen, Hover-Effekte
+- **Animationen**: Slide-Animationen, Hover-Effekte, Puls-Animationen
+- **Speech Bubbles**: Gradient-Hintergrund mit Pfeil, mood-spezifische Farben
 - **Einheitliche Abstände**: 28px links/rechts für Header, Screens, App-body
 - **Card-Padding**: 16px für inneren Abstand
 

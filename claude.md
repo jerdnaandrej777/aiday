@@ -200,6 +200,10 @@ aiday/
 - [x] **Toast Notifications** für alle Aktionen (statt alerts)
 - [x] **Confetti-Animation** bei Erledigung aller Aufgaben
 - [x] **Verbesserte Empty States** mit Action-Buttons
+- [x] **Animiertes Mood Face** im Dashboard (lächelt, blinzelt basierend auf Stimmung)
+- [x] **Klickbare Mood Face** mit mood-spezifischen Animationen + Speech Bubble
+- [x] **Dynamischer Header-Button** (Dashboard ↔ Mein Fortschritt)
+- [x] **Animierte Energielevel-Validierung** (Puls-Animation + Sprechblase)
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
 - [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
@@ -814,3 +818,148 @@ CORS policy: Cross origin requests are only supported...
 Für korrektes Testen:
 1. **GitHub Pages nutzen:** https://jerdnaandrej777.github.io/aiday/app.html
 2. **Oder lokalen Server starten:** `npx serve .` oder `python -m http.server 8000`
+
+### 22. Animiertes Mood Face im Dashboard
+**Feature:** Interaktives animiertes Gesicht im "Heute"-Block
+
+**Implementierung:**
+- SVG-basiertes animiertes Gesicht mit Augen, Mund, Wangen, Tränen, Funkeln
+- 5 Stimmungs-Modi mit unterschiedlichen Expressionen:
+  - `great`: Großes Lächeln, Funkeln, orange Wangen
+  - `good`: Freundliches Lächeln, leichtes Blinzeln
+  - `neutral`: Gerader Mund, normales Blinzeln
+  - `bad`: Trauriger Mund, blaue Wangen
+  - `terrible`: Sehr traurig, Tränen-Animation
+- CSS-Animationen: Blinzeln, Lächeln, Wangen-Pulsieren
+
+**Code-Struktur:**
+```javascript
+function updateMoodFace(mood) {
+  const moodFace = document.getElementById('moodFace');
+  moodFace.className = 'mood-face ' + mood;
+  // Mund-Pfad wird je nach Stimmung angepasst
+}
+```
+
+### 23. Klickbare Mood Face mit Animationen
+**Feature:** Bei Klick auf das Mood Face werden mood-spezifische Animationen ausgelöst
+
+**Animationen pro Stimmung:**
+- `great`: Tanzen (Hüpfen + Drehen)
+- `good`: Zunge rausstrecken + Lachen
+- `neutral`: Verrückte Augen + Wackeln
+- `bad`: Winken + Herz-Animation
+- `terrible`: Virtuelle Umarmung + Herzen
+
+**Speech Bubble:**
+- Erscheint über dem Mood Face (nicht als Toast unten)
+- Zufällige aufmunternde Nachrichten mit Emojis
+- Mood-spezifische Gradient-Farben
+- Pop-In Animation + Fade-Out nach 2 Sekunden
+
+**Code:**
+```javascript
+function onMoodFaceClick() {
+  const bubble = document.getElementById('moodSpeechBubble');
+  bubble.textContent = randomMessage;
+  bubble.className = 'mood-speech-bubble ' + currentMood + ' show';
+}
+```
+
+### 24. Dynamischer Header-Navigation Button
+**Problem:** Der Header-Button war statisch und zeigte immer "Mein Fortschritt"
+
+**Lösung:**
+- Auf dem **Dashboard**: Button zeigt "Mein Fortschritt" → navigiert zu Progress Screen
+- Auf **allen anderen Screens**: Button zeigt "Dashboard" → navigiert zurück zum Dashboard
+- Icon wechselt dynamisch (Chart-Icon ↔ Grid-Icon)
+
+**Code:**
+```javascript
+function updateHeaderNavButton(screenId) {
+  const navText = document.getElementById('headerNavText');
+  if (screenId === 'dashboardScreen') {
+    navText.textContent = 'Mein Fortschritt';
+    // Chart-Icon
+  } else {
+    navText.textContent = 'Dashboard';
+    // Grid-Icon
+  }
+}
+
+function onHeaderNavClick() {
+  if (activeScreen.id === 'dashboardScreen') {
+    showProgressScreen();
+  } else {
+    showScreen('dashboardScreen', 'back');
+  }
+}
+```
+
+### 25. Header Button Höhe auf Mobile
+**Problem:** "Mein Fortschritt" brach auf zwei Zeilen um, was den Header höher machte als "Dashboard"
+
+**Lösung:**
+```css
+.progress-btn {
+  white-space: nowrap;  /* Kein Zeilenumbruch */
+  font-size: 13px;      /* Etwas kleiner */
+  padding: 10px 16px;   /* Kompakter */
+  gap: 6px;
+}
+```
+
+### 26. Animierte Energielevel-Validierung
+**Problem:** Beim Check-in ohne Energielevel kam eine Fehlermeldung
+
+**Lösung:** Statt Fehlermeldung wird eine aufmerksamkeitsstarke Animation ausgelöst:
+- Wellenförmige Puls-Animation der 1-5 Buttons (nacheinander)
+- Sprechblase erscheint über dem Label "Wie ist dein Energielevel?"
+- Text: "Bitte wähle dein Energielevel! ⚡"
+- Gradient-Hintergrund (lila-cyan), nicht transparent
+- Auto-Scroll zum Energy-Slider
+- Shake-Animation der Sprechblase
+
+**CSS:**
+```css
+.energy-slider.needs-attention .energy-level {
+  animation: energyPulse 0.6s ease-in-out;
+}
+
+.energy-slider.needs-attention .energy-level:nth-child(1) { animation-delay: 0s; }
+.energy-slider.needs-attention .energy-level:nth-child(2) { animation-delay: 0.08s; }
+/* ... usw. für Welleneffekt */
+
+@keyframes energyPulse {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.15); border-color: var(--accent); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.1); }
+}
+
+.energy-speech-bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #6366f1, #22d3ee);
+  /* Überdeckt das Label vollständig */
+}
+```
+
+**JavaScript:**
+```javascript
+async function submitCheckin() {
+  if (!checkinData.energy_level) {
+    showEnergyAttention();
+    return;
+  }
+  // ... rest of function
+}
+
+function showEnergyAttention() {
+  formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  slider.classList.add('needs-attention');
+  bubble.classList.add('show');
+}
+```
