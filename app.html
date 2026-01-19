@@ -2118,16 +2118,19 @@
     .heart-2 { animation-delay: 0.2s; }
     .heart-3 { animation-delay: 0.4s; }
 
-    /* Heute Container für Sprechblase */
-    .heute-container {
+    /* Dashboard Bubble Container */
+    .dashboard-bubble-container {
       position: relative;
+      width: 100%;
+      height: 0;
     }
 
-    /* Speech Bubble über "Heute" (Dashboard) */
+    /* Speech Bubble über Emoji (Dashboard) */
     .dashboard-bubble {
       position: absolute;
-      bottom: calc(100% + 18px);
+      top: 0;
       left: 0;
+      right: 0;
       background: white;
       color: var(--text-primary);
       padding: 12px 24px;
@@ -2135,15 +2138,14 @@
       font-size: 14px;
       font-weight: 500;
       white-space: nowrap;
-      width: max-content;
-      min-width: 120px;
-      max-width: 300px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       border: 1px solid var(--glass-border);
       opacity: 0;
       pointer-events: none;
       z-index: 100;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
       line-height: 1.4;
     }
@@ -2152,7 +2154,7 @@
       content: '';
       position: absolute;
       top: 100%;
-      left: 20px;
+      left: 50px;
       width: 0;
       height: 0;
       border-left: 12px solid transparent;
@@ -2947,12 +2949,13 @@
       <!-- Today's Status Card -->
       <div class="card progress-card animate-in">
         <div class="progress-card-header">
-          <div class="heute-container">
-            <h3>Heute</h3>
-            <!-- Speech Bubble über Heute -->
-            <div class="mood-speech-bubble dashboard-bubble" id="moodSpeechBubble"></div>
-          </div>
+          <h3>Heute</h3>
           <span class="progress-date" id="progressDate"></span>
+        </div>
+
+        <!-- Speech Bubble über den Stats -->
+        <div class="dashboard-bubble-container">
+          <div class="mood-speech-bubble dashboard-bubble" id="moodSpeechBubble"></div>
         </div>
 
         <div class="today-stats">
