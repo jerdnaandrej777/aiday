@@ -152,6 +152,7 @@ aiday/
 - [x] Kontext-Analyse (Angestellt vs. Selbstständig etc.)
 - [x] **Personalisierte Aktionspläne basierend auf Benutzerprofil**
 - [x] Automatische Task-Generierung
+- [x] **Automatische tägliche Tasks aus Plan** (jeden Tag bis Ziel erreicht)
 - [x] Task-Management (Abhaken, Löschen)
 - [x] **Ziel-Löschung mit Bestätigungsdialog**
 - [x] Fortschritts-Dashboard mit Statistiken
@@ -243,7 +244,7 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 | `goal-regenerate-plan` | POST | AI-Plan für bestehendes Ziel regenerieren | GPT-4o-mini |
 | `goal-delete` | POST | Ziel mit allen zugehörigen Daten löschen | - |
 | `accept-plan` | POST | Plan akzeptieren & Tasks erstellen | - |
-| `daily-start` | GET/POST | Täglicher Flow-Status (lädt plan_json) | - |
+| `daily-start` | GET/POST | Täglicher Flow-Status (lädt plan_json, AUTO-generiert Tasks) | - |
 | `daily-checkin` | POST | Check-in speichern | - |
 | `daily-review` | POST | Tagesreview mit AI-Feedback | GPT-4o-mini |
 | `task-update` | POST | Task abhaken/löschen | - |
@@ -660,6 +661,15 @@ Wenn von der Goals-Übersicht zum Detail navigiert wurde, blieb der Detail-Scree
 - Weniger Partikel auf Mobile (12 statt 35)
 - `prefers-reduced-motion` Support
 - Verstecke unnötige Elemente auf Mobile (.clock-4, .clock-5, .orb-4, .orb-5)
+
+### 15. Tägliche Aufgaben nur am Erstellungstag sichtbar
+**Problem:** Tasks wurden nur am Tag der Plan-Akzeptierung erstellt und an Folgetagen nicht angezeigt
+
+**Lösung:**
+- `daily-start` Edge Function erweitert mit AUTO-GENERATE Logik
+- Bei jedem API-Call prüft `daily-start` ob aktive Ziele (`status: 'in_progress'`) mit `plan_json` existieren
+- Falls für heute keine Tasks existieren, werden automatisch Tasks aus `plan_json.daily_tasks` erstellt
+- Tasks erscheinen nun jeden Tag bis das Ziel erreicht ist
 
 ---
 

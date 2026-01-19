@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     const pendingReview = yesterdayTasks || []
 
     // 4. Hole heutige Tasks
-    const { data: todayTasks, error: tasksError } = await supabase
+    let { data: todayTasks, error: tasksError } = await supabase
       .schema('core')
       .from('daily_tasks')
       .select('id, task_text, completed, goal_id, task_order')
@@ -99,6 +99,55 @@ Deno.serve(async (req) => {
       todayTasks,
       tasksError
     })
+
+    // 4b. AUTO-GENERATE: Erstelle automatisch Tasks für aktive Ziele, falls noch keine für heute existieren
+    const activeGoals = (longtermGoals || []).filter(g => g.status === 'in_progress' && g.plan_json)
+    const goalsWithTasksToday = new Set((todayTasks || []).map(t => t.goal_id))
+
+    for (const goal of activeGoals) {
+      // Überspringe, wenn dieses Ziel bereits Tasks für heute hat
+      if (goalsWithTasksToday.has(goal.id)) {
+        console.log(`Goal ${goal.id} already has tasks for today, skipping auto-generation`)
+        continue
+      }
+
+      const plan = goal.plan_json as any
+      const dailyTasks = plan?.daily_tasks || []
+
+      if (dailyTasks.length === 0) {
+        console.log(`Goal ${goal.id} has no daily_tasks in plan, skipping`)
+        continue
+      }
+
+      console.log(`Auto-generating ${dailyTasks.length} tasks for goal ${goal.id} (${goal.title})`)
+
+      // Erstelle Tasks aus dem Plan
+      const tasksToInsert = dailyTasks.map((t: any, idx: number) => ({
+        user_id: userId,
+        goal_id: goal.id,
+        date: today,
+        task_text: t.task || t.task_text || `Aufgabe ${idx + 1}`,
+        task_order: idx,
+        ai_generated: true,
+        estimated_minutes: t.duration_minutes || t.estimated_minutes || 15
+      }))
+
+      const { data: newTasks, error: insertError } = await supabase
+        .schema('core')
+        .from('daily_tasks')
+        .insert(tasksToInsert)
+        .select()
+
+      if (insertError) {
+        console.error(`Failed to auto-generate tasks for goal ${goal.id}:`, insertError)
+      } else {
+        console.log(`Successfully auto-generated ${newTasks?.length || 0} tasks for goal ${goal.id}`)
+        // Füge die neuen Tasks zur Liste hinzu
+        if (newTasks) {
+          todayTasks = [...(todayTasks || []), ...newTasks]
+        }
+      }
+    }
 
     // 5. Berechne Streak (aufeinanderfolgende Tage mit Check-ins)
     let streak = 0

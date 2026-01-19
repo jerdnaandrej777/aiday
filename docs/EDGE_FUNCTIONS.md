@@ -42,7 +42,11 @@ supabase.schema('audit').from('event_log')
 Pfad: `functions/v1/daily-start`
 - Methode: GET/POST
 - Auth: required
-- **NEU: Lädt `plan_json` für jedes Ziel für Detailansicht**
+- **Lädt `plan_json` für jedes Ziel für Detailansicht**
+- **AUTO-GENERATE: Erstellt automatisch tägliche Tasks für aktive Ziele**
+  - Prüft ob Ziele mit `status: 'in_progress'` und `plan_json` existieren
+  - Erstellt automatisch Tasks aus `plan_json.daily_tasks` falls für heute keine existieren
+  - Tasks werden jeden Tag neu aus dem Plan generiert bis das Ziel erreicht ist
 - Response:
 ```json
 {
