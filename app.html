@@ -5188,6 +5188,135 @@
     }
 
     // Task Detail Functions
+    function generateTaskGuidance(taskText) {
+      // Generiere hilfreiche Anleitungen basierend auf Schlüsselwörtern
+      const text = taskText.toLowerCase();
+
+      // Entspannung / Meditation / Schlaf
+      if (text.includes('entspannung') || text.includes('meditation') || text.includes('schlaf') || text.includes('ruhe')) {
+        return {
+          why: 'Regelmäßige Entspannung reduziert Stress, verbessert die Schlafqualität und steigert deine mentale Klarheit. Schon wenige Minuten täglich können einen großen Unterschied machen.',
+          steps: [
+            'Finde einen ruhigen Ort ohne Ablenkungen',
+            'Setze oder lege dich bequem hin',
+            'Schließe die Augen und atme 5x tief ein und aus',
+            'Konzentriere dich auf deinen Körper - entspanne jeden Muskel von den Füßen bis zum Kopf',
+            'Bleibe 5-10 Minuten in diesem entspannten Zustand'
+          ]
+        };
+      }
+
+      // Sport / Bewegung / Training
+      if (text.includes('sport') || text.includes('training') || text.includes('bewegung') || text.includes('laufen') || text.includes('fitness') || text.includes('übung')) {
+        return {
+          why: 'Körperliche Aktivität stärkt nicht nur deinen Körper, sondern auch deinen Geist. Sport setzt Endorphine frei und gibt dir mehr Energie für den Tag.',
+          steps: [
+            'Ziehe bequeme Sportkleidung an',
+            'Wärme dich 5 Minuten auf (Dehnen, leichtes Gehen)',
+            'Führe die geplante Aktivität in deinem Tempo durch',
+            'Achte auf deine Atmung und höre auf deinen Körper',
+            'Cool-down: 5 Minuten auslaufen und dehnen'
+          ]
+        };
+      }
+
+      // Lernen / Lesen / Studieren
+      if (text.includes('lern') || text.includes('les') || text.includes('studi') || text.includes('buch') || text.includes('kurs')) {
+        return {
+          why: 'Kontinuierliches Lernen hält deinen Geist scharf und eröffnet neue Möglichkeiten. Kleine, regelmäßige Lerneinheiten sind effektiver als lange Marathons.',
+          steps: [
+            'Schalte alle Benachrichtigungen aus',
+            'Bereite dein Lernmaterial vor',
+            'Setze dir ein kleines, konkretes Lernziel für heute',
+            'Lerne in 25-Minuten-Blöcken mit kurzen Pausen (Pomodoro)',
+            'Fasse das Gelernte kurz in eigenen Worten zusammen'
+          ]
+        };
+      }
+
+      // Arbeit / Projekt / Aufgabe
+      if (text.includes('arbeit') || text.includes('projekt') || text.includes('aufgabe') || text.includes('erledige') || text.includes('fertig')) {
+        return {
+          why: 'Das Abschließen von Aufgaben gibt dir ein Erfolgserlebnis und reduziert mentale Last. Jeder kleine Fortschritt bringt dich deinem Ziel näher.',
+          steps: [
+            'Definiere klar, was "fertig" für diese Aufgabe bedeutet',
+            'Teile die Aufgabe in kleine, machbare Schritte auf',
+            'Beginne mit dem einfachsten Schritt',
+            'Arbeite fokussiert ohne Multitasking',
+            'Feiere den Abschluss und mache eine kurze Pause'
+          ]
+        };
+      }
+
+      // Ernährung / Essen / Kochen
+      if (text.includes('ess') || text.includes('ernährung') || text.includes('koch') || text.includes('mahl') || text.includes('trink') || text.includes('wasser')) {
+        return {
+          why: 'Gute Ernährung ist die Basis für Energie und Wohlbefinden. Was du isst, beeinflusst direkt deine Leistungsfähigkeit und Stimmung.',
+          steps: [
+            'Plane deine Mahlzeit bewusst im Voraus',
+            'Wähle frische, nährstoffreiche Zutaten',
+            'Nimm dir Zeit zum Essen ohne Ablenkung',
+            'Kaue gründlich und genieße jeden Bissen',
+            'Trinke ein Glas Wasser dazu'
+          ]
+        };
+      }
+
+      // Bildschirm / Digital Detox / Handy
+      if (text.includes('bildschirm') || text.includes('handy') || text.includes('digital') || text.includes('social') || text.includes('internet')) {
+        return {
+          why: 'Bildschirmpausen geben deinen Augen und deinem Gehirn Erholung. Weniger Bildschirmzeit vor dem Schlafen verbessert nachweislich die Schlafqualität.',
+          steps: [
+            'Stelle einen Timer für das Ende deiner Bildschirmzeit',
+            'Lege alle Geräte außer Reichweite',
+            'Finde eine alternative Aktivität (Lesen, Spazieren, Gespräch)',
+            'Wenn du Langeweile spürst - das ist normal und gut!',
+            'Genieße die Zeit ohne digitale Reize'
+          ]
+        };
+      }
+
+      // Sozial / Familie / Freunde
+      if (text.includes('freund') || text.includes('familie') || text.includes('ruf an') || text.includes('treff') || text.includes('kontakt')) {
+        return {
+          why: 'Soziale Verbindungen sind essentiell für unser Wohlbefinden. Ein kurzer Austausch mit wichtigen Menschen kann den ganzen Tag positiv beeinflussen.',
+          steps: [
+            'Überlege, wen du lange nicht gesprochen hast',
+            'Wähle den passenden Kommunikationsweg (Anruf, Nachricht, Treffen)',
+            'Stelle offene Fragen und höre aktiv zu',
+            'Teile auch etwas von dir selbst',
+            'Vereinbare ggf. einen nächsten Kontakt'
+          ]
+        };
+      }
+
+      // Planung / Organisation / Ziele
+      if (text.includes('plan') || text.includes('organis') || text.includes('ziel') || text.includes('überleg') || text.includes('reflekt')) {
+        return {
+          why: 'Regelmäßige Planung und Reflexion geben dir Klarheit und Richtung. Du behältst den Überblick und triffst bessere Entscheidungen.',
+          steps: [
+            'Nimm dir Stift und Papier oder öffne deine Notizen',
+            'Schreibe alle Gedanken ungefiltert auf',
+            'Sortiere nach Wichtigkeit und Dringlichkeit',
+            'Wähle die 1-3 wichtigsten nächsten Schritte',
+            'Trage feste Zeiten für diese Schritte ein'
+          ]
+        };
+      }
+
+      // Standard-Anleitung für alle anderen
+      return {
+        why: 'Diese Aufgabe bringt dich einen Schritt näher an dein Ziel. Jede kleine Handlung zählt und baut Momentum auf.',
+        steps: [
+          'Lies die Aufgabe nochmal und verstehe, was zu tun ist',
+          'Bereite alles vor, was du brauchst',
+          'Setze dir einen Timer für fokussierte Arbeit',
+          'Beginne mit dem ersten kleinen Schritt',
+          'Hake die Aufgabe ab und sei stolz auf dich!'
+        ]
+      };
+    }
+
     function showTaskDetail(taskId) {
       // Task-Daten aus appData finden
       const tasks = appData?.data?.today_tasks || [];
@@ -5216,10 +5345,16 @@
       document.getElementById('taskDetailDuration').textContent =
         `~${task.estimated_minutes || 15} Min`;
 
+      // Generiere Anleitungen wenn keine Details vorhanden
+      const guidance = (!details.why && (!details.steps || details.steps.length === 0))
+        ? generateTaskGuidance(task.task_text)
+        : null;
+
       // Why-Section
       const whyEl = document.getElementById('taskDetailWhy');
-      if (details.why) {
-        whyEl.innerHTML = `<strong>Warum diese Aufgabe?</strong><p>${details.why}</p>`;
+      const whyText = details.why || (guidance ? guidance.why : null);
+      if (whyText) {
+        whyEl.innerHTML = `<strong>💡 Warum diese Aufgabe?</strong><p>${whyText}</p>`;
         whyEl.style.display = 'block';
       } else {
         whyEl.style.display = 'none';
@@ -5227,10 +5362,11 @@
 
       // Steps-Section
       const stepsEl = document.getElementById('taskDetailSteps');
-      if (details.steps && details.steps.length > 0) {
+      const steps = (details.steps && details.steps.length > 0) ? details.steps : (guidance ? guidance.steps : []);
+      if (steps.length > 0) {
         stepsEl.innerHTML = `
-          <strong>So gehst du vor:</strong>
-          <ol>${details.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+          <strong>📋 So gehst du vor:</strong>
+          <ol>${steps.map(s => `<li>${s}</li>`).join('')}</ol>
         `;
         stepsEl.style.display = 'block';
       } else {
