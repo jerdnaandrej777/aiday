@@ -815,15 +815,44 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--text-muted);
+      color: var(--accent);
+      opacity: 0.6;
     }
 
     .empty-state-icon svg {
       color: inherit;
     }
 
+    .empty-state-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
     .empty-state p {
       font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .empty-state-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--accent-glow);
     }
 
     /* AI Plan Card */
@@ -2145,6 +2174,78 @@
     .mood-neutral { color: #f59e0b; }
     .mood-bad { color: #ef4444; }
     .mood-terrible { color: #dc2626; }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: toastIn 0.3s ease forwards;
+      pointer-events: auto;
+    }
+
+    .toast.toast-out {
+      animation: toastOut 0.3s ease forwards;
+    }
+
+    .toast-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .toast-success { border-left: 4px solid var(--success); }
+    .toast-success .toast-icon { color: var(--success); }
+
+    .toast-error { border-left: 4px solid var(--danger); }
+    .toast-error .toast-icon { color: var(--danger); }
+
+    .toast-info { border-left: 4px solid var(--accent); }
+    .toast-info .toast-icon { color: var(--accent); }
+
+    .toast-warning { border-left: 4px solid var(--warning); }
+    .toast-warning .toast-icon { color: var(--warning); }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+
+    /* Confetti Canvas */
+    .confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
@@ -2163,6 +2264,12 @@
   </svg>
 
   <div class="bg-animation"></div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
   <div class="container">
     <!-- Global Header -->
@@ -2772,6 +2879,101 @@
       window.location.href = 'start-ui.html';
     }
 
+    // ===== TOAST NOTIFICATIONS =====
+
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span class="toast-message">${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      // Auto-remove after duration
+      setTimeout(() => {
+        toast.classList.add('toast-out');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    // ===== CONFETTI ANIMATION =====
+
+    function showConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const colors = ['#6366f1', '#22d3ee', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+      const particleCount = 80;
+
+      // Create particles
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15 - 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 8 + 4,
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          gravity: 0.3,
+          opacity: 1
+        });
+      }
+
+      let animationFrame;
+      const startTime = Date.now();
+      const duration = 2000;
+
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > duration) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          cancelAnimationFrame(animationFrame);
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.rotation += p.rotationSpeed;
+          p.opacity = Math.max(0, 1 - (elapsed / duration));
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation * Math.PI / 180);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        });
+
+        animationFrame = requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
     // ===== NAVIGATION / ZURÜCK-BUTTONS =====
 
     function goBackFromCheckin() {
@@ -3113,6 +3315,7 @@
 
         if (result.success) {
           btn.textContent = 'Gespeichert!';
+          showToast('Check-in erfolgreich!', 'success', 2000);
 
           // Short delay to show success
           setTimeout(() => {
@@ -3130,13 +3333,13 @@
         } else {
           btn.disabled = false;
           btn.textContent = originalText;
-          alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+          showToast('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'), 'error');
         }
       } catch (error) {
         console.error('submitCheckin error:', error);
         btn.disabled = false;
         btn.textContent = originalText;
-        alert('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'));
+        showToast('Fehler beim Speichern: ' + (error.message || 'Unbekannter Fehler'), 'error');
       }
     }
 
@@ -3296,7 +3499,7 @@
       const goalData = getCurrentGoalFormData();
 
       if (!goalData.title) {
-        alert('Bitte gib ein Ziel ein.');
+        showToast('Bitte gib ein Ziel ein.', 'warning');
         return;
       }
 
@@ -3472,7 +3675,7 @@
       }
 
       if (goals.length === 0) {
-        alert('Bitte gib mindestens ein Ziel ein.');
+        showToast('Bitte gib mindestens ein Ziel ein.', 'warning');
         return;
       }
 
@@ -3495,7 +3698,7 @@
         btn.disabled = false;
         btn.textContent = 'Plan erstellen';
         showScreen('goalsScreen', 'back');
-        alert('Fehler: ' + (result.error || 'Unbekannter Fehler'));
+        showToast('Fehler: ' + (result.error || 'Unbekannter Fehler'), 'error');
       }
     }
 
@@ -3600,7 +3803,7 @@
     async function acceptPlan() {
       if (!currentPlanData) {
         console.error('acceptPlan: No currentPlanData available');
-        alert('Fehler: Keine Plandaten vorhanden. Bitte versuche es erneut.');
+        showToast('Fehler: Keine Plandaten vorhanden. Bitte versuche es erneut.', 'error');
         return;
       }
 
@@ -3674,6 +3877,7 @@
         // Success! Show confirmation and go to dashboard
         currentPlanData = null;
         btn.textContent = 'Gespeichert!';
+        showToast('Plan akzeptiert! Deine Aufgaben wurden erstellt.', 'success', 3000);
 
         // Short delay to show success, then load dashboard
         setTimeout(async () => {
@@ -3688,7 +3892,7 @@
 
       } catch (error) {
         console.error('acceptPlan error:', error);
-        alert('Fehler beim Speichern des Plans: ' + (error.message || 'Unbekannter Fehler. Bitte versuche es erneut.'));
+        showToast('Fehler beim Speichern des Plans: ' + (error.message || 'Unbekannter Fehler'), 'error');
 
         // Reset button
         btn.disabled = false;
@@ -3724,7 +3928,23 @@
       const goalsList = data.longterm_goals || [];
 
       if (tasks.length === 0) {
-        tasksEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><p>Keine Aufgaben für heute</p></div>';
+        tasksEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="empty-state-title">Bereit für neue Aufgaben!</div>
+            <p>Definiere ein Ziel, um deine ersten Aufgaben zu erhalten.</p>
+            <button class="empty-state-btn" onclick="editGoals()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Ziel erstellen
+            </button>
+          </div>
+        `;
       } else {
         tasksEl.innerHTML = tasks.map(task => `
           <div class="task-item ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
@@ -3743,7 +3963,23 @@
       window.dashboardGoals = goalsList;
 
       if (goalsList.length === 0) {
-        goalsEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><p>Noch keine Ziele definiert</p></div>';
+        goalsEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <div class="empty-state-title">Setze dir ein Ziel!</div>
+            <p>Mit einem klaren Ziel beginnt jede Reise. Was möchtest du erreichen?</p>
+            <button class="empty-state-btn" onclick="editGoals()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Ziel definieren
+            </button>
+          </div>
+        `;
       } else {
         goalsEl.innerHTML = goalsList.map((goal, idx) => {
           const hasProgress = goal.target_date && goal.days_left !== null;
@@ -3842,6 +4078,20 @@
         // Revert progress
         updateTaskProgress(completed ? -1 : 1);
         console.error('Failed to update task:', result.error);
+        showToast('Fehler beim Aktualisieren der Aufgabe', 'error');
+      } else if (completed) {
+        // Success feedback
+        showToast('Aufgabe erledigt!', 'success', 2000);
+
+        // Check if all tasks are completed
+        const allTasks = document.querySelectorAll('.task-item, .progress-task-item');
+        const completedTasks = document.querySelectorAll('.task-item.completed, .progress-task-item.completed');
+        if (allTasks.length > 0 && allTasks.length === completedTasks.length) {
+          setTimeout(() => {
+            showConfetti();
+            showToast('Alle Aufgaben erledigt! Fantastisch!', 'success', 4000);
+          }, 300);
+        }
       }
     }
 
@@ -3903,13 +4153,14 @@
           taskEl.style.opacity = '0';
           setTimeout(() => taskEl.remove(), 300);
         }
+        showToast('Aufgabe gelöscht', 'info', 2000);
       } else {
         // Revert on error
         if (taskEl) {
           taskEl.style.opacity = '1';
           taskEl.style.pointerEvents = 'auto';
         }
-        alert('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'));
+        showToast('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'), 'error');
       }
     }
 
@@ -3974,10 +4225,10 @@
       btn.textContent = 'Profil speichern';
 
       if (result.success) {
-        alert('Profil gespeichert!');
+        showToast('Profil gespeichert!', 'success');
         closeProfileScreen();
       } else {
-        alert('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'));
+        showToast('Fehler beim Speichern: ' + (result.error || 'Unbekannter Fehler'), 'error');
       }
     }
 
@@ -4039,7 +4290,7 @@
       } else {
         btn.disabled = false;
         btn.textContent = 'Weiter';
-        alert('Fehler: ' + (result.error || 'Unbekannter Fehler'));
+        showToast('Fehler: ' + (result.error || 'Unbekannter Fehler'), 'error');
       }
     }
 
@@ -4156,9 +4407,20 @@
 
       if (tasks.length === 0) {
         tasksContainer.innerHTML = `
-          <div class="progress-empty">
-            <div class="progress-empty-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
-            <p>Keine Aufgaben für heute</p>
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="empty-state-title">Zeit für neue Ziele!</div>
+            <p>Erstelle ein Ziel, um automatisch tägliche Aufgaben zu erhalten.</p>
+            <button class="empty-state-btn" onclick="closeProgressScreen(); editGoals();">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Ziel erstellen
+            </button>
           </div>
         `;
       } else {
@@ -4202,16 +4464,20 @@
       if (goalsOverviewData.length === 0) {
         container.innerHTML = `
           <div class="card">
-            <div class="goal-overview-empty">
-              <div class="goal-overview-empty-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"/>
                   <circle cx="12" cy="12" r="6"/>
                   <circle cx="12" cy="12" r="2"/>
                 </svg>
               </div>
-              <p>Noch keine Ziele definiert</p>
-              <button class="btn btn-primary" style="margin-top: 16px;" onclick="startNewGoal()">Neues Ziel erstellen</button>
+              <div class="empty-state-title">Deine Ziele warten auf dich!</div>
+              <p>Jedes große Projekt beginnt mit einem klaren Ziel. Was möchtest du erreichen?</p>
+              <button class="empty-state-btn" onclick="startNewGoal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Ziel definieren
+              </button>
             </div>
           </div>
         `;
@@ -4460,14 +4726,14 @@
           btn.disabled = false;
           btn.innerHTML = originalHTML;
           btn.style.opacity = '1';
-          alert('Fehler: ' + (result.error || 'Plan konnte nicht generiert werden'));
+          showToast('Fehler: ' + (result.error || 'Plan konnte nicht generiert werden'), 'error');
         }
       } catch (error) {
         console.error('Regenerate plan error:', error);
         btn.disabled = false;
         btn.innerHTML = originalHTML;
         btn.style.opacity = '1';
-        alert('Fehler beim Generieren des Plans: ' + error.message);
+        showToast('Fehler beim Generieren des Plans: ' + error.message, 'error');
       }
     }
 
@@ -4499,12 +4765,12 @@
         } else {
           btn.disabled = false;
           btn.innerHTML = originalHTML;
-          alert('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'));
+          showToast('Fehler beim Löschen: ' + (result.error || 'Unbekannter Fehler'), 'error');
         }
       } catch (error) {
         btn.disabled = false;
         btn.innerHTML = originalHTML;
-        alert('Fehler beim Löschen: ' + error.message);
+        showToast('Fehler beim Löschen: ' + error.message, 'error');
       }
     }
 
@@ -4698,7 +4964,7 @@
       console.log('showGoalDetail complete');
       } catch (error) {
         console.error('Error in showGoalDetail:', error);
-        alert('Fehler beim Laden der Zieldetails: ' + error.message);
+        showToast('Fehler beim Laden der Zieldetails: ' + error.message, 'error');
       }
     }
 

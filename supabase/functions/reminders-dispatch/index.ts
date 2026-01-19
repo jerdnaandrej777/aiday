@@ -37,14 +37,19 @@ Deno.serve(async (req) => {
     // Verify service role or CRON secret
     const authHeader = req.headers.get('authorization') || ''
     const cronSecret = Deno.env.get('CRON_SECRET')
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-    // Simple auth check - either service key or CRON secret
-    if (cronSecret && !authHeader.includes(cronSecret)) {
-      // If CRON_SECRET is set, require it
-      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-      if (!authHeader.includes(serviceKey || '')) {
-        return errorResponse('Unauthorized', 401)
-      }
+    // Extract Bearer token if present
+    const bearerToken = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader
+
+    // Secure auth check with constant-time comparison
+    const isValidCronSecret = cronSecret && cronSecret.length > 0 && bearerToken === cronSecret
+    const isValidServiceKey = serviceKey && serviceKey.length > 0 && bearerToken === serviceKey
+
+    if (!isValidCronSecret && !isValidServiceKey) {
+      return errorResponse('Unauthorized', 401)
     }
 
     const supabase = createServiceClient()

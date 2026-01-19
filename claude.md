@@ -196,7 +196,10 @@ aiday/
 - [x] **Swipe-Navigation (links/rechts wischen)**
 - [x] **Streak-Tracking-Anzeige**
 - [x] **Klickbare "Aktive Ziele" Stat-Box → Goals Overview**
-- [x] **"Erreichte Ziele" Button im Header** (Pokal-Icon) ← NEU
+- [x] **"Erreichte Ziele" Button im Header** (Pokal-Icon)
+- [x] **Toast Notifications** für alle Aktionen (statt alerts)
+- [x] **Confetti-Animation** bei Erledigung aller Aufgaben
+- [x] **Verbesserte Empty States** mit Action-Buttons
 - [x] **Mobile-optimiert (kein horizontales Scrollen)**
 - [x] **Runde Emoji-Buttons im Check-in**
 - [x] **Loading-States für Buttons** ("Plan wird erstellt...", "Wird gespeichert...")
@@ -707,6 +710,68 @@ Wenn von der Goals-Übersicht zum Detail navigiert wurde, blieb der Detail-Scree
   - Statistiken: Wochen, Meilensteine, Tasks
   - Klick auf Ziel öffnet Goal-Detail
 - Funktionen: `showAchievedGoalsScreen()`, `renderAchievedGoals()`, `showAchievedGoalDetail()`
+
+### 18. Toast Notifications System
+**Problem:** `alert()` Dialoge blockieren die UI und sind nicht benutzerfreundlich
+
+**Lösung:**
+- Neues Toast Notification System implementiert
+- Typen: `success` (grün), `error` (rot), `warning` (orange), `info` (blau)
+- Aufruf: `showToast('Nachricht', 'success', 3000)`
+- Alle `alert()` Aufrufe durch `showToast()` ersetzt
+- Toast-Container fest am unteren Bildschirmrand positioniert
+- Auto-Remove nach konfigurierbarer Dauer
+- Slide-In/Out Animationen
+
+### 19. Confetti-Animation bei Task-Completion
+**Problem:** Kein visuelles Feedback bei wichtigen Erfolgen
+
+**Lösung:**
+- Canvas-basierte Confetti-Animation
+- Wird ausgelöst wenn alle täglichen Aufgaben erledigt sind
+- 80 Partikel in App-Farben (#6366f1, #22d3ee, #10b981, etc.)
+- 2 Sekunden Dauer mit Physics-Simulation (Gravitation)
+- Aufruf: `showConfetti()`
+
+### 20. Verbesserte Empty States
+**Problem:** Leere Listen zeigten nur minimalen Text ohne Handlungsaufforderung
+
+**Lösung:**
+- Neue CSS-Klassen: `.empty-state-title`, `.empty-state-btn`
+- Positive, motivierende Texte
+- Action-Buttons für direkten nächsten Schritt
+- Größere Icons (48px statt 40px)
+- Angepasste Farben (Accent statt Muted)
+- Beispiel:
+  ```html
+  <div class="empty-state">
+    <div class="empty-state-icon">...</div>
+    <div class="empty-state-title">Bereit für neue Aufgaben!</div>
+    <p>Definiere ein Ziel, um deine ersten Aufgaben zu erhalten.</p>
+    <button class="empty-state-btn" onclick="editGoals()">Ziel erstellen</button>
+  </div>
+  ```
+
+### 21. Security Fix: Auth-Token Comparison
+**Problem:** `reminders-dispatch` verwendete `.includes()` für Token-Vergleich, was unsicher ist
+
+**Lösung:**
+- Bearer Token korrekt extrahieren
+- Explizite Gleichheitsprüfung statt `.includes()`
+- Prüfung auf leere/undefinierte Secrets
+- Code:
+  ```typescript
+  const bearerToken = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : authHeader
+
+  const isValidCronSecret = cronSecret && cronSecret.length > 0 && bearerToken === cronSecret
+  const isValidServiceKey = serviceKey && serviceKey.length > 0 && bearerToken === serviceKey
+
+  if (!isValidCronSecret && !isValidServiceKey) {
+    return errorResponse('Unauthorized', 401)
+  }
+  ```
 
 ---
 

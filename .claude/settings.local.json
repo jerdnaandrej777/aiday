@@ -11,7 +11,13 @@
       "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" repo edit jerdnaandrej777/aiday --visibility public --accept-visibility-change-consequences)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; if \\(!\\(Get-Command scoop -ErrorAction SilentlyContinue\\)\\) { irm get.scoop.sh | iex }\")",
+      "Bash(~/scoop/shims/supabase secrets set:*)",
+      "Bash(~/scoop/shims/supabase functions deploy goals-setup --no-verify-jwt)",
+      "Bash(~/scoop/shims/supabase functions deploy:*)",
+      "Bash(~/scoop/shims/supabase functions deploy accept-plan --no-verify-jwt)",
+      "Bash(supabase functions deploy:*)"
     ]
   }
 }
