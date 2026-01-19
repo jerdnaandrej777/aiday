@@ -1123,6 +1123,208 @@
       margin-bottom: 20px;
     }
 
+    /* Gamification */
+    .gamification-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .gamification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .level-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gradient-primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .level-badge svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .xp-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .xp-bar-container {
+      background: var(--bg-input);
+      border-radius: 10px;
+      height: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .xp-bar-progress {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+
+    .xp-bar-progress::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+      border-radius: 10px 10px 0 0;
+    }
+
+    .achievements-preview {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .achievement-mini {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-input);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .achievement-mini.earned {
+      background: var(--gradient-primary);
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .achievement-mini.locked {
+      opacity: 0.4;
+      filter: grayscale(100%);
+    }
+
+    .achievement-mini:hover {
+      transform: scale(1.1);
+    }
+
+    /* Achievement Popup */
+    .achievement-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 32px;
+      text-align: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 320px;
+      width: 90%;
+    }
+
+    .achievement-popup.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .achievement-popup-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      animation: achievementBounce 0.6s ease;
+    }
+
+    @keyframes achievementBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .achievement-popup-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .achievement-popup-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .achievement-popup-xp {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gradient-primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .achievement-popup-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 8px;
+      font-size: 20px;
+    }
+
+    .achievement-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .achievement-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Level Up Animation */
+    .level-up-flash {
+      animation: levelUpFlash 1s ease;
+    }
+
+    @keyframes levelUpFlash {
+      0%, 100% { box-shadow: 0 2px 8px var(--accent-glow); }
+      50% { box-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-2-glow); }
+    }
+
     /* Loading */
     .loading {
       display: flex;
@@ -2917,6 +3119,16 @@
   <!-- Toast Notifications Container -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- Achievement Popup -->
+  <div class="achievement-overlay" id="achievementOverlay" onclick="hideAchievementPopup()"></div>
+  <div class="achievement-popup" id="achievementPopup">
+    <button class="achievement-popup-close" onclick="hideAchievementPopup()">&times;</button>
+    <div class="achievement-popup-icon" id="achievementPopupIcon">🏆</div>
+    <div class="achievement-popup-title" id="achievementPopupTitle">Achievement freigeschaltet!</div>
+    <div class="achievement-popup-desc" id="achievementPopupDesc">Du hast etwas Tolles erreicht!</div>
+    <div class="achievement-popup-xp" id="achievementPopupXp">+100 XP</div>
+  </div>
+
   <!-- Confetti Canvas -->
   <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
@@ -3044,6 +3256,25 @@
         <div class="motivation-speech-bubble" id="motivationBubble">
           <div class="quote-text"></div>
           <div class="quote-author"></div>
+        </div>
+      </div>
+
+      <!-- Gamification Card -->
+      <div class="gamification-card animate-in" style="animation-delay: 0.05s;" id="gamificationCard">
+        <div class="gamification-header">
+          <div class="level-badge" id="levelBadge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            <span>Level <span id="userLevel">1</span></span>
+          </div>
+          <span class="xp-text"><span id="currentXp">0</span> / <span id="nextLevelXp">100</span> XP</span>
+        </div>
+        <div class="xp-bar-container">
+          <div class="xp-bar-progress" id="xpBarProgress" style="width: 0%"></div>
+        </div>
+        <div class="achievements-preview" id="achievementsPreview">
+          <!-- Wird dynamisch gefüllt -->
         </div>
       </div>
 
@@ -3603,6 +3834,14 @@
     const MOTIVATION_COOLDOWN = 4 * 60 * 60 * 1000; // 4 Stunden in Millisekunden
     let pendingMotivationMood = null; // Mood from check-in, shown on progress screen
 
+    // Gamification State
+    let gamificationData = {
+      total_xp: 0,
+      level: 1,
+      achievements: [],
+      earnedAchievements: []
+    };
+
     // Auth Check
     (function init() {
       const token = localStorage.getItem('aiday_token');
@@ -3671,6 +3910,151 @@
         toast.classList.add('toast-out');
         setTimeout(() => toast.remove(), 300);
       }, duration);
+    }
+
+    // ===== GAMIFICATION FUNCTIONS =====
+
+    // Berechnet XP für nächstes Level
+    function xpForLevel(level) {
+      return level * level * 100;
+    }
+
+    // Lädt Gamification-Daten vom Server
+    async function loadGamificationData() {
+      try {
+        // User-Profil mit XP und Level laden
+        const profileResult = await apiCall('/functions/v1/auth-profile', { method: 'GET' });
+        if (profileResult.success && profileResult.data) {
+          gamificationData.total_xp = profileResult.data.total_xp || 0;
+          gamificationData.level = profileResult.data.level || 1;
+        }
+
+        // Achievements laden (alle und verdiente)
+        // TODO: Eigener Endpoint für Achievements oder in auth-profile integrieren
+        // Für jetzt verwenden wir die Daten aus dem Profil
+
+        updateGamificationUI();
+      } catch (error) {
+        console.error('Gamification load error:', error);
+      }
+    }
+
+    // Aktualisiert die Gamification-UI
+    function updateGamificationUI() {
+      const level = gamificationData.level || 1;
+      const totalXp = gamificationData.total_xp || 0;
+      const xpForCurrentLevel = xpForLevel(level - 1);
+      const xpForNextLevel = xpForLevel(level);
+      const xpInCurrentLevel = totalXp - xpForCurrentLevel;
+      const xpNeededForNext = xpForNextLevel - xpForCurrentLevel;
+      const progressPercent = Math.min(100, Math.round((xpInCurrentLevel / xpNeededForNext) * 100));
+
+      // UI-Elemente aktualisieren
+      const levelEl = document.getElementById('userLevel');
+      const currentXpEl = document.getElementById('currentXp');
+      const nextLevelXpEl = document.getElementById('nextLevelXp');
+      const xpBarEl = document.getElementById('xpBarProgress');
+
+      if (levelEl) levelEl.textContent = level;
+      if (currentXpEl) currentXpEl.textContent = totalXp;
+      if (nextLevelXpEl) nextLevelXpEl.textContent = xpForNextLevel;
+      if (xpBarEl) xpBarEl.style.width = progressPercent + '%';
+
+      // Achievements-Preview aktualisieren
+      updateAchievementsPreview();
+    }
+
+    // Zeigt die Mini-Achievements-Vorschau
+    function updateAchievementsPreview() {
+      const container = document.getElementById('achievementsPreview');
+      if (!container) return;
+
+      // Standard-Achievements die angezeigt werden
+      const previewAchievements = [
+        { code: 'first_task', icon: '✅', earned: gamificationData.total_xp >= 25 },
+        { code: 'streak_3', icon: '🔥', earned: false }, // TODO: Streak prüfen
+        { code: 'tasks_10', icon: '⭐', earned: gamificationData.total_xp >= 100 },
+        { code: 'streak_7', icon: '💪', earned: false },
+        { code: 'perfect_day', icon: '🌈', earned: false },
+      ];
+
+      container.innerHTML = previewAchievements.map(a => `
+        <div class="achievement-mini ${a.earned ? 'earned' : 'locked'}"
+             title="${a.code}"
+             onclick="showAchievementInfo('${a.code}')">
+          ${a.icon}
+        </div>
+      `).join('');
+    }
+
+    // Zeigt das Achievement-Popup
+    function showAchievementPopup(achievement) {
+      const overlay = document.getElementById('achievementOverlay');
+      const popup = document.getElementById('achievementPopup');
+      const iconEl = document.getElementById('achievementPopupIcon');
+      const titleEl = document.getElementById('achievementPopupTitle');
+      const descEl = document.getElementById('achievementPopupDesc');
+      const xpEl = document.getElementById('achievementPopupXp');
+
+      if (iconEl) iconEl.textContent = achievement.icon || '🏆';
+      if (titleEl) titleEl.textContent = achievement.name || 'Achievement freigeschaltet!';
+      if (descEl) descEl.textContent = achievement.description || 'Du hast etwas Tolles erreicht!';
+      if (xpEl) xpEl.textContent = `+${achievement.xp_reward || 0} XP`;
+
+      if (overlay) overlay.classList.add('show');
+      if (popup) popup.classList.add('show');
+
+      // Auto-hide nach 4 Sekunden
+      setTimeout(() => hideAchievementPopup(), 4000);
+    }
+
+    // Versteckt das Achievement-Popup
+    function hideAchievementPopup() {
+      const overlay = document.getElementById('achievementOverlay');
+      const popup = document.getElementById('achievementPopup');
+      if (overlay) overlay.classList.remove('show');
+      if (popup) popup.classList.remove('show');
+    }
+
+    // Zeigt Achievement-Info (für Klick auf Mini-Badge)
+    function showAchievementInfo(code) {
+      // TODO: Achievement-Details anzeigen
+      showToast(`Achievement: ${code}`, 'info', 2000);
+    }
+
+    // Verarbeitet Gamification-Response von task-update
+    function handleGamificationResponse(gamification) {
+      if (!gamification) return;
+
+      // XP und Level aktualisieren
+      gamificationData.total_xp = gamification.total_xp;
+      gamificationData.level = gamification.level;
+      updateGamificationUI();
+
+      // Level-Up Animation
+      if (gamification.level_up) {
+        const levelBadge = document.getElementById('levelBadge');
+        if (levelBadge) {
+          levelBadge.classList.add('level-up-flash');
+          setTimeout(() => levelBadge.classList.remove('level-up-flash'), 1000);
+        }
+        showToast(`🎉 Level Up! Du bist jetzt Level ${gamification.level}!`, 'success', 4000);
+      }
+
+      // Neue Achievements anzeigen
+      if (gamification.new_achievements && gamification.new_achievements.length > 0) {
+        // Zeige jedes Achievement mit Verzögerung
+        gamification.new_achievements.forEach((achievement, index) => {
+          setTimeout(() => {
+            showAchievementPopup(achievement);
+          }, index * 2000);
+        });
+      }
+
+      // XP-Toast (wenn kein Achievement)
+      if (gamification.xp_earned > 0 && (!gamification.new_achievements || gamification.new_achievements.length === 0)) {
+        showToast(`+${gamification.xp_earned} XP`, 'success', 1500);
+      }
     }
 
     // ===== CONFETTI ANIMATION =====
@@ -4033,6 +4417,14 @@
       }
     }
 
+    // Timezone-Offset für API-Calls (einmal berechnen)
+    const userTimezoneOffset = new Date().getTimezoneOffset();
+
+    // Generiert einen eindeutigen Idempotency-Key
+    function generateIdempotencyKey() {
+      return `${currentUser?.id || 'anon'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
     // API Call
     async function apiCall(endpoint, options = {}) {
       const url = SUPABASE_URL + endpoint;
@@ -4043,6 +4435,17 @@
         ...options.headers
       };
 
+      // Idempotency-Key hinzufügen wenn gewünscht
+      if (options.idempotencyKey) {
+        headers['X-Idempotency-Key'] = options.idempotencyKey;
+      }
+
+      // Timezone-Offset automatisch zum Body hinzufügen
+      let body = options.body || {};
+      if (typeof body === 'object' && !Array.isArray(body)) {
+        body = { ...body, timezone_offset: userTimezoneOffset };
+      }
+
       // Timeout - Standard 60 Sekunden, kann per options.timeout überschrieben werden
       const timeoutMs = options.timeout || 60000;
       const controller = new AbortController();
@@ -4052,7 +4455,7 @@
         const response = await fetch(url, {
           method: options.method || 'GET',
           headers,
-          body: options.body ? JSON.stringify(options.body) : undefined,
+          body: options.body ? JSON.stringify(body) : undefined,
           signal: controller.signal
         });
 
@@ -4333,6 +4736,9 @@
 
       // Nach dem Einloggen immer zuerst das Dashboard anzeigen
       setupDashboard(result.data.data);
+
+      // Gamification-Daten laden (asynchron, nicht blockierend)
+      loadGamificationData();
       showScreen('dashboardScreen');
     }
 
@@ -4837,10 +5243,14 @@
       showScreen('loadingScreen');
       document.querySelector('.loading-text').textContent = 'Dein persönlicher Plan wird erstellt...';
 
+      // Idempotency-Key verhindert doppelte Einträge bei erneutem Absenden
+      const idempotencyKey = generateIdempotencyKey();
+
       const result = await apiCall('/functions/v1/goals-setup', {
         method: 'POST',
         body: { goals },
-        timeout: 120000 // 2 Minuten für AI-Plan-Generierung
+        timeout: 120000, // 2 Minuten für AI-Plan-Generierung
+        idempotencyKey: idempotencyKey
       });
 
       if (result.success) {
@@ -5242,8 +5652,13 @@
         console.error('Failed to update task:', result.error);
         showToast('Fehler beim Aktualisieren der Aufgabe', 'error');
       } else if (completed) {
-        // Success feedback
-        showToast('Aufgabe erledigt!', 'success', 2000);
+        // Gamification-Response verarbeiten
+        if (result.data?.gamification) {
+          handleGamificationResponse(result.data.gamification);
+        } else {
+          // Fallback: Einfacher Success-Toast wenn keine Gamification-Daten
+          showToast('Aufgabe erledigt!', 'success', 2000);
+        }
 
         // Check if all tasks are completed
         const allTasks = document.querySelectorAll('.task-item, .progress-task-item');
@@ -5251,7 +5666,7 @@
         if (allTasks.length > 0 && allTasks.length === completedTasks.length) {
           setTimeout(() => {
             showConfetti();
-            showToast('Alle Aufgaben erledigt! Fantastisch!', 'success', 4000);
+            showToast('🎉 Alle Aufgaben erledigt! Fantastisch!', 'success', 4000);
           }, 300);
         }
       }

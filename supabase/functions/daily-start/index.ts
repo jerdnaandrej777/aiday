@@ -4,6 +4,7 @@
 import { handleCors } from '../_shared/cors.ts'
 import { jsonResponse, errorResponse, successResponse } from '../_shared/response.ts'
 import { createSupabaseClient, getAuthUser, extractToken } from '../_shared/supabase.ts'
+import { getUserToday, getUserYesterday, extractTimezoneOffset } from '../_shared/utils.ts'
 
 Deno.serve(async (req) => {
   const corsResponse = handleCors(req)
@@ -19,11 +20,22 @@ Deno.serve(async (req) => {
       return errorResponse(authResult.error || 'Unauthorized', 401)
     }
 
+    // Parse body for timezone_offset (POST) or use query params (GET)
+    let body: any = null
+    if (req.method === 'POST') {
+      try {
+        body = await req.json()
+      } catch {
+        // Body ist optional für daily-start
+      }
+    }
+
+    const timezoneOffset = extractTimezoneOffset(req, body)
     const token = extractToken(req)!
     const supabase = createSupabaseClient(token)
     const userId = authResult.user.id
-    const today = new Date().toISOString().split('T')[0]
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    const today = getUserToday(timezoneOffset)
+    const yesterday = getUserYesterday(timezoneOffset)
 
     // 1. Prüfe ob Check-in für heute existiert und hole Daten
     const { data: todayCheckin } = await supabase

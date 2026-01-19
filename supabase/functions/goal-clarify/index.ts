@@ -179,8 +179,25 @@ Passe die Fragen an das spezifische Ziel an!`
       // Fallback wenn AI keine Antwort gibt
       return successResponse(getSmartFallback(goal_title))
 
-    } catch (aiError) {
-      console.error('AI clarification failed:', aiError)
+    } catch (aiError: any) {
+      // Detailliertes Error-Logging
+      console.error('OpenAI Clarify Error:', {
+        code: aiError?.code,
+        message: aiError?.message,
+        status: aiError?.status,
+        type: aiError?.type
+      })
+
+      // User-freundliche Fehlermeldungen für bekannte Fehler
+      if (aiError?.status === 429) {
+        return errorResponse('Zu viele Anfragen an die KI. Bitte warte 1 Minute und versuche es erneut.', 429)
+      }
+      if (aiError?.status === 503 || aiError?.status === 502) {
+        return errorResponse('Der KI-Service ist momentan überlastet. Bitte versuche es in ein paar Minuten erneut.', 503)
+      }
+
+      // Fallback für alle anderen Fehler
+      console.log('Using smart fallback for goal clarification')
       return successResponse(getSmartFallback(goal_title))
     }
 

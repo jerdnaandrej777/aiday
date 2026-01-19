@@ -6,6 +6,7 @@ import { jsonResponse, errorResponse, successResponse } from '../_shared/respons
 import { createSupabaseClient, getAuthUser, extractToken } from '../_shared/supabase.ts'
 import { GoalsSetupRequestSchema } from '../_shared/validation.ts'
 import { getOpenAIClient, GOALS_ANALYSIS_SYSTEM_PROMPT } from '../_shared/openai.ts'
+import { getUserToday, extractTimezoneOffset, extractIdempotencyKey } from '../_shared/utils.ts'
 
 interface Milestone {
   week: number
@@ -65,7 +66,30 @@ Deno.serve(async (req) => {
     const token = extractToken(req)!
     const supabase = createSupabaseClient(token)
     const userId = authResult.user.id
-    const today = new Date().toISOString().split('T')[0]
+
+    // Timezone-Support
+    const timezoneOffset = extractTimezoneOffset(req, validation.data)
+    const today = getUserToday(timezoneOffset)
+
+    // Idempotency-Key prüfen (verhindert doppelte Einträge bei erneutem Absenden)
+    const idempotencyKey = extractIdempotencyKey(req)
+    if (idempotencyKey) {
+      const { data: existing } = await supabase
+        .schema('core')
+        .from('goals')
+        .select('id, title, status, plan_json')
+        .eq('user_id', userId)
+        .eq('idempotency_key', idempotencyKey)
+
+      if (existing && existing.length > 0) {
+        console.log('Idempotency hit: returning cached goals', existing.length)
+        return successResponse({
+          goals: existing,
+          cached: true,
+          requires_acceptance: existing.some(g => g.plan_json !== null)
+        })
+      }
+    }
 
     // 1. Erstelle/Aktualisiere day_entry für heute
     const { data: dayEntry, error: dayError } = await supabase
@@ -93,7 +117,8 @@ Deno.serve(async (req) => {
       previous_efforts: g.previous_efforts,
       believed_steps: g.believed_steps,
       is_longterm: true,
-      status: 'open'
+      status: 'open',
+      idempotency_key: idempotencyKey || null  // Für Idempotency-Prüfung
     }))
 
     const { data: savedGoals, error: goalsError } = await supabase
@@ -238,8 +263,31 @@ Antworte im JSON-Format:
         }
         modelUsed = completion.model || 'gpt-4o-mini'
       }
-    } catch (aiError) {
-      console.error('AI generation failed:', aiError)
+    } catch (aiError: any) {
+      // Detailliertes Error-Logging
+      console.error('OpenAI Error:', {
+        code: aiError?.code,
+        message: aiError?.message,
+        status: aiError?.status,
+        type: aiError?.type
+      })
+
+      // User-freundliche Fehlermeldungen für bekannte Fehler
+      if (aiError?.status === 429) {
+        return errorResponse('Zu viele Anfragen an die KI. Bitte warte 1 Minute und versuche es erneut.', 429)
+      }
+      if (aiError?.status === 503 || aiError?.status === 502) {
+        return errorResponse('Der KI-Service ist momentan überlastet. Bitte versuche es in ein paar Minuten erneut.', 503)
+      }
+      if (aiError?.status === 500) {
+        return errorResponse('Ein Fehler beim KI-Service ist aufgetreten. Bitte versuche es erneut.', 500)
+      }
+      if (aiError?.code === 'ECONNREFUSED' || aiError?.code === 'ETIMEDOUT') {
+        return errorResponse('Verbindung zum KI-Service fehlgeschlagen. Bitte prüfe deine Internetverbindung.', 503)
+      }
+
+      // Fallback-Plan verwenden bei allen anderen Fehlern
+      console.log('Using fallback plan generation due to AI error')
       // Fallback mit neuem Format
       aiPlans = savedGoals.map(g => {
         const title = g.title?.toLowerCase() || ''
