@@ -15,7 +15,16 @@ const openai = new OpenAI({
 
 // AI: Generiere Vorteile für einen Habit
 async function generateHabitBenefits(title: string, description?: string): Promise<string[]> {
+  console.log('generateHabitBenefits called with:', { title, description })
+
   try {
+    const apiKey = Deno.env.get('OPENAI_API_KEY')
+    if (!apiKey) {
+      console.error('OPENAI_API_KEY is not set!')
+      return []
+    }
+    console.log('OpenAI API Key is set (length:', apiKey.length, ')')
+
     const prompt = `Du bist ein Gesundheits- und Wellness-Coach. Generiere 4-5 konkrete Vorteile für folgende Gewohnheit:
 
 Gewohnheit: ${title}
@@ -30,20 +39,37 @@ Die Vorteile sollten:
 - Kurz sein (max 15 Wörter pro Vorteil)
 - Positive Auswirkungen auf Gesundheit, Produktivität oder Wohlbefinden beschreiben`
 
+    console.log('Calling OpenAI API...')
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
       max_tokens: 300,
     })
+    console.log('OpenAI response received')
 
     const content = response.choices[0]?.message?.content || '[]'
+    console.log('OpenAI content:', content)
 
-    // Parse JSON Array
-    const benefits = JSON.parse(content)
+    // Parse JSON Array - handle markdown code blocks
+    let jsonContent = content.trim()
+    if (jsonContent.startsWith('```json')) {
+      jsonContent = jsonContent.slice(7)
+    } else if (jsonContent.startsWith('```')) {
+      jsonContent = jsonContent.slice(3)
+    }
+    if (jsonContent.endsWith('```')) {
+      jsonContent = jsonContent.slice(0, -3)
+    }
+    jsonContent = jsonContent.trim()
+
+    console.log('Parsed JSON content:', jsonContent)
+    const benefits = JSON.parse(jsonContent)
     if (Array.isArray(benefits)) {
+      console.log('Benefits generated:', benefits)
       return benefits.slice(0, 5) // Max 5 Vorteile
     }
+    console.log('Benefits is not an array:', benefits)
     return []
   } catch (e) {
     console.error('Failed to generate habit benefits:', e)
