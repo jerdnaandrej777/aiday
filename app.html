@@ -6150,8 +6150,14 @@
     const totalOnboardingSlides = 3;
 
     function shouldShowOnboarding() {
-      // Onboarding wird bei jedem Login angezeigt
-      return true;
+      // Onboarding nur einmal anzeigen (gespeichert in localStorage)
+      const onboardingCompleted = localStorage.getItem('aiday_onboarding_completed');
+      return !onboardingCompleted;
+    }
+
+    function completeOnboarding() {
+      // Markiere Onboarding als abgeschlossen
+      localStorage.setItem('aiday_onboarding_completed', 'true');
     }
 
     function showOnboarding() {
@@ -6171,6 +6177,7 @@
     }
 
     function skipOnboarding() {
+      completeOnboarding();
       hideOnboarding();
     }
 
@@ -6180,6 +6187,7 @@
         updateOnboardingSlide();
       } else {
         // Letzte Slide - Onboarding abschließen
+        completeOnboarding();
         hideOnboarding();
         showToast('Willkommen bei AIDAY! Los geht\'s!', 'success', 3000);
       }
