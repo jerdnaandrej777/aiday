@@ -8765,6 +8765,9 @@
         document.getElementById('profileChallenges').value = profile.challenges || '';
         document.getElementById('profileMotivation').value = profile.motivation || '';
 
+        // Coaching-Stil setzen
+        setCoachingStyle(profile.coaching_style || 'balanced');
+
         // Profil-Vollständigkeit berechnen
         updateProfileCompletion();
       }
@@ -8861,7 +8864,8 @@
         hobbies: document.getElementById('profileHobbies').value || null,
         strengths: document.getElementById('profileStrengths').value || null,
         challenges: document.getElementById('profileChallenges').value || null,
-        motivation: document.getElementById('profileMotivation').value || null
+        motivation: document.getElementById('profileMotivation').value || null,
+        coaching_style: getCoachingStyle()
       };
 
       const result = await apiCall('/functions/v1/auth-profile', {
