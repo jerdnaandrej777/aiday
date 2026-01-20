@@ -1,4 +1,4 @@
-# AIDAY - KI-gestützter Tagesplaner
+# AimDo - KI-gestützter Tagesplaner
 
 ## Inhaltsverzeichnis
 
@@ -18,7 +18,7 @@
 
 ## Projektübersicht
 
-AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gestütztem Coaching. Das Backend basiert auf Supabase mit PostgreSQL und Deno Edge Functions.
+AimDo ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gestütztem Coaching. Das Backend basiert auf Supabase mit PostgreSQL und Deno Edge Functions.
 
 **Vision:** Nutzer dabei unterstützen, ihre Träume in konkrete Tagesziele zu verwandeln und diese mit Hilfe eines KI-Coaches zu erreichen.
 
@@ -303,8 +303,8 @@ aiday/
 ### manifest.json
 ```json
 {
-  "name": "AIDAY - KI-gestützter Tagesplaner",
-  "short_name": "AIDAY",
+  "name": "AimDo - KI-gestützter Tagesplaner",
+  "short_name": "AimDo",
   "start_url": "./app.html",
   "display": "standalone",
   "background_color": "#0a0a0f",
@@ -571,7 +571,7 @@ html, body {
 
 ### Globaler Header
 Auf allen Screens sichtbar (außer Loading):
-- Logo "aiday" links
+- Logo "AimDo" links
 - "Mein Fortschritt" Button Mitte
 - "Abmelden" rechts
 
@@ -637,7 +637,7 @@ CRON_SECRET=...
 
 ## Test-Credentials
 
-**Demo-Account:** `admin@aiday.test` / `admin1`
+**Demo-Account:** `admin@aimdo.test` / `admin1`
 
 Zum Testen: `test-api.html` öffnen → "Demo Login (admin)" klicken
 
@@ -1282,7 +1282,7 @@ function showMoodAttention() {
 - Nach Check-in bei neutral/bad/terrible Stimmung
 - Abends (nach 18:00) bei <50% erledigten Tasks
 
-**Cooldown:** Max 1x pro 4 Stunden (localStorage: `aiday_last_motivation`)
+**Cooldown:** Max 1x pro 4 Stunden (localStorage: `aimdo_last_motivation`)
 
 **Zitate-Sammlung:** ~40 Zitate von:
 - Stoikern (Marc Aurel, Epiktet)
@@ -1728,17 +1728,17 @@ function handleGamificationFeedback(gamification) {
 ```javascript
 function shouldShowOnboarding() {
   // sessionStorage statt localStorage - wird bei jedem Login zurückgesetzt
-  const onboardingShownThisSession = sessionStorage.getItem('aiday_onboarding_shown_this_session');
+  const onboardingShownThisSession = sessionStorage.getItem('aimdo_onboarding_shown_this_session');
   return !onboardingShownThisSession;
 }
 
 function completeOnboarding() {
-  sessionStorage.setItem('aiday_onboarding_shown_this_session', 'true');
+  sessionStorage.setItem('aimdo_onboarding_shown_this_session', 'true');
 }
 
 // Bei Logout wird sessionStorage automatisch gelöscht
 function logout() {
-  sessionStorage.removeItem('aiday_onboarding_shown_this_session');
+  sessionStorage.removeItem('aimdo_onboarding_shown_this_session');
   // ...
 }
 ```
@@ -1787,7 +1787,7 @@ function closeHabitDetail() {
 **Lösung:** User aus localStorage holen:
 ```javascript
 function generateIdempotencyKey() {
-  const user = localStorage.getItem('aiday_user');
+  const user = localStorage.getItem('aimdo_user');
   const userId = user ? JSON.parse(user)?.id : 'anon';
   return `${userId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
@@ -1973,7 +1973,7 @@ User Message → ai-chat Function →
 
 **System-Prompt:**
 ```
-Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AIDAY App.
+Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AimDo App.
 
 DEINE ROLLE:
 - Du hilfst Nutzern, ihre Ziele zu erreichen

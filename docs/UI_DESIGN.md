@@ -1,6 +1,6 @@
-# AIDAY - UI Design System
+# AimDo - UI Design System
 
-Dokumentation des einheitlichen Design-Systems für alle AIDAY-Oberflächen.
+Dokumentation des einheitlichen Design-Systems für alle AimDo-Oberflächen.
 
 ---
 
@@ -24,7 +24,7 @@ Dokumentation des einheitlichen Design-Systems für alle AIDAY-Oberflächen.
 
 ## Design-Philosophie
 
-Das AIDAY Design-System folgt diesen Prinzipien:
+Das AimDo Design-System folgt diesen Prinzipien:
 
 - **Dark-First**: Dunkler Hintergrund für reduzierte Augenbelastung
 - **Glassmorphism**: Transparente Cards mit Blur-Effekt
@@ -631,7 +631,7 @@ Fünf langsam schwebende Orbs im Hintergrund (start-ui.html):
 
 | Screen | Beschreibung | Besondere Features |
 |--------|--------------|-------------------|
-| **Dashboard ("aiday")** | Tägliche Tasks, Goals-Übersicht (Startseite) | Task-Checkboxes, Klickbare Stat-Boxes |
+| **Dashboard ("AimDo")** | Tägliche Tasks, Goals-Übersicht (Startseite) | Task-Checkboxes, Klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie, Notizen | Emoji-Mood-Selector, Energy-Slider |
 | **Review** | Aufgaben vom Vortag bewerten | Task-Bewertung, Blocker-Erfassung |
 | Goals | Ziel mit Details eingeben | Form-Validation |
@@ -646,7 +646,7 @@ Fünf langsam schwebende Orbs im Hintergrund (start-ui.html):
 ### Layout-Änderungen (AKTUALISIERT)
 
 - **Globaler Header**: Auf allen Screens sichtbar (außer Loading)
-- **Dashboard-Titel**: "aiday" im Header
+- **Dashboard-Titel**: "AimDo" im Header
 - **"Übersicht"**: Quick Actions umbenannt in "Übersicht"
 - **Keine Bottom-Navigation**: Navigation über Buttons/Cards
 - **Unified Back Button**: Innerhalb der Cards am unteren Rand
@@ -982,7 +982,7 @@ Detailansicht eines einzelnen Ziels mit vollständigem AI-Plan:
 **Abstands-Logik:**
 - Header, Screens und App-body haben 28px links/rechts Padding
 - Cards haben 16px Padding
-- "aiday" im Header ist bündig mit dem Card-Rand (beide 28px vom Bildschirmrand)
+- "AimDo" im Header ist bündig mit dem Card-Rand (beide 28px vom Bildschirmrand)
 - Card-Inhalt (z.B. "Heutige Aufgaben") hat zusätzlich 16px Abstand zum Card-Rand
 
 ### Breakpoints
@@ -1366,7 +1366,7 @@ Erforderliche Tags in `<head>`:
 <!-- PWA Meta Tags -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AIDAY">
+<meta name="apple-mobile-web-app-title" content="AimDo">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#6366f1">
 

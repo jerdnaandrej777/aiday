@@ -1,6 +1,6 @@
 File: ..\..\..\..\..\Desktop\Apps\aiday\db\001_init.sql
 
-     1	-- aiday initial schema
+     1	-- aimdo initial schema
      2	create extension if not exists "pgcrypto";
      3	create schema if not exists core;
      4	create schema if not exists coach;

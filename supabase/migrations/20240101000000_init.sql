@@ -1,4 +1,4 @@
--- aiday initial schema
+-- aimdo initial schema
 create extension if not exists "pgcrypto";
 create schema if not exists core;
 create schema if not exists coach;

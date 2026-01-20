@@ -1,5 +1,5 @@
-// AIDAY Service Worker
-const CACHE_NAME = 'aiday-v2';
+// AimDo Service Worker
+const CACHE_NAME = 'aimdo-v2';
 const OFFLINE_URL = 'offline.html';
 
 // Base-Pfad ermitteln (funktioniert für GitHub Pages Subdirectory)
@@ -165,7 +165,7 @@ self.addEventListener('push', (event) => {
   console.log('[SW] Push received');
 
   let data = {
-    title: 'AIDAY',
+    title: 'AimDo',
     body: 'Du hast eine neue Benachrichtigung',
     icon: 'icons/icon-192.png',
     badge: 'icons/icon-72.png'
@@ -215,7 +215,7 @@ self.addEventListener('notificationclick', (event) => {
       .then((clientList) => {
         // Existierendes Fenster fokussieren
         for (const client of clientList) {
-          if (client.url.includes('aiday') && 'focus' in client) {
+          if (client.url.includes('aimdo') && 'focus' in client) {
             client.navigate(url);
             return client.focus();
           }

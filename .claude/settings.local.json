@@ -5,7 +5,7 @@
       "Bash(npx supabase:*)",
       "Bash(cd:*)",
       "Bash(findstr:*)",
-      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" repo create aiday --public --source=. --remote=origin --description \"AIDAY - KI-gestützter Tagesplaner PWA\")",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" repo create aiday --public --source=. --remote=origin --description \"AimDo - KI-gestützter Tagesplaner PWA\")",
       "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" api repos/jerdnaandrej777/aiday/pages -X POST -f build_type=legacy -f source[branch]=main -f source[path]=/)",
       "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" repo edit jerdnaandrej777/aiday --visibility public)",
       "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" repo edit jerdnaandrej777/aiday --visibility public --accept-visibility-change-consequences)",

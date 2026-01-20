@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#6366f1">
-  <meta name="description" content="AIDAY - Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität">
+  <meta name="description" content="AimDo - Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität">
 
   <!-- PWA Meta-Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="AIDAY">
-  <meta name="application-name" content="AIDAY">
+  <meta name="apple-mobile-web-app-title" content="AimDo">
+  <meta name="application-name" content="AimDo">
   <meta name="msapplication-TileColor" content="#0a0a0f">
   <meta name="msapplication-config" content="none">
 
@@ -25,7 +25,7 @@
   <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
   <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120.png">
 
-  <title>AIDAY - Dein persönlicher Ziel-Coach</title>
+  <title>AimDo - Dein persönlicher Ziel-Coach</title>
   <style>
     :root {
       --bg-dark: #0a0a0f;
@@ -1438,7 +1438,7 @@
   <!-- Main Container -->
   <div class="container">
     <!-- Logo -->
-    <div class="logo"><span>aiday</span></div>
+    <div class="logo"><span>AimDo</span></div>
 
     <!-- Skip Button -->
     <button class="btn-skip" onclick="goToSlide(2)">Überspringen</button>
@@ -1518,7 +1518,7 @@
   <div class="auth-screen" id="registerScreen">
     <div class="auth-card">
       <div class="auth-header">
-        <div class="auth-logo"><span>aiday</span></div>
+        <div class="auth-logo"><span>AimDo</span></div>
         <h2 class="auth-title">Konto erstellen</h2>
         <p class="auth-subtitle">Starte deine Reise zu deinen Zielen</p>
       </div>
@@ -1548,7 +1548,7 @@
   <div class="auth-screen" id="loginScreen">
     <div class="auth-card">
       <div class="auth-header">
-        <div class="auth-logo"><span>aiday</span></div>
+        <div class="auth-logo"><span>AimDo</span></div>
         <h2 class="auth-title">Willkommen zurück</h2>
         <p class="auth-subtitle">Melde dich an, um fortzufahren</p>
       </div>
@@ -1797,8 +1797,8 @@
 
         if (data.access_token) {
           // Direkt eingeloggt (E-Mail-Bestätigung deaktiviert)
-          localStorage.setItem('aiday_token', data.access_token);
-          localStorage.setItem('aiday_user', JSON.stringify(data.user));
+          localStorage.setItem('aimdo_token', data.access_token);
+          localStorage.setItem('aimdo_user', JSON.stringify(data.user));
           showSuccess('registerSuccess', 'Konto erfolgreich erstellt! Weiterleitung...');
           setTimeout(() => {
             window.location.href = 'app.html';
@@ -1854,16 +1854,16 @@
         }
 
         // Speichere Token
-        localStorage.setItem('aiday_token', data.access_token);
-        localStorage.setItem('aiday_user', JSON.stringify(data.user));
+        localStorage.setItem('aimdo_token', data.access_token);
+        localStorage.setItem('aimdo_user', JSON.stringify(data.user));
 
         // Einlogdaten merken (oder löschen)
         if (rememberMe) {
-          localStorage.setItem('aiday_remember_email', email);
-          localStorage.setItem('aiday_remember_password', btoa(password)); // Base64 encoded
+          localStorage.setItem('aimdo_remember_email', email);
+          localStorage.setItem('aimdo_remember_password', btoa(password)); // Base64 encoded
         } else {
-          localStorage.removeItem('aiday_remember_email');
-          localStorage.removeItem('aiday_remember_password');
+          localStorage.removeItem('aimdo_remember_email');
+          localStorage.removeItem('aimdo_remember_password');
         }
 
         // Weiterleitung zur Hauptseite
@@ -1883,8 +1883,8 @@
 
     // Gespeicherte Einlogdaten laden
     function loadRememberedCredentials() {
-      const savedEmail = localStorage.getItem('aiday_remember_email');
-      const savedPassword = localStorage.getItem('aiday_remember_password');
+      const savedEmail = localStorage.getItem('aimdo_remember_email');
+      const savedPassword = localStorage.getItem('aimdo_remember_password');
 
       if (savedEmail && savedPassword) {
         document.getElementById('loginEmail').value = savedEmail;
@@ -1895,7 +1895,7 @@
 
     // Auto-Login Check
     (function checkExistingSession() {
-      const token = localStorage.getItem('aiday_token');
+      const token = localStorage.getItem('aimdo_token');
       if (token) {
         // Prüfen ob Token noch gültig
         fetch(`${SUPABASE_URL}/auth/v1/user`, {
@@ -1909,8 +1909,8 @@
             window.location.href = 'app.html';
           } else {
             // Token ungültig - löschen
-            localStorage.removeItem('aiday_token');
-            localStorage.removeItem('aiday_user');
+            localStorage.removeItem('aimdo_token');
+            localStorage.removeItem('aimdo_user');
           }
         }).catch(() => {
           // Fehler ignorieren

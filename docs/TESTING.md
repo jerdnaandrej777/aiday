@@ -12,7 +12,7 @@
 2. **"Demo Login (admin)"** klicken
 3. Endpoints testen
 
-**Test-Credentials:** `admin@aiday.test` / `admin1`
+**Test-Credentials:** `admin@aimdo.test` / `admin1`
 
 ### Postman
 - Collection importieren; optional Newman im CI.
@@ -28,6 +28,6 @@ Mobile Tests
 - Unit/UI: Framework abhängig (z. B. Jest + React Native Testing Library / Flutter test).
 - E2E: Detox (React Native) oder Appium.
 - Device Farms: Firebase Test Lab, BrowserStack, AWS Device Farm.
-- Deep Links: aiday://auth-callback und Universal Links testen.
+- Deep Links: aimdo://auth-callback und Universal Links testen.
 - Offline/Sync: Netzwerk on/off, Konflikte, Retries.
 - Push: FCM/APNs in Staging testen.

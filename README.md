@@ -1,4 +1,4 @@
-# AIDAY
+# AimDo
 
 KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem täglichen Coaching-Flow auf Basis von Supabase und OpenAI GPT-4o-mini.
 
@@ -36,7 +36,7 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Desktop Chrome/Edge:** Install-Icon (⊕) in Adressleiste
 
 ### Test-Credentials
-**Demo-Account:** `admin@aiday.test` / `admin1`
+**Demo-Account:** `admin@aimdo.test` / `admin1`
 
 ---
 
@@ -358,7 +358,7 @@ Alle Tabellen haben RLS aktiviert. Benutzer können nur ihre eigenen Daten lesen
 2. **"Demo Login (admin)"** klicken - erstellt automatisch Test-Account
 3. Endpoints testen
 
-**Test-Credentials:** `admin@aiday.test` / `admin1`
+**Test-Credentials:** `admin@aimdo.test` / `admin1`
 
 Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wird er automatisch erstellt und dann eingeloggt.
 
@@ -374,7 +374,7 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 ### Screens in app.html (15+ Screens)
 | Screen | Beschreibung |
 |--------|--------------|
-| **Dashboard ("aiday")** | Tägliche Tasks, klickbare Stat-Boxes |
+| **Dashboard ("AimDo")** | Tägliche Tasks, klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie, Notizen |
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziel mit Details eingeben |

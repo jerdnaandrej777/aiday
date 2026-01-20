@@ -1,6 +1,6 @@
-# Aiday – Dokumentation
+# AimDo – Dokumentation
 
-Dieser Ordner bündelt die Projekt-Dokumentation für die AIDAY Web-App mit Supabase-Backend.
+Dieser Ordner bündelt die Projekt-Dokumentation für die AimDo Web-App mit Supabase-Backend.
 
 ## Inhalte
 

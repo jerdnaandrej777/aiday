@@ -1,4 +1,4 @@
-# AIDAY — Projekt-Tasks
+# AimDo — Projekt-Tasks
 
 ## Aktueller Stand: Phase 3 (UI) teilweise, Phase 4-6 abgeschlossen
 

@@ -1,6 +1,6 @@
 {
-  "name": "AIDAY - KI-gestützter Tagesplaner",
-  "short_name": "AIDAY",
+  "name": "AimDo - KI-gestützter Tagesplaner",
+  "short_name": "AimDo",
   "description": "Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität",
   "start_url": "./app.html",
   "display": "standalone",

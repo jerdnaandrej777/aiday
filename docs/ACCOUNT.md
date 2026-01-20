@@ -12,14 +12,14 @@ Konfiguration
 
 Mobile Flows
 - Registrierung (E-Mail/Passwort)
-  - signUp({ email, password, options: { emailRedirectTo: "aiday://auth-callback" } })
-  - Alternativ Universal Link: https://aiday.app/auth/callback
+  - signUp({ email, password, options: { emailRedirectTo: "aimdo://auth-callback" } })
+  - Alternativ Universal Link: https://aimdo.app/auth/callback
 - Magic Link / OAuth Callback
   - App erhält Deep Link, ruft exchangeCodeForSession() auf (PKCE/Code-Flow).
 - Login (Password)
   - signInWithPassword({ email, password })
 - Passwort-Reset
-  - resetPasswordForEmail(email, { redirectTo: "aiday://reset" })
+  - resetPasswordForEmail(email, { redirectTo: "aimdo://reset" })
   - Nach Deep Link: updateUser({ password: newPassword })
 - Session-Handling
   - Tokens sicher im Secure Storage (Keychain/Keystore) halten.

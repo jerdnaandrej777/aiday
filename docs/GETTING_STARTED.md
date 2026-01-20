@@ -1,4 +1,4 @@
-# AIDAY - Schnellstart-Anleitung
+# AimDo - Schnellstart-Anleitung
 
 ## Voraussetzungen
 

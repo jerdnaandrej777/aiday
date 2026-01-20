@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
           const success = await sendPushNotification(
             pushToken,
             {
-              title: 'aiday Erinnerung',
+              title: 'AimDo Erinnerung',
               body: reminder.text,
               data: { action_step_id: reminder.id },
             },
