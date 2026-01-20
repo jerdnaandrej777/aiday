@@ -41,8 +41,9 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Timezone-Support** für korrekte Datumsberechnung
 - **Idempotency-Keys** verhindert doppelte Einträge
 - **Habit Tracking System** mit Streak-Berechnung pro Habit
-- **AI-generierte Habit Benefits** - Automatische Vorteile pro Gewohnheit ← NEU
-- **Habit Detail Modal** - Klickbare Habits mit Statistiken ← NEU
+- **AI-generierte Habit Benefits** - Automatische Vorteile pro Gewohnheit
+- **Habit Detail Screen** - Eigener Screen für Habit-Details (wie Goal-Details) ← NEU
+- **Onboarding nach jedem Login** - Wird bei jeder neuen Session angezeigt ← NEU
 - **Pomodoro Timer** (25min Fokus + 5min Pause)
 - **Task Priorität** (High/Medium/Low mit variablen XP)
 - **Streak Recovery** (3-Tage Comeback-Challenge, max 1x/Monat)
@@ -1712,17 +1713,26 @@ function handleGamificationFeedback(gamification) {
 }
 ```
 
-### 51. Onboarding nur einmal anzeigen
-**Feature:** Onboarding erscheint nur beim ersten Login, nicht bei jedem Start
+### 51. Onboarding nach jedem Login anzeigen
+**Feature:** Onboarding erscheint nach jedem erfolgreichen Login (einmal pro Session)
 
 **Implementierung:**
 ```javascript
 function shouldShowOnboarding() {
-  return !localStorage.getItem('aiday_onboarding_completed');
+  // sessionStorage statt localStorage - wird bei jedem Login zurückgesetzt
+  const onboardingShownThisSession = sessionStorage.getItem('aiday_onboarding_shown_this_session');
+  return !onboardingShownThisSession;
 }
 
-// Nach erfolgreichem Onboarding:
-localStorage.setItem('aiday_onboarding_completed', 'true');
+function completeOnboarding() {
+  sessionStorage.setItem('aiday_onboarding_shown_this_session', 'true');
+}
+
+// Bei Logout wird sessionStorage automatisch gelöscht
+function logout() {
+  sessionStorage.removeItem('aiday_onboarding_shown_this_session');
+  // ...
+}
 ```
 
 ### 52. "Alle Habits" als Modal
@@ -1734,3 +1744,59 @@ localStorage.setItem('aiday_onboarding_completed', 'true');
 - Button "📋 Alle Habits verwalten" öffnet Modal
 - Modal zeigt alle Habits mit Bearbeiten/Löschen-Optionen
 - "+ Neuer Habit" Button im Modal
+
+### 53. Habit-Details als eigener Screen
+**Feature:** Habit-Details werden als vollständiger Screen angezeigt, nicht als Modal
+
+**Grund:** Konsistenz mit Goal-Detail-Screen, bessere UX
+
+**Implementierung:**
+- Modal durch `<div class="screen" id="habitDetailScreen">` ersetzt
+- Verwendet `goal-detail-section` und `plan-steps` CSS-Klassen
+- "Zurück" Button am Ende des Screens
+- "Habit löschen" Button im gleichen Stil wie "Ziel löschen"
+- `showScreen('habitDetailScreen')` statt Modal-Display
+
+**Code:**
+```javascript
+function showHabitDetail(habitId) {
+  // ... Daten füllen ...
+  previousScreen = 'habitsScreen';
+  showScreen('habitDetailScreen');
+}
+
+function closeHabitDetail() {
+  showScreen(previousScreen || 'habitsScreen', 'back');
+  currentHabitDetail = null;
+}
+```
+
+### 54. Fix: currentUser is not defined
+**Problem:** `ReferenceError: currentUser is not defined` in `generateIdempotencyKey`
+
+**Ursache:** Variable `currentUser` existierte nicht global
+
+**Lösung:** User aus localStorage holen:
+```javascript
+function generateIdempotencyKey() {
+  const user = localStorage.getItem('aiday_user');
+  const userId = user ? JSON.parse(user)?.id : 'anon';
+  return `${userId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+```
+
+### 55. Fix: CORS Header für Idempotency-Key
+**Problem:** `x-idempotency-key is not allowed by Access-Control-Allow-Headers`
+
+**Ursache:** Custom Header nicht in CORS-Konfiguration erlaubt
+
+**Lösung:** Header in `_shared/cors.ts` hinzugefügt:
+```typescript
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-idempotency-key, x-timezone-offset',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+}
+```
+
+**Betroffene Edge Functions:** Alle (shared cors.ts) - neu deployed
