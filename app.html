@@ -6885,6 +6885,49 @@
     // Theme beim Laden initialisieren (vor allem anderen)
     initTheme();
 
+    // Bottom Navigation Mapping (muss vor init() definiert sein)
+    var bottomNavScreenMapping = {
+      'dashboardScreen': 'navHome',
+      'habitsScreen': 'navHabits',
+      'goalsOverviewScreen': 'navGoals',
+      'chatScreen': 'navChat',
+      'profileScreen': 'navProfile'
+    };
+
+    function updateBottomNavForScreen(screenId) {
+      // Alle Nav-Items deaktivieren
+      document.querySelectorAll('.nav-item').forEach(function(item) {
+        item.classList.remove('active');
+      });
+
+      // Aktuellen Tab aktivieren
+      var navId = bottomNavScreenMapping[screenId];
+      if (navId) {
+        var navItem = document.getElementById(navId);
+        if (navItem) {
+          navItem.classList.add('active');
+        }
+      }
+
+      // Bottom Nav und FAB Sichtbarkeit
+      var bottomNav = document.getElementById('bottomNav');
+      var fab = document.getElementById('fab');
+      var fabMenu = document.getElementById('fabMenu');
+      var fabOverlay = document.getElementById('fabOverlay');
+
+      var hideOnScreens = ['loadingScreen', 'checkinScreen', 'goalsScreen', 'clarifyScreen', 'planScreen', 'reviewScreen'];
+
+      if (hideOnScreens.indexOf(screenId) !== -1) {
+        if (bottomNav) bottomNav.style.display = 'none';
+        if (fab) fab.style.display = 'none';
+        if (fabMenu) fabMenu.classList.remove('open');
+        if (fabOverlay) fabOverlay.classList.remove('open');
+      } else {
+        if (bottomNav) bottomNav.style.display = 'flex';
+        if (fab) fab.style.display = 'flex';
+      }
+    }
+
     // Auth Check
     (function init() {
       const token = localStorage.getItem('aiday_token');
@@ -7772,49 +7815,6 @@
       'progressScreen',
       'profileScreen'
     ];
-
-    // Bottom Navigation Helper (muss vor showScreen definiert sein)
-    const bottomNavScreenMapping = {
-      'dashboardScreen': 'navHome',
-      'habitsScreen': 'navHabits',
-      'goalsOverviewScreen': 'navGoals',
-      'chatScreen': 'navChat',
-      'profileScreen': 'navProfile'
-    };
-
-    function updateBottomNavForScreen(screenId) {
-      // Alle Nav-Items deaktivieren
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-
-      // Aktuellen Tab aktivieren
-      const navId = bottomNavScreenMapping[screenId];
-      if (navId) {
-        const navItem = document.getElementById(navId);
-        if (navItem) {
-          navItem.classList.add('active');
-        }
-      }
-
-      // Bottom Nav und FAB Sichtbarkeit
-      const bottomNav = document.getElementById('bottomNav');
-      const fab = document.getElementById('fab');
-      const fabMenu = document.getElementById('fabMenu');
-      const fabOverlay = document.getElementById('fabOverlay');
-
-      const hideOnScreens = ['loadingScreen', 'checkinScreen', 'goalsScreen', 'clarifyScreen', 'planScreen', 'reviewScreen'];
-
-      if (hideOnScreens.includes(screenId)) {
-        if (bottomNav) bottomNav.style.display = 'none';
-        if (fab) fab.style.display = 'none';
-        if (fabMenu) fabMenu.classList.remove('open');
-        if (fabOverlay) fabOverlay.classList.remove('open');
-      } else {
-        if (bottomNav) bottomNav.style.display = 'flex';
-        if (fab) fab.style.display = 'flex';
-      }
-    }
 
     function showScreen(screenId, direction = null) {
       const currentActive = document.querySelector('.screen.active');
