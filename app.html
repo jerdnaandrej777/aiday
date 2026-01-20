@@ -7112,7 +7112,9 @@
 
     // Generiert einen eindeutigen Idempotency-Key
     function generateIdempotencyKey() {
-      return `${currentUser?.id || 'anon'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const user = localStorage.getItem('aiday_user');
+      const userId = user ? JSON.parse(user)?.id : 'anon';
+      return `${userId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
 
     // API Call
