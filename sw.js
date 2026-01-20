@@ -1,4 +1,4 @@
-// AImDo Service Worker
+// aimDo Service Worker
 const CACHE_NAME = 'aimdo-v2';
 const OFFLINE_URL = 'offline.html';
 
@@ -165,7 +165,7 @@ self.addEventListener('push', (event) => {
   console.log('[SW] Push received');
 
   let data = {
-    title: 'AImDo',
+    title: 'aimDo',
     body: 'Du hast eine neue Benachrichtigung',
     icon: 'icons/icon-192.png',
     badge: 'icons/icon-72.png'

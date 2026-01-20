@@ -1,4 +1,4 @@
-# AImDo
+# aimDo
 
 KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem täglichen Coaching-Flow auf Basis von Supabase und OpenAI GPT-4o-mini.
 
@@ -374,7 +374,7 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 ### Screens in app.html (15+ Screens)
 | Screen | Beschreibung |
 |--------|--------------|
-| **Dashboard ("AImDo")** | Tägliche Tasks, klickbare Stat-Boxes |
+| **Dashboard ("aimDo")** | Tägliche Tasks, klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie, Notizen |
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziel mit Details eingeben |

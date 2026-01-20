@@ -1,4 +1,4 @@
-# AImDo — Projekt-Tasks
+# aimDo — Projekt-Tasks
 
 ## Aktueller Stand: Phase 3 (UI) teilweise, Phase 4-6 abgeschlossen
 

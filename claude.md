@@ -1,4 +1,4 @@
-# AImDo - KI-gestützter Tagesplaner
+# aimDo - KI-gestützter Tagesplaner
 
 ## Inhaltsverzeichnis
 
@@ -18,7 +18,7 @@
 
 ## Projektübersicht
 
-AImDo ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gestütztem Coaching. Das Backend basiert auf Supabase mit PostgreSQL und Deno Edge Functions.
+aimDo ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gestütztem Coaching. Das Backend basiert auf Supabase mit PostgreSQL und Deno Edge Functions.
 
 **Vision:** Nutzer dabei unterstützen, ihre Träume in konkrete Tagesziele zu verwandeln und diese mit Hilfe eines KI-Coaches zu erreichen.
 
@@ -303,8 +303,8 @@ aiday/
 ### manifest.json
 ```json
 {
-  "name": "AImDo - KI-gestützter Tagesplaner",
-  "short_name": "AImDo",
+  "name": "aimDo - KI-gestützter Tagesplaner",
+  "short_name": "aimDo",
   "start_url": "./app.html",
   "display": "standalone",
   "background_color": "#0a0a0f",
@@ -571,7 +571,7 @@ html, body {
 
 ### Globaler Header
 Auf allen Screens sichtbar (außer Loading):
-- Logo "AImDo" links
+- Logo "aimDo" links
 - "Mein Fortschritt" Button Mitte
 - "Abmelden" rechts
 
@@ -1973,7 +1973,7 @@ User Message → ai-chat Function →
 
 **System-Prompt:**
 ```
-Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AImDo App.
+Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der aimDo App.
 
 DEINE ROLLE:
 - Du hilfst Nutzern, ihre Ziele zu erreichen
