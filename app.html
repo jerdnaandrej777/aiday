@@ -4186,8 +4186,18 @@
       color: var(--text-muted);
     }
 
-    .habit-calendar-day.completed {
+    .habit-calendar-day.completed-all {
       background: var(--success);
+      color: white;
+    }
+
+    .habit-calendar-day.completed-partial {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .habit-calendar-day.completed-none {
+      background: #ef4444;
       color: white;
     }
 
@@ -10066,11 +10076,19 @@
 
         // Zähle Completions für diesen Tag
         const dayLogs = habitsData.logs?.filter(l => l.date === dateStr && l.completed) || [];
-        const totalHabits = habitsData.habits?.filter(h => h.is_active).length || 1;
-        const completionRate = dayLogs.length / totalHabits;
+        const completedCount = dayLogs.length;
+        const totalHabits = habitsData.habits?.filter(h => h.is_active).length || 0;
 
         let cssClass = 'habit-calendar-day';
-        if (completionRate >= 0.8) cssClass += ' completed';
+        if (totalHabits > 0) {
+          if (completedCount >= totalHabits) {
+            cssClass += ' completed-all'; // Grün - alle abgeschlossen
+          } else if (completedCount > 0) {
+            cssClass += ' completed-partial'; // Orange - mindestens einer
+          } else {
+            cssClass += ' completed-none'; // Rot - keiner abgeschlossen
+          }
+        }
         if (isToday) cssClass += ' today';
 
         daysHtml += `<div class="${cssClass}">${date.getDate()}</div>`;
