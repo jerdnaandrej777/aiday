@@ -131,6 +131,9 @@ aiday/
 │   │   ├── weekly-reflection/    # POST - Weekly Deep Review mit AI
 │   │   ├── burnout-assessment/   # POST - Burnout Detection + Recovery Mode
 │   │   │
+│   │   │── # === PHASE 8 FEATURES (NEU) ===
+│   │   ├── ai-chat/              # POST - AI-Coaching Chat mit Kontext-Awareness
+│   │   │
 │   │   │── # === LEGACY ===
 │   │   ├── coach-plan/           # POST - AI Tagesplan (alt)
 │   │   ├── coach-checkin/        # POST - AI Check-in (alt)
@@ -148,7 +151,8 @@ aiday/
 │   ├── 001_init.sql              # Basis-Schema
 │   ├── 002_auth.sql              # Auth Trigger
 │   ├── 003_daily_coaching.sql    # Daily Coaching Tabellen
-│   └── fix_goals_schema.sql      # FIX: Fehlende Spalten
+│   ├── fix_goals_schema.sql      # FIX: Fehlende Spalten
+│   └── 20260121_chat_messages.sql # Phase 8: Chat-Historie Tabelle (NEU)
 │
 ├── docs/                         # Dokumentation
 ├── postman/                      # API Collection
@@ -346,6 +350,7 @@ Generiert in allen Größen: 16, 32, 72, 96, 120, 128, 144, 152, 180, 192, 384, 
 | `streak-recovery` | POST | 3-Tage Streak Recovery Challenge | GPT-4o-mini |
 | `weekly-reflection` | POST | Weekly Deep Review mit AI-Analyse | GPT-4o-mini |
 | `burnout-assessment` | POST | Burnout Detection + Recovery Mode | GPT-4o-mini |
+| `ai-chat` | POST | AI-Coaching Chat mit Kontext-Awareness (NEU Phase 8) | GPT-4o-mini |
 | `coach-plan` | POST | AI-Tagesplan (LEGACY) | GPT-4o-mini |
 | `coach-checkin` | POST | AI-Coaching Feedback (LEGACY) | GPT-4o-mini |
 | `auth-profile` | GET/POST | Benutzerprofil | - |
@@ -1803,3 +1808,213 @@ export const corsHeaders = {
 ```
 
 **Betroffene Edge Functions:** Alle (shared cors.ts) - neu deployed
+
+### 56. Fix: bottomNavScreenMapping Initialisierungsfehler (Phase 8)
+**Problem:** `ReferenceError: Cannot access 'bottomNavScreenMapping' before initialization`
+
+**Ursache:** `const` Variablen werden nicht gehoisted - `bottomNavScreenMapping` war nach der `init()` IIFE deklariert, die sofort ausgeführt wird und `showScreen()` aufruft.
+
+**Lösung:** Variablen und Funktionen VOR die init() IIFE verschieben und `const` zu `var` ändern:
+```javascript
+// MUSS VOR init() stehen!
+var bottomNavScreenMapping = {
+  'dashboardScreen': 'navHome',
+  'habitsScreen': 'navHabits',
+  'goalsOverviewScreen': 'navGoals',
+  'chatScreen': 'navChat',
+  'profileScreen': 'navProfile'
+};
+
+function updateBottomNavForScreen(screenId) {
+  // ... Tab-Highlighting und Visibility-Logic
+}
+
+// Danach kommt init()
+;(async function init() {
+  // ... nutzt updateBottomNavForScreen()
+})();
+```
+
+---
+
+## Phase 8 Features (NEU)
+
+### Bottom Navigation Bar
+**Feature:** Mobile-freundliche Tab-Navigation am unteren Bildschirmrand
+
+**5 Tabs:**
+- Home (Dashboard)
+- Habits (Habits-Screen)
+- Ziele (Goals Overview)
+- Chat (AI-Coaching Chat)
+- Profil (Profile-Screen)
+
+**CSS:**
+```css
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  border-top: 1px solid var(--glass-border);
+}
+
+.nav-item.active {
+  color: var(--accent);
+}
+```
+
+**JavaScript:**
+- `updateBottomNavForScreen(screenId)` - Aktualisiert aktiven Tab
+- Versteckt Bottom Nav auf bestimmten Screens (Loading, Check-in, etc.)
+
+### Floating Action Button (FAB)
+**Feature:** Schwebendes "+" Button für Quick-Add Aktionen
+
+**3 Optionen:**
+- + Neues Ziel
+- + Neuer Habit
+- + Schnelle Notiz
+
+**CSS:**
+```css
+.fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  z-index: 999;
+}
+
+.fab-menu {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fab.active .fab-menu {
+  display: flex;
+}
+```
+
+**JavaScript:**
+- `toggleFab()` - Öffnet/schließt das FAB-Menü
+- Klick außerhalb schließt Menü automatisch
+
+### AI-Coaching Chat
+**Feature:** Konversationeller AI-Coach mit Kontext-Awareness
+
+**Chat-Interface:**
+- Nachrichten-Liste mit User/AI-Bubbles
+- Input-Feld mit Senden-Button
+- Vorschläge für schnelle Fragen
+- Typing-Indicator während AI antwortet
+
+**Kontext-Awareness:**
+Die AI kennt:
+- Benutzerprofil (Alter, Beruf, etc.)
+- Aktuelle Ziele und deren Fortschritt
+- Aktive Habits und Streaks
+- Heutige Stimmung und Energie
+- Heutige Aufgaben
+
+**CSS:**
+```css
+.chat-message.user {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  margin-left: auto;
+}
+
+.chat-message.ai {
+  background: var(--bg-card);
+  margin-right: auto;
+}
+```
+
+**JavaScript-Funktionen:**
+```javascript
+let chatMessages = [];    // Chat-Historie (localStorage)
+let chatIsTyping = false; // Typing-Status
+
+function loadChatHistory()   // Lädt aus localStorage
+function saveChatHistory()   // Speichert letzte 50 Nachrichten
+function renderChatMessages() // Rendert Chat-Bubbles
+async function sendChatMessage() // Sendet an ai-chat API
+function showTypingIndicator() // Zeigt "..." Animation
+function useSuggestion(text)  // Verwendet Vorschlag
+```
+
+### ai-chat Edge Function
+**Pfad:** `supabase/functions/ai-chat/index.ts`
+
+**Architektur:**
+```
+User Message → ai-chat Function →
+  1. Authentifizierung prüfen
+  2. Lade User-Kontext (Profile, Goals, Habits, Check-in, Tasks)
+  3. Baue System-Prompt mit Kontext
+  4. GPT-4o-mini Call mit Chat-History
+  5. Speichere in coach.ai_suggestions (kind: 'chat')
+  6. Return AI-Response
+```
+
+**System-Prompt:**
+```
+Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AIDAY App.
+
+DEINE ROLLE:
+- Du hilfst Nutzern, ihre Ziele zu erreichen
+- Du gibst personalisierte Tipps basierend auf Kontext
+- Du motivierst bei Herausforderungen
+
+WICHTIGE REGELN:
+1. Antworte IMMER auf Deutsch
+2. Sei warmherzig, aber direkt
+3. Gib konkrete, umsetzbare Tipps
+4. Halte Antworten prägnant (max 3-4 Absätze)
+```
+
+### chat_messages SQL Migration
+**Pfad:** `db/20260121_chat_messages.sql`
+
+**Tabelle:**
+```sql
+CREATE TABLE IF NOT EXISTS core.chat_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'ai', 'system')),
+  content TEXT NOT NULL,
+  context_data JSONB DEFAULT NULL,
+  tokens_used INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_chat_messages_user_id ON core.chat_messages(user_id);
+CREATE INDEX idx_chat_messages_created_at ON core.chat_messages(created_at DESC);
+
+-- RLS
+ALTER TABLE core.chat_messages ENABLE ROW LEVEL SECURITY;
+```
+
+**ai_suggestions Constraint erweitert:**
+```sql
+ALTER TABLE coach.ai_suggestions
+ADD CONSTRAINT ai_suggestions_kind_check
+CHECK (kind IN ('plan', 'checkin', 'nudge', 'daily_review', 'goal_clarify',
+                'goal_plan', 'habit_benefits', 'task_adjust', 'streak_recovery',
+                'weekly_reflection', 'burnout_assessment', 'chat'));
+```

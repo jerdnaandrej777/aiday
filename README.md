@@ -66,6 +66,15 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 - **Coaching Style**: Personalisierung (supportive/challenging/balanced)
 - **Smart Task Adjustment**: AI splittet schwierige Tasks automatisch
 
+### Phase 8 Features (NEU)
+- **Bottom Navigation Bar**: Mobile-freundliche Tab-Navigation (Home, Habits, Ziele, Chat, Profil)
+- **Floating Action Button (FAB)**: Quick-Add Menü für Ziele, Habits, Notizen
+- **AI-Coaching Chat**: Konversationeller AI-Coach mit Kontext-Awareness
+  - Chat-Interface mit User/AI-Bubbles
+  - Kennt Benutzerprofil, Ziele, Habits, Stimmung
+  - Vorschläge für schnelle Fragen
+  - Chat-Historie in localStorage
+
 ### Profil-System (NEU)
 - **Persönliche Daten**: Alter, Beruf, Bildung, Familienstand
 - **Interessen**: Hobbys, Stärken, Herausforderungen, Motivation
@@ -132,6 +141,7 @@ KI-gestützter Tagesplaner - Progressive Web App (PWA) mit vollständigem tägli
 | `streak-recovery` | POST | 3-Tage Streak Recovery Challenge (NEU) |
 | `weekly-reflection` | POST | Weekly Deep Review mit AI (NEU) |
 | `burnout-assessment` | POST | Burnout Detection + Recovery Mode (NEU) |
+| `ai-chat` | POST | AI-Coaching Chat mit Kontext-Awareness (Phase 8) |
 
 #### Auth & Profil
 | Function | Methode | Beschreibung |
@@ -275,6 +285,9 @@ aiday/
 │   │   ├── task-update/          # Tasks bearbeiten
 │   │   ├── daily-review/         # Tagesreview
 │   │   │
+│   │   ├── # Phase 8: AI Chat
+│   │   ├── ai-chat/              # POST - AI-Coaching Chat (NEU)
+│   │   │
 │   │   ├── # Auth & Utilities
 │   │   ├── auth-profile/         # GET/POST Profil
 │   │   ├── auth-onboarding/
@@ -290,7 +303,8 @@ aiday/
 │   ├── 001_init.sql              # Hauptschema
 │   ├── 002_auth.sql              # Auth Trigger
 │   ├── 003_daily_coaching.sql    # Daily Coaching Tabellen
-│   └── fix_goals_schema.sql      # FIX: Fehlende Spalten
+│   ├── fix_goals_schema.sql      # FIX: Fehlende Spalten
+│   └── 20260121_chat_messages.sql # Phase 8: Chat-Historie (NEU)
 │
 ├── docs/                         # Dokumentation
 ├── icons/                        # PWA App-Icons (alle Größen)
@@ -357,7 +371,7 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 
 ## UI-Design
 
-### Screens in app.html (11 Screens)
+### Screens in app.html (15+ Screens)
 | Screen | Beschreibung |
 |--------|--------------|
 | **Dashboard ("aiday")** | Tägliche Tasks, klickbare Stat-Boxes |
@@ -369,7 +383,10 @@ Der Demo-Login versucht zuerst ein Login. Falls der Account nicht existiert, wir
 | Progress | Heutige Aufgaben anzeigen |
 | **Goals Overview** | Übersicht aller Ziele, klickbar → Goal Detail |
 | Goal Detail | Ziel-Details mit Plan, Meilensteinen und Tasks |
-| **Erreichte Ziele (NEU)** | Abgeschlossene Ziele mit Statistiken |
+| **Erreichte Ziele** | Abgeschlossene Ziele mit Statistiken |
+| Habits | Habit-Übersicht mit Kalender |
+| Habit Detail | Habit-Details mit Statistiken und AI-Benefits |
+| **AI-Chat (Phase 8)** | Konversationeller AI-Coach |
 | **Profile ("Mein Profil")** | Persönliche Daten bearbeiten |
 
 ### start-ui.html Features
@@ -469,6 +486,7 @@ supabase functions deploy task-adjust-ai --no-verify-jwt
 supabase functions deploy streak-recovery --no-verify-jwt
 supabase functions deploy weekly-reflection --no-verify-jwt
 supabase functions deploy burnout-assessment --no-verify-jwt
+supabase functions deploy ai-chat --no-verify-jwt
 supabase functions deploy auth-profile --no-verify-jwt
 supabase functions deploy auth-onboarding --no-verify-jwt
 ```
