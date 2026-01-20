@@ -4773,6 +4773,434 @@
     .goal-trend.up { color: var(--success); }
     .goal-trend.down { color: var(--danger); }
     .goal-trend.stable { color: var(--text-muted); }
+
+    /* ============================================
+       BOTTOM NAVIGATION BAR
+       ============================================ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      background: var(--bg-card);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    body.dark-mode .bottom-nav {
+      background: rgba(30, 41, 59, 0.95);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-muted);
+      min-width: 64px;
+    }
+
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item span {
+      font-size: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-item.active svg {
+      transform: scale(1.1);
+    }
+
+    .nav-item:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Container padding für Bottom Nav */
+    .container {
+      padding-bottom: calc(60px + env(safe-area-inset-bottom, 0) + 20px);
+    }
+
+    /* ============================================
+       FLOATING ACTION BUTTON (FAB)
+       ============================================ */
+    .fab {
+      position: fixed;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0));
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px var(--accent-glow);
+    }
+
+    .fab svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      stroke-width: 2.5;
+      transition: transform 0.3s ease;
+    }
+
+    .fab.open svg {
+      transform: rotate(45deg);
+    }
+
+    .fab-menu {
+      position: fixed;
+      bottom: calc(145px + env(safe-area-inset-bottom, 0));
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 998;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .fab-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .fab-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .fab-menu-item:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .fab-menu-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+
+    .fab-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 997;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .fab-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ============================================
+       AI CHAT SCREEN
+       ============================================ */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 160px - env(safe-area-inset-bottom, 0));
+      max-height: calc(100vh - 160px - env(safe-area-inset-bottom, 0));
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+      animation: messageSlideIn 0.3s ease;
+    }
+
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-message.ai {
+      align-self: flex-start;
+    }
+
+    .chat-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .chat-message.user .chat-avatar {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .chat-message.ai .chat-avatar {
+      background: var(--bg-input);
+      color: var(--accent);
+    }
+
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .chat-message.user .chat-bubble {
+      background: var(--gradient-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-message.ai .chat-bubble {
+      background: var(--bg-card);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow);
+    }
+
+    .chat-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .chat-message.ai .chat-time {
+      text-align: left;
+    }
+
+    .chat-typing {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+    }
+
+    .chat-typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+
+    .chat-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .chat-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .chat-typing-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-input-container {
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      background: var(--bg-input);
+      color: var(--text);
+      font-size: 14px;
+      resize: none;
+      max-height: 120px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent);
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .chat-send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    .chat-send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .chat-send-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      stroke-width: 2;
+    }
+
+    .chat-welcome {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .chat-welcome-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .chat-welcome-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .chat-welcome-text {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .chat-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .chat-suggestion {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chat-suggestion:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .chat-header-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .chat-header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
@@ -6207,7 +6635,139 @@
       </div>
 
     </div>
+
+    <!-- AI Chat Screen -->
+    <div class="screen" id="chatScreen">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div>
+            <div class="chat-header-title">AI-Coach</div>
+            <div class="chat-header-subtitle">Dein persönlicher Begleiter</div>
+          </div>
+          <button class="btn btn-secondary" onclick="clearChatHistory()" style="padding: 8px 12px; font-size: 12px;">
+            Neu starten
+          </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-welcome" id="chatWelcome">
+            <div class="chat-welcome-icon">🤖</div>
+            <div class="chat-welcome-title">Hallo! Ich bin dein AI-Coach</div>
+            <div class="chat-welcome-text">
+              Ich kenne deine Ziele, Gewohnheiten und deinen Fortschritt.
+              Frag mich alles über Produktivität, Motivation oder wie du deine Ziele erreichen kannst!
+            </div>
+            <div class="chat-suggestions">
+              <button class="chat-suggestion" onclick="sendSuggestion('Wie kann ich motivierter bleiben?')">
+                💪 Mehr Motivation
+              </button>
+              <button class="chat-suggestion" onclick="sendSuggestion('Welche Tipps hast du für meinen heutigen Tag?')">
+                📅 Tages-Tipps
+              </button>
+              <button class="chat-suggestion" onclick="sendSuggestion('Analysiere meinen Fortschritt')">
+                📊 Fortschritt
+              </button>
+              <button class="chat-suggestion" onclick="sendSuggestion('Wie kann ich meine Gewohnheiten besser einhalten?')">
+                🔄 Habit-Tipps
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-container">
+          <textarea
+            class="chat-input"
+            id="chatInput"
+            placeholder="Schreib eine Nachricht..."
+            rows="1"
+            onkeydown="handleChatKeydown(event)"
+            oninput="autoResizeChatInput(this)"
+          ></textarea>
+          <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav" id="bottomNav" style="display: none;">
+    <button class="nav-item active" id="navHome" onclick="navigateToTab('dashboardScreen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" id="navHabits" onclick="navigateToTab('habitsScreen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20V10"/>
+        <path d="M18 20V4"/>
+        <path d="M6 20v-4"/>
+      </svg>
+      <span>Habits</span>
+    </button>
+    <button class="nav-item" id="navGoals" onclick="navigateToTab('goalsOverviewScreen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="12" r="6"/>
+        <circle cx="12" cy="12" r="2"/>
+      </svg>
+      <span>Ziele</span>
+    </button>
+    <button class="nav-item" id="navChat" onclick="navigateToTab('chatScreen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span>Chat</span>
+    </button>
+    <button class="nav-item" id="navProfile" onclick="navigateToTab('profileScreen')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Profil</span>
+    </button>
+  </nav>
+
+  <!-- Floating Action Button -->
+  <div class="fab-overlay" id="fabOverlay" onclick="toggleFabMenu()"></div>
+  <div class="fab-menu" id="fabMenu">
+    <button class="fab-menu-item" onclick="fabNewGoal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="12" r="6"/>
+        <circle cx="12" cy="12" r="2"/>
+      </svg>
+      Neues Ziel
+    </button>
+    <button class="fab-menu-item" onclick="fabNewHabit()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 20V10"/>
+        <path d="M18 20V4"/>
+        <path d="M6 20v-4"/>
+      </svg>
+      Neuer Habit
+    </button>
+    <button class="fab-menu-item" onclick="fabQuickNote()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      </svg>
+      Schnell-Notiz
+    </button>
+  </div>
+  <button class="fab" id="fab" onclick="toggleFabMenu()" style="display: none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </button>
 
   <script>
     // Configuration
@@ -7213,6 +7773,49 @@
       'profileScreen'
     ];
 
+    // Bottom Navigation Helper (muss vor showScreen definiert sein)
+    const bottomNavScreenMapping = {
+      'dashboardScreen': 'navHome',
+      'habitsScreen': 'navHabits',
+      'goalsOverviewScreen': 'navGoals',
+      'chatScreen': 'navChat',
+      'profileScreen': 'navProfile'
+    };
+
+    function updateBottomNavForScreen(screenId) {
+      // Alle Nav-Items deaktivieren
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Aktuellen Tab aktivieren
+      const navId = bottomNavScreenMapping[screenId];
+      if (navId) {
+        const navItem = document.getElementById(navId);
+        if (navItem) {
+          navItem.classList.add('active');
+        }
+      }
+
+      // Bottom Nav und FAB Sichtbarkeit
+      const bottomNav = document.getElementById('bottomNav');
+      const fab = document.getElementById('fab');
+      const fabMenu = document.getElementById('fabMenu');
+      const fabOverlay = document.getElementById('fabOverlay');
+
+      const hideOnScreens = ['loadingScreen', 'checkinScreen', 'goalsScreen', 'clarifyScreen', 'planScreen', 'reviewScreen'];
+
+      if (hideOnScreens.includes(screenId)) {
+        if (bottomNav) bottomNav.style.display = 'none';
+        if (fab) fab.style.display = 'none';
+        if (fabMenu) fabMenu.classList.remove('open');
+        if (fabOverlay) fabOverlay.classList.remove('open');
+      } else {
+        if (bottomNav) bottomNav.style.display = 'flex';
+        if (fab) fab.style.display = 'flex';
+      }
+    }
+
     function showScreen(screenId, direction = null) {
       const currentActive = document.querySelector('.screen.active');
       if (currentActive && currentActive.id !== screenId) {
@@ -7266,6 +7869,9 @@
 
       // Header Navigation Button aktualisieren
       updateHeaderNavButton(screenId);
+
+      // Bottom Navigation aktualisieren
+      updateBottomNavForScreen(screenId);
     }
 
     // Header Navigation Button dynamisch aktualisieren
@@ -11093,6 +11699,305 @@
     document.addEventListener('DOMContentLoaded', () => {
       initNotificationSettings();
     });
+
+    // ============================================
+    // BOTTOM NAVIGATION BAR
+    // ============================================
+
+    function navigateToTab(screenId) {
+      // FAB-Menü schließen falls offen
+      closeFabMenu();
+
+      // Screen wechseln
+      showScreen(screenId);
+
+      // Spezielle Initialisierungen
+      if (screenId === 'habitsScreen') {
+        loadHabits();
+      } else if (screenId === 'goalsOverviewScreen') {
+        showGoalsOverviewScreen();
+      } else if (screenId === 'profileScreen') {
+        showProfileScreen();
+      } else if (screenId === 'chatScreen') {
+        loadChatHistory();
+      }
+    }
+
+    // ============================================
+    // FLOATING ACTION BUTTON (FAB)
+    // ============================================
+
+    let fabMenuOpen = false;
+
+    function toggleFabMenu() {
+      fabMenuOpen = !fabMenuOpen;
+
+      const fab = document.getElementById('fab');
+      const fabMenu = document.getElementById('fabMenu');
+      const fabOverlay = document.getElementById('fabOverlay');
+
+      if (fabMenuOpen) {
+        fab.classList.add('open');
+        fabMenu.classList.add('open');
+        fabOverlay.classList.add('open');
+      } else {
+        closeFabMenu();
+      }
+    }
+
+    function closeFabMenu() {
+      fabMenuOpen = false;
+      const fab = document.getElementById('fab');
+      const fabMenu = document.getElementById('fabMenu');
+      const fabOverlay = document.getElementById('fabOverlay');
+
+      if (fab) fab.classList.remove('open');
+      if (fabMenu) fabMenu.classList.remove('open');
+      if (fabOverlay) fabOverlay.classList.remove('open');
+    }
+
+    function fabNewGoal() {
+      closeFabMenu();
+      startNewGoal();
+    }
+
+    function fabNewHabit() {
+      closeFabMenu();
+      navigateToTab('habitsScreen');
+      setTimeout(() => {
+        showAddHabitModal();
+      }, 300);
+    }
+
+    function fabQuickNote() {
+      closeFabMenu();
+      // Öffne Chat mit einem Quick-Note Vorschlag
+      navigateToTab('chatScreen');
+      setTimeout(() => {
+        const input = document.getElementById('chatInput');
+        if (input) {
+          input.value = 'Notiz: ';
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+      }, 300);
+    }
+
+    // ============================================
+    // AI CHAT SYSTEM
+    // ============================================
+
+    let chatMessages = [];
+    let chatIsTyping = false;
+
+    function loadChatHistory() {
+      const saved = localStorage.getItem('aiday_chat_history');
+      if (saved) {
+        try {
+          chatMessages = JSON.parse(saved);
+          renderChatMessages();
+        } catch (e) {
+          chatMessages = [];
+        }
+      }
+
+      // Welcome-Message anzeigen wenn leer
+      const welcome = document.getElementById('chatWelcome');
+      if (welcome) {
+        welcome.style.display = chatMessages.length === 0 ? 'block' : 'none';
+      }
+    }
+
+    function saveChatHistory() {
+      // Nur die letzten 50 Nachrichten speichern
+      const toSave = chatMessages.slice(-50);
+      localStorage.setItem('aiday_chat_history', JSON.stringify(toSave));
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chatMessages');
+      if (!container) return;
+
+      const welcome = document.getElementById('chatWelcome');
+
+      if (chatMessages.length === 0) {
+        if (welcome) welcome.style.display = 'block';
+        return;
+      }
+
+      if (welcome) welcome.style.display = 'none';
+
+      let html = '';
+      chatMessages.forEach(msg => {
+        const time = new Date(msg.timestamp).toLocaleTimeString('de-DE', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        html += `
+          <div class="chat-message ${msg.role}">
+            <div class="chat-avatar">${msg.role === 'user' ? '👤' : '🤖'}</div>
+            <div>
+              <div class="chat-bubble">${escapeHtml(msg.content)}</div>
+              <div class="chat-time">${time}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      scrollChatToBottom();
+    }
+
+    function scrollChatToBottom() {
+      const container = document.getElementById('chatMessages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+
+    function handleChatKeydown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    function autoResizeChatInput(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    function sendSuggestion(text) {
+      const input = document.getElementById('chatInput');
+      if (input) {
+        input.value = text;
+        sendChatMessage();
+      }
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSendBtn');
+      if (!input) return;
+
+      const message = input.value.trim();
+      if (!message || chatIsTyping) return;
+
+      // User-Nachricht hinzufügen
+      const userMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date().toISOString()
+      };
+      chatMessages.push(userMessage);
+      renderChatMessages();
+      saveChatHistory();
+
+      // Input zurücksetzen
+      input.value = '';
+      input.style.height = 'auto';
+
+      // Typing-Indicator anzeigen
+      chatIsTyping = true;
+      sendBtn.disabled = true;
+      showTypingIndicator();
+
+      try {
+        // API-Call zum AI-Chat Backend
+        const result = await apiCall('/functions/v1/ai-chat', {
+          method: 'POST',
+          body: {
+            message: message,
+            history: chatMessages.slice(-10) // Letzte 10 Nachrichten als Kontext
+          },
+          timeout: 60000
+        });
+
+        hideTypingIndicator();
+
+        if (result.error) {
+          // Fehler-Nachricht als AI-Antwort
+          const errorMessage = {
+            role: 'ai',
+            content: 'Entschuldige, ich konnte deine Nachricht nicht verarbeiten. Bitte versuche es erneut.',
+            timestamp: new Date().toISOString()
+          };
+          chatMessages.push(errorMessage);
+        } else {
+          // AI-Antwort hinzufügen
+          const aiMessage = {
+            role: 'ai',
+            content: result.data?.response || 'Ich habe leider keine Antwort für dich.',
+            timestamp: new Date().toISOString()
+          };
+          chatMessages.push(aiMessage);
+        }
+
+        renderChatMessages();
+        saveChatHistory();
+      } catch (e) {
+        console.error('Chat error:', e);
+        hideTypingIndicator();
+
+        const errorMessage = {
+          role: 'ai',
+          content: 'Es gab einen Fehler bei der Verbindung. Bitte prüfe deine Internetverbindung und versuche es erneut.',
+          timestamp: new Date().toISOString()
+        };
+        chatMessages.push(errorMessage);
+        renderChatMessages();
+        saveChatHistory();
+      } finally {
+        chatIsTyping = false;
+        sendBtn.disabled = false;
+      }
+    }
+
+    function showTypingIndicator() {
+      const container = document.getElementById('chatMessages');
+      if (!container) return;
+
+      // Prüfen ob Typing-Indicator bereits existiert
+      if (document.getElementById('chatTyping')) return;
+
+      const typingHtml = `
+        <div class="chat-message ai" id="chatTyping">
+          <div class="chat-avatar">🤖</div>
+          <div class="chat-bubble chat-typing">
+            <div class="chat-typing-dot"></div>
+            <div class="chat-typing-dot"></div>
+            <div class="chat-typing-dot"></div>
+          </div>
+        </div>
+      `;
+
+      container.insertAdjacentHTML('beforeend', typingHtml);
+      scrollChatToBottom();
+    }
+
+    function hideTypingIndicator() {
+      const typing = document.getElementById('chatTyping');
+      if (typing) {
+        typing.remove();
+      }
+    }
+
+    function clearChatHistory() {
+      if (confirm('Möchtest du den Chat-Verlauf wirklich löschen?')) {
+        chatMessages = [];
+        localStorage.removeItem('aiday_chat_history');
+        renderChatMessages();
+
+        // Welcome-Message wieder anzeigen
+        const welcome = document.getElementById('chatWelcome');
+        if (welcome) {
+          welcome.style.display = 'block';
+        }
+
+        showToast('Chat-Verlauf gelöscht', 'success');
+      }
+    }
 
     // ============================================
     // COACHING STYLE

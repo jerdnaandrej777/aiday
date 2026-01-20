@@ -51,8 +51,11 @@ AIDAY ist eine Progressive Web App (PWA) für tägliche Zielplanung mit KI-gest�
 - **Burnout Detection** mit automatischer Warnung
 - **Notification Preferences** (Quiet Hours, Reminder-Zeit)
 - **Coaching Style Personalisierung** (supportive/challenging/balanced)
-- **Dark Mode Quick Action** - 6. Button im Dashboard ← NEU
-- **Einheitliche Badges** - "X Habits" statt "X/Y" ← NEU
+- **Dark Mode Quick Action** - 6. Button im Dashboard
+- **Einheitliche Badges** - "X Habits" statt "X/Y"
+- **Bottom Navigation Bar** - Mobile-freundliche Tab-Navigation (Phase 8) ← NEU
+- **Floating Action Button (FAB)** - Quick-Add Menü für Ziele, Habits, Notizen ← NEU
+- **AI-Coaching Chat** - Konversationeller AI-Coach mit Kontext-Awareness ← NEU
 
 ---
 
