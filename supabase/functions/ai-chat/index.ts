@@ -7,7 +7,7 @@ import { createSupabaseClient, getAuthUser, extractToken } from '../_shared/supa
 import { getOpenAIClient, createPersonalizedPrompt } from '../_shared/openai.ts'
 
 // Chat-spezifischer System Prompt
-const AI_CHAT_SYSTEM_PROMPT = `Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AimDo App.
+const AI_CHAT_SYSTEM_PROMPT = `Du bist ein erfahrener und einfühlsamer AI-Life-Coach in der AImDo App.
 
 DEINE ROLLE:
 - Du hilfst Nutzern, ihre Ziele zu erreichen und produktiver zu werden

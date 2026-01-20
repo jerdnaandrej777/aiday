@@ -1,4 +1,4 @@
-# AimDo - Schnellstart-Anleitung
+# AImDo - Schnellstart-Anleitung
 
 ## Voraussetzungen
 

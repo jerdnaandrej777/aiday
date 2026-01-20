@@ -21,7 +21,7 @@
 │                        FRONTEND (app.html)                       │
 │  ┌─────────────────────────────────────────────────────────┐   │
 │  │              GLOBALER HEADER (auf allen Screens)         │   │
-│  │  AimDo    [Erreichte Ziele 🏆]   user@email.com  Abmelden │   │
+│  │  AImDo    [Erreichte Ziele 🏆]   user@email.com  Abmelden │   │
 │  └─────────────────────────────────────────────────────────┘   │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
 │  │Check-in │ │ Goals   │ │ Clarify │ │  Plan   │ │Dashboard│   │
@@ -76,7 +76,7 @@
 ### Screens (11 Screens)
 | Screen | Funktion |
 |--------|----------|
-| Dashboard ("AimDo") | Übersicht, Quick Actions, Tasks, klickbare Stat-Boxes |
+| Dashboard ("AImDo") | Übersicht, Quick Actions, Tasks, klickbare Stat-Boxes |
 | Check-in | Stimmung, Energie erfassen |
 | Review | Aufgaben vom Vortag bewerten |
 | Goals | Ziele definieren |
@@ -90,7 +90,7 @@
 
 ### Globaler Header
 - **Sichtbar auf allen Screens** (außer Loading-Screen)
-- **Inhalt**: "AimDo" Logo, "Erreichte Ziele" Button (Pokal-Icon), E-Mail, "Abmelden"
+- **Inhalt**: "AImDo" Logo, "Erreichte Ziele" Button (Pokal-Icon), E-Mail, "Abmelden"
 - **Abstände**: 28px links/rechts für Bündigkeit mit Card-Rand
 
 ### Navigation

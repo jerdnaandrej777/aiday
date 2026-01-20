@@ -1,6 +1,6 @@
 {
-  "name": "AimDo - KI-gestützter Tagesplaner",
-  "short_name": "AimDo",
+  "name": "AImDo - KI-gestützter Tagesplaner",
+  "short_name": "AImDo",
   "description": "Dein persönlicher KI-Coach für tägliche Zielplanung und Produktivität",
   "start_url": "./app.html",
   "display": "standalone",

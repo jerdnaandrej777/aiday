@@ -1,6 +1,6 @@
-# AimDo – Dokumentation
+# AImDo – Dokumentation
 
-Dieser Ordner bündelt die Projekt-Dokumentation für die AimDo Web-App mit Supabase-Backend.
+Dieser Ordner bündelt die Projekt-Dokumentation für die AImDo Web-App mit Supabase-Backend.
 
 ## Inhalte
 
