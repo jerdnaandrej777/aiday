@@ -4126,54 +4126,42 @@
     }
 
     .habit-detail-benefits {
-      margin-bottom: 20px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
     }
 
     .habit-benefits-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-bottom: 12px;
-      color: var(--text);
     }
 
     .habit-benefits-list {
       list-style: none;
       padding: 0;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
 
     .habit-benefits-list li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--bg-input);
-      border-radius: 12px;
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
       font-size: 14px;
-      color: var(--text);
-      transition: all 0.2s;
-    }
-
-    .habit-benefits-list li:hover {
-      background: var(--bg-card-hover);
     }
 
     .habit-benefits-list li::before {
-      content: '✓';
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      min-width: 22px;
-      background: var(--success);
-      color: white;
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
       border-radius: 50%;
-      font-size: 12px;
-      font-weight: 700;
     }
 
     .habit-detail-frequency {
@@ -5252,10 +5240,11 @@
         </div>
 
         <div class="habit-detail-benefits">
-          <h3 class="habit-benefits-title">💡 Warum diese Gewohnheit gut für dich ist</h3>
+          <div class="habit-benefits-title">Vorteile</div>
           <ul class="habit-benefits-list" id="habitDetailBenefits">
             <!-- Wird dynamisch gefüllt -->
           </ul>
+          <div id="habitBenefitsActions" style="margin-top: 16px; text-align: center;"></div>
         </div>
 
         <div class="habit-detail-frequency" id="habitDetailFrequency">
@@ -10318,24 +10307,23 @@
 
       // Vorteile anzeigen
       const benefitsList = document.getElementById('habitDetailBenefits');
+      const benefitsActions = document.getElementById('habitBenefitsActions');
       const benefits = habit.benefits || [];
 
       if (benefits.length > 0) {
-        benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('') +
-          `<li style="display: block; text-align: center; border: none; padding: 8px 0 0 0;">
-            <button class="btn btn-secondary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 12px; padding: 8px 16px;">
-              🔄 Neu generieren
-            </button>
-          </li>`;
+        benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+        benefitsActions.innerHTML = `
+          <button class="btn btn-secondary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 12px; padding: 8px 16px;">
+            🔄 Neu generieren
+          </button>
+        `;
       } else {
         // Falls keine Vorteile vorhanden, zeige Button zum Generieren
-        benefitsList.innerHTML = `
-          <li style="display: block; text-align: center; border: none; padding: 16px;">
-            <p style="color: var(--text-muted); margin-bottom: 12px;">Noch keine AI-generierten Vorteile vorhanden</p>
-            <button class="btn btn-primary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 14px;">
-              ✨ Vorteile generieren
-            </button>
-          </li>
+        benefitsList.innerHTML = `<li style="color: var(--text-muted);">Noch keine AI-generierten Vorteile vorhanden</li>`;
+        benefitsActions.innerHTML = `
+          <button class="btn btn-primary" onclick="regenerateHabitBenefits('${habit.id}')" id="regenerateBenefitsBtn" style="font-size: 14px;">
+            ✨ Vorteile generieren
+          </button>
         `;
       }
 
@@ -10453,8 +10441,16 @@
         // Benefits in der UI aktualisieren
         const benefits = result.data?.benefits || [];
         const benefitsList = document.getElementById('habitDetailBenefits');
+        const benefitsActions = document.getElementById('habitBenefitsActions');
         if (benefitsList && benefits.length > 0) {
           benefitsList.innerHTML = benefits.map(b => `<li>${escapeHtml(b)}</li>`).join('');
+          if (benefitsActions) {
+            benefitsActions.innerHTML = `
+              <button class="btn btn-secondary" onclick="regenerateHabitBenefits('${habitId}')" id="regenerateBenefitsBtn" style="font-size: 12px; padding: 8px 16px;">
+                🔄 Neu generieren
+              </button>
+            `;
+          }
         }
 
         // Auch im lokalen Daten-Cache aktualisieren
