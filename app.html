@@ -4125,45 +4125,6 @@
       margin-top: 4px;
     }
 
-    .habit-detail-benefits {
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .habit-benefits-title {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-
-    .habit-benefits-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .habit-benefits-list li {
-      padding: 8px 0;
-      padding-left: 24px;
-      position: relative;
-      font-size: 14px;
-    }
-
-    .habit-benefits-list li::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      border-radius: 50%;
-    }
-
     .habit-detail-frequency {
       text-align: center;
       padding: 12px;
@@ -5213,48 +5174,67 @@
       </div>
     </div>
 
-    <!-- Habit Detail Modal -->
-    <div class="modal-overlay" id="habitDetailModal" style="display: none;">
-      <div class="modal habit-detail-modal">
-        <button class="modal-close-btn" onclick="closeHabitDetailModal()">×</button>
-
+    <!-- Habit Detail Screen -->
+    <div class="screen" id="habitDetailScreen">
+      <div class="card">
         <div class="habit-detail-header">
           <div class="habit-detail-icon" id="habitDetailIcon">✨</div>
-          <h2 class="modal-title" id="habitDetailTitle">Habit Name</h2>
+          <h2 class="card-title" id="habitDetailTitle">Habit Name</h2>
           <p class="habit-detail-description" id="habitDetailDescription"></p>
         </div>
 
-        <div class="habit-detail-stats">
-          <div class="habit-stat-mini">
-            <span class="habit-stat-mini-value" id="habitDetailStreak">0</span>
-            <span class="habit-stat-mini-label">🔥 Aktuelle Streak</span>
-          </div>
-          <div class="habit-stat-mini">
-            <span class="habit-stat-mini-value" id="habitDetailBestStreak">0</span>
-            <span class="habit-stat-mini-label">🏆 Beste Streak</span>
-          </div>
-          <div class="habit-stat-mini">
-            <span class="habit-stat-mini-value" id="habitDetailTotal">0</span>
-            <span class="habit-stat-mini-label">✅ Gesamt</span>
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Statistiken</div>
+          <div class="habit-detail-stats">
+            <div class="habit-stat-mini">
+              <span class="habit-stat-mini-value" id="habitDetailStreak">0</span>
+              <span class="habit-stat-mini-label">🔥 Aktuelle Streak</span>
+            </div>
+            <div class="habit-stat-mini">
+              <span class="habit-stat-mini-value" id="habitDetailBestStreak">0</span>
+              <span class="habit-stat-mini-label">🏆 Beste Streak</span>
+            </div>
+            <div class="habit-stat-mini">
+              <span class="habit-stat-mini-value" id="habitDetailTotal">0</span>
+              <span class="habit-stat-mini-label">✅ Gesamt</span>
+            </div>
           </div>
         </div>
 
-        <div class="habit-detail-benefits">
-          <div class="habit-benefits-title">Vorteile</div>
-          <ul class="habit-benefits-list" id="habitDetailBenefits">
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Vorteile</div>
+          <ul class="plan-steps" id="habitDetailBenefits">
             <!-- Wird dynamisch gefüllt -->
           </ul>
           <div id="habitBenefitsActions" style="margin-top: 16px; text-align: center;"></div>
         </div>
 
-        <div class="habit-detail-frequency" id="habitDetailFrequency">
-          <!-- Frequenz-Anzeige -->
+        <div class="goal-detail-section">
+          <div class="goal-detail-section-title">Frequenz</div>
+          <div class="habit-detail-frequency" id="habitDetailFrequency">
+            <!-- Frequenz-Anzeige -->
+          </div>
         </div>
 
-        <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeHabitDetailModal()">Schließen</button>
-          <button class="btn btn-danger" onclick="deleteHabit()" id="deleteHabitBtn">Löschen</button>
-        </div>
+        <!-- Delete Habit Button -->
+        <button class="btn-delete-goal" onclick="deleteHabit()" id="deleteHabitBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/>
+            <line x1="10" y1="11" x2="10" y2="17"/>
+            <line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          Habit löschen
+        </button>
+
+        <!-- Footer Back Button -->
+        <button class="footer-back-btn" onclick="closeHabitDetail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Zurück
+        </button>
       </div>
     </div>
 
@@ -6371,6 +6351,7 @@
     function logout() {
       localStorage.removeItem('aiday_token');
       localStorage.removeItem('aiday_user');
+      sessionStorage.removeItem('aiday_onboarding_shown_this_session');
       window.location.href = 'start-ui.html';
     }
 
@@ -6380,14 +6361,14 @@
     const totalOnboardingSlides = 3;
 
     function shouldShowOnboarding() {
-      // Onboarding nur einmal anzeigen (gespeichert in localStorage)
-      const onboardingCompleted = localStorage.getItem('aiday_onboarding_completed');
-      return !onboardingCompleted;
+      // Onboarding nach jedem Login anzeigen (nur einmal pro Session)
+      const onboardingShownThisSession = sessionStorage.getItem('aiday_onboarding_shown_this_session');
+      return !onboardingShownThisSession;
     }
 
     function completeOnboarding() {
-      // Markiere Onboarding als abgeschlossen
-      localStorage.setItem('aiday_onboarding_completed', 'true');
+      // Markiere Onboarding als für diese Session abgeschlossen
+      sessionStorage.setItem('aiday_onboarding_shown_this_session', 'true');
     }
 
     function showOnboarding() {
@@ -10337,12 +10318,13 @@
       document.getElementById('habitDetailFrequency').textContent =
         frequencyMap[habit.frequency] || '📅 Täglich';
 
-      // Modal öffnen
-      document.getElementById('habitDetailModal').style.display = 'flex';
+      // Screen anzeigen
+      previousScreen = 'habitsScreen';
+      showScreen('habitDetailScreen');
     }
 
-    function closeHabitDetailModal() {
-      document.getElementById('habitDetailModal').style.display = 'none';
+    function closeHabitDetail() {
+      showScreen(previousScreen || 'habitsScreen', 'back');
       currentHabitDetail = null;
     }
 
